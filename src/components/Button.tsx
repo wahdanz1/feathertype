@@ -21,7 +21,7 @@ export function Button({
   const theme = useEditorStore((s) => s.theme);
 
   // Base styles
-  const baseStyles = 'rounded text-sm flex items-center justify-center';
+  const baseStyles = 'rounded text-sm leading-none flex items-center justify-center';
 
   // Padding based on iconOnly
   const paddingStyles = iconOnly ? 'p-2' : 'px-3 py-2';

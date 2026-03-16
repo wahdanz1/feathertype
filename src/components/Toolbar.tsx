@@ -3,8 +3,6 @@ import { Button } from './Button';
 import { useEditorStore } from '../store/useEditorStore';
 
 export function Toolbar() {
-  const togglePreview = useEditorStore((s) => s.togglePreview);
-  const showPreview = useEditorStore((s) => s.showPreview);
   const toggleTheme = useEditorStore((s) => s.toggleTheme);
   const theme = useEditorStore((s) => s.theme);
 
@@ -16,13 +14,6 @@ export function Toolbar() {
     }`}>
       <FileMenu />
       <div className="flex-1" />
-      <Button
-        variant={showPreview ? 'primary' : 'secondary'}
-        onClick={togglePreview}
-        title="Toggle Preview (Ctrl+\)"
-      >
-        {showPreview ? 'Hide Preview' : 'Show Preview'}
-      </Button>
       <Button
         variant="secondary"
         iconOnly

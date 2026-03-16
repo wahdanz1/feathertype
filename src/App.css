@@ -1,0 +1,255 @@
+@import "tailwindcss";
+
+@theme {
+  --color-editor-bg: #1e1e1e;
+  --color-editor-gutter: #252526;
+  --color-tab-active: #2d2d2d;
+  --color-tab-inactive: #252526;
+  --color-border: #3e3e42;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background-color: #1e1e1e;
+  color: #e5e7eb;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+}
+
+#root {
+  height: 100vh;
+  width: 100vw;
+}
+
+.cm-editor {
+  height: 100%;
+  font-size: 14px;
+}
+
+.cm-editor .cm-gutters {
+  display: flex;
+  align-items: center;
+}
+
+.cm-editor .cm-gutter {
+  display: flex;
+  flex-direction: column;
+}
+
+.cm-editor .cm-gutterElement {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 1.4em;
+}
+
+.cm-scroller {
+  overflow: auto;
+}
+
+.markdown-preview {
+  max-width: none;
+  padding: 1.5rem;
+  color: #d4d4d4;
+  background-color: #1e1e1e;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.markdown-preview h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  margin-top: 1.5rem;
+  color: #ffffff;
+  border-bottom: 1px solid #3e3e42;
+  padding-bottom: 0.5rem;
+}
+
+.markdown-preview h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  margin-top: 1.25rem;
+  color: #ffffff;
+}
+
+.markdown-preview h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  margin-top: 1rem;
+  color: #ffffff;
+}
+
+.markdown-preview h4 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  margin-top: 0.875rem;
+  color: #ffffff;
+}
+
+.markdown-preview h5 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  margin-top: 0.75rem;
+  color: #ffffff;
+}
+
+.markdown-preview code {
+  background-color: #2d2d2d;
+  color: #e5e7eb;
+  padding: 0.2rem 0.4rem;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  font-family: 'Consolas', 'Monaco', monospace;
+}
+
+.markdown-preview pre {
+  background-color: #2d2d2d;
+  color: #e5e7eb;
+  padding: 1rem;
+  border-radius: 0.375rem;
+  overflow-x: auto;
+  margin: 1rem 0;
+  border: 1px solid #3e3e42;
+}
+
+.markdown-preview pre code {
+  background-color: transparent;
+  padding: 0;
+}
+
+.markdown-preview ul {
+  margin-left: 1.5rem;
+  margin-bottom: 1rem;
+  list-style-type: disc;
+  padding-left: 0.5rem;
+}
+
+.markdown-preview ol {
+  margin-left: 1.5rem;
+  margin-bottom: 1rem;
+  list-style-type: decimal;
+  padding-left: 0.5rem;
+}
+
+.markdown-preview li {
+  margin-bottom: 0.25rem;
+}
+
+.markdown-preview p {
+  margin-bottom: 1rem;
+  color: #d4d4d4;
+}
+
+.markdown-preview a {
+  color: #60a5fa;
+  text-decoration: underline;
+}
+
+.markdown-preview a:hover {
+  color: #93c5fd;
+}
+
+.markdown-preview blockquote {
+  border-left: 4px solid #3e3e42;
+  padding-left: 1rem;
+  margin: 1rem 0;
+  color: #a8a8a8;
+  font-style: italic;
+}
+
+.markdown-preview table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1rem 0;
+}
+
+.markdown-preview th,
+.markdown-preview td {
+  border: 1px solid #3e3e42;
+  padding: 0.5rem;
+}
+
+.markdown-preview th {
+  background-color: #2d2d2d;
+  font-weight: 600;
+}
+
+.markdown-preview hr {
+  border: none;
+  border-top: 1px solid #3e3e42;
+  margin: 1.5rem 0;
+}
+
+/* Light theme */
+body.light-theme {
+  background-color: #ffffff;
+  color: #1e1e1e;
+}
+
+body.light-theme .markdown-preview {
+  background-color: #ffffff;
+  color: #1e1e1e;
+}
+
+body.light-theme .markdown-preview h1,
+body.light-theme .markdown-preview h2,
+body.light-theme .markdown-preview h3,
+body.light-theme .markdown-preview h4,
+body.light-theme .markdown-preview h5 {
+  color: #1e1e1e;
+}
+
+body.light-theme .markdown-preview h1 {
+  border-bottom-color: #d0d0d0;
+}
+
+body.light-theme .markdown-preview code {
+  background-color: #f0f0f0;
+  color: #1e1e1e;
+}
+
+body.light-theme .markdown-preview pre {
+  background-color: #f5f5f5;
+  color: #1e1e1e;
+  border-color: #d0d0d0;
+}
+
+body.light-theme .markdown-preview a {
+  color: #0066cc;
+}
+
+body.light-theme .markdown-preview a:hover {
+  color: #0052a3;
+}
+
+body.light-theme .markdown-preview blockquote {
+  border-left-color: #d0d0d0;
+  color: #5a5a5a;
+}
+
+body.light-theme .markdown-preview table th,
+body.light-theme .markdown-preview table td {
+  border-color: #d0d0d0;
+}
+
+body.light-theme .markdown-preview table th {
+  background-color: #f0f0f0;
+}
+
+body.light-theme .markdown-preview hr {
+  border-top-color: #d0d0d0;
+}
+
+body.light-theme .markdown-preview p {
+  color: #1e1e1e;
+}

@@ -1,18 +1,20 @@
 import { create } from 'zustand';
 import { Tab } from '../types';
 import { v4 as uuidv4 } from 'uuid';
+import { ask } from '@tauri-apps/plugin-dialog';
 
 interface EditorState {
   tabs: Tab[];
   activeTabId: string | null;
   showPreview: boolean;
   theme: 'dark' | 'light';
+  lineWrap: boolean;
 }
 
 interface EditorStore extends EditorState {
   // Tab management
   addTab: (tab?: Partial<Tab>) => string;
-  closeTab: (tabId: string) => void;
+  closeTab: (tabId: string) => Promise<void>;
   setActiveTab: (tabId: string) => void;
   updateTabContent: (tabId: string, content: string) => void;
   updateTabPath: (tabId: string, path: string, title: string) => void;
@@ -22,6 +24,7 @@ interface EditorStore extends EditorState {
   togglePreview: () => void;
   setShowPreview: (show: boolean) => void;
   toggleTheme: () => void;
+  toggleLineWrap: () => void;
 
   // Getters
   getActiveTab: () => Tab | null;
@@ -32,6 +35,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   activeTabId: null,
   showPreview: true,
   theme: 'dark',
+  lineWrap: true,
 
   addTab: (partialTab = {}) => {
     const newId = uuidv4();
@@ -52,13 +56,16 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
     return newId;
   },
 
-  closeTab: (tabId: string) => {
+  closeTab: async (tabId: string) => {
     const state = get();
     const tab = state.tabs.find((t) => t.id === tabId);
 
     // Warn if tab has unsaved changes
     if (tab?.isDirty) {
-      const confirmed = confirm(`${tab.title} has unsaved changes. Close anyway?`);
+      const confirmed = await ask(`${tab.title} has unsaved changes. Close anyway?`, {
+        title: 'Unsaved Changes',
+        kind: 'warning',
+      });
       if (!confirmed) return;
     }
 
@@ -122,6 +129,10 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
 
   toggleTheme: () => {
     set((state) => ({ theme: state.theme === 'dark' ? 'light' : 'dark' }));
+  },
+
+  toggleLineWrap: () => {
+    set((state) => ({ lineWrap: !state.lineWrap }));
   },
 
   getActiveTab: () => {

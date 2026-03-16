@@ -4,6 +4,7 @@ import { EditorView } from '@codemirror/view';
 import { search, searchKeymap } from '@codemirror/search';
 import { keymap } from '@codemirror/view';
 import { useEditorStore } from '../store/useEditorStore';
+import type { Extension } from '@codemirror/state';
 
 const darkTheme = EditorView.theme({
   '&': {
@@ -29,8 +30,15 @@ const darkTheme = EditorView.theme({
   '.cm-activeLineGutter': {
     backgroundColor: '#2d2d2d',
   },
-  '.cm-gutterElement': {
-    paddingTop: '2px',
+  '.cm-foldGutter': {
+    width: '16px',
+  },
+  '.cm-foldGutter .cm-gutterElement': {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    cursor: 'pointer',
+    height: '100%',
   },
 });
 
@@ -58,8 +66,15 @@ const lightTheme = EditorView.theme({
   '.cm-activeLineGutter': {
     backgroundColor: '#e8e8e8',
   },
-  '.cm-gutterElement': {
-    paddingTop: '2px',
+  '.cm-foldGutter': {
+    width: '16px',
+  },
+  '.cm-foldGutter .cm-gutterElement': {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    cursor: 'pointer',
+    height: '100%',
   },
 });
 
@@ -67,6 +82,7 @@ export function Editor() {
   const activeTab = useEditorStore((s) => s.getActiveTab());
   const updateContent = useEditorStore((s) => s.updateTabContent);
   const theme = useEditorStore((s) => s.theme);
+  const lineWrap = useEditorStore((s) => s.lineWrap);
 
   if (!activeTab) {
     return (
@@ -76,17 +92,23 @@ export function Editor() {
     );
   }
 
+  const extensions: Extension[] = [
+    markdown(),
+    search(),
+    keymap.of(searchKeymap),
+    theme === 'dark' ? darkTheme : lightTheme,
+  ];
+
+  if (lineWrap) {
+    extensions.push(EditorView.lineWrapping);
+  }
+
   return (
     <CodeMirror
       value={activeTab.content}
       height="100%"
       theme={theme}
-      extensions={[
-        markdown(),
-        search(),
-        keymap.of(searchKeymap),
-        theme === 'dark' ? darkTheme : lightTheme,
-      ]}
+      extensions={extensions}
       onChange={(value) => updateContent(activeTab.id, value)}
       basicSetup={{
         lineNumbers: true,

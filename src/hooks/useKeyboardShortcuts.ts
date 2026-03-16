@@ -8,6 +8,7 @@ export function useKeyboardShortcuts() {
   const updateTabPath = useEditorStore((s) => s.updateTabPath);
   const markTabClean = useEditorStore((s) => s.markTabClean);
   const togglePreview = useEditorStore((s) => s.togglePreview);
+  const toggleLineWrap = useEditorStore((s) => s.toggleLineWrap);
 
   useEffect(() => {
     const handleKeyDown = async (e: KeyboardEvent) => {
@@ -87,9 +88,15 @@ export function useKeyboardShortcuts() {
         e.preventDefault();
         togglePreview();
       }
+
+      // Alt+Z - Toggle line wrap
+      if (e.altKey && e.key === 'z') {
+        e.preventDefault();
+        toggleLineWrap();
+      }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [addTab, getActiveTab, updateTabPath, markTabClean, togglePreview]);
+  }, [addTab, getActiveTab, updateTabPath, markTabClean, togglePreview, toggleLineWrap]);
 }

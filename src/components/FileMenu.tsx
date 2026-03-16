@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useEditorStore } from '../store/useEditorStore';
 import { openFileDialog, saveFileDialog, readFile, writeFile, getFileName } from '../utils/fileOperations';
+import { Button } from './Button';
 
 export function FileMenu() {
   const [isOpen, setIsOpen] = useState(false);
@@ -11,6 +12,8 @@ export function FileMenu() {
   const updateTabPath = useEditorStore((s) => s.updateTabPath);
   const markTabClean = useEditorStore((s) => s.markTabClean);
   const theme = useEditorStore((s) => s.theme);
+  const toggleLineWrap = useEditorStore((s) => s.toggleLineWrap);
+  const lineWrap = useEditorStore((s) => s.lineWrap);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -86,16 +89,21 @@ export function FileMenu() {
     setIsOpen(false);
   };
 
+  const handleToggleLineWrap = () => {
+    toggleLineWrap();
+    setIsOpen(false);
+  };
+
   return (
     <div className="relative" ref={menuRef}>
-      <button
+      <Button
+        variant="primary"
+        iconOnly
         onClick={() => setIsOpen(!isOpen)}
-        className="px-3 py-1 text-sm bg-[#0e639c] hover:bg-[#1177bb] text-white rounded transition-colors flex items-center gap-1"
         title="File menu"
       >
-        <span className="text-lg leading-none">☰</span>
-        <span>File</span>
-      </button>
+        <span className="w-4 h-4 flex items-center justify-center text-sm leading-none">☰</span>
+      </Button>
 
       {isOpen && (
         <div className={`absolute top-full left-0 mt-1 border rounded shadow-lg min-w-[160px] z-50 ${
@@ -139,6 +147,16 @@ export function FileMenu() {
           >
             <span>Save As</span>
             <span className="text-xs text-gray-400">Ctrl+Shift+S</span>
+          </button>
+          <div className={`border-t my-1 ${theme === 'dark' ? 'border-[#3e3e42]' : 'border-gray-300'}`}></div>
+          <button
+            onClick={handleToggleLineWrap}
+            className={`w-full px-4 py-2 text-left text-sm transition-colors flex justify-between items-center ${
+              theme === 'dark' ? 'hover:bg-[#2a2d2e]' : 'hover:bg-gray-100'
+            }`}
+          >
+            <span>{lineWrap ? '✓ ' : ''}Word Wrap</span>
+            <span className="text-xs text-gray-400">Alt+Z</span>
           </button>
         </div>
       )}

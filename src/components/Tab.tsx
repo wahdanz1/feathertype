@@ -40,7 +40,6 @@ export function Tab({ tab, isActive, onSelect, onClose }: TabProps) {
         ${isActive ? colors.active : colors.inactive}
         ${colors.hover}
         ${colors.text}
-        transition-colors
       `}
     >
       <span className="text-sm">{tab.title}</span>

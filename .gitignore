@@ -52,3 +52,6 @@ Thumbs.db
 
 # Claude
 .claude/
+
+# Additional
+.vscode/

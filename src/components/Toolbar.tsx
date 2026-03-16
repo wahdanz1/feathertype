@@ -1,4 +1,5 @@
 import { FileMenu } from './FileMenu';
+import { SettingsMenu } from './SettingsMenu';
 import { Button } from './Button';
 import { useEditorStore } from '../store/useEditorStore';
 
@@ -13,6 +14,7 @@ export function Toolbar() {
         : 'bg-[#f5f5f5] border-gray-300'
     }`}>
       <FileMenu />
+      <SettingsMenu />
       <div className="flex-1" />
       <Button
         variant="secondary"

@@ -12,8 +12,6 @@ export function FileMenu() {
   const updateTabPath = useEditorStore((s) => s.updateTabPath);
   const markTabClean = useEditorStore((s) => s.markTabClean);
   const theme = useEditorStore((s) => s.theme);
-  const toggleLineWrap = useEditorStore((s) => s.toggleLineWrap);
-  const lineWrap = useEditorStore((s) => s.lineWrap);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -89,11 +87,6 @@ export function FileMenu() {
     setIsOpen(false);
   };
 
-  const handleToggleLineWrap = () => {
-    toggleLineWrap();
-    setIsOpen(false);
-  };
-
   return (
     <div className="relative" ref={menuRef}>
       <Button
@@ -147,16 +140,6 @@ export function FileMenu() {
           >
             <span>Save As</span>
             <span className="text-xs text-gray-400">Ctrl+Shift+S</span>
-          </button>
-          <div className={`border-t my-1 ${theme === 'dark' ? 'border-[#3e3e42]' : 'border-gray-300'}`}></div>
-          <button
-            onClick={handleToggleLineWrap}
-            className={`w-full px-4 py-2 text-left text-sm transition-colors flex justify-between items-center ${
-              theme === 'dark' ? 'hover:bg-[#2a2d2e]' : 'hover:bg-gray-100'
-            }`}
-          >
-            <span>{lineWrap ? '✓ ' : ''}Word Wrap</span>
-            <span className="text-xs text-gray-400">Alt+Z</span>
           </button>
         </div>
       )}

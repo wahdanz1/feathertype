@@ -24,7 +24,11 @@ export async function saveFileDialog(defaultPath?: string): Promise<string | nul
     filters: [
       {
         name: 'Markdown',
-        extensions: ['md'],
+        extensions: ['md', 'markdown'],
+      },
+      {
+        name: 'Text',
+        extensions: ['txt'],
       },
     ],
   });

@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useEditorStore } from '../store/useEditorStore';
-import { openFileDialog, saveFileDialog, readFile, writeFile, getFileName } from '../utils/fileOperations';
+import { openFileDialog, saveFileDialog, openAndReadFile, writeFile, getFileName } from '../utils/fileOperations';
 
 export function useKeyboardShortcuts() {
   const addTab = useEditorStore((s) => s.addTab);
@@ -26,7 +26,7 @@ export function useKeyboardShortcuts() {
         try {
           const path = await openFileDialog();
           if (path) {
-            const content = await readFile(path);
+            const content = await openAndReadFile(path);
             const title = getFileName(path);
             addTab({ filePath: path, content, title, isDirty: false });
           }

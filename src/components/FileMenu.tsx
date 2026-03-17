@@ -1,7 +1,35 @@
 import { useState, useRef, useEffect } from 'react';
 import { useEditorStore } from '../store/useEditorStore';
-import { openFileDialog, saveFileDialog, readFile, writeFile, getFileName } from '../utils/fileOperations';
+import { openFileDialog, saveFileDialog, openAndReadFile, writeFile, getFileName } from '../utils/fileOperations';
 import { Button } from './Button';
+import { Tab } from '../types';
+
+// Exported helper for saving files (used by store's saveAndCloseTab)
+export async function handleSaveFile(
+  tab: Tab,
+  markTabClean: (tabId: string) => void,
+  updateTabPath: (tabId: string, path: string, title: string) => void
+): Promise<void> {
+  try {
+    if (tab.filePath) {
+      await writeFile(tab.filePath, tab.content);
+      markTabClean(tab.id);
+    } else {
+      // Save As
+      const path = await saveFileDialog(tab.filePath || undefined);
+      if (path) {
+        await writeFile(path, tab.content);
+        const title = getFileName(path);
+        updateTabPath(tab.id, path, title);
+        markTabClean(tab.id);
+      }
+    }
+  } catch (error) {
+    console.error('Failed to save file:', error);
+    alert('Failed to save file: ' + error);
+    throw error;
+  }
+}
 
 export function FileMenu() {
   const [isOpen, setIsOpen] = useState(false);
@@ -38,7 +66,7 @@ export function FileMenu() {
     try {
       const path = await openFileDialog();
       if (path) {
-        const content = await readFile(path);
+        const content = await openAndReadFile(path);
         const title = getFileName(path);
         addTab({ filePath: path, content, title, isDirty: false });
       }
@@ -53,18 +81,7 @@ export function FileMenu() {
     const activeTab = getActiveTab();
     if (!activeTab) return;
 
-    try {
-      if (activeTab.filePath) {
-        await writeFile(activeTab.filePath, activeTab.content);
-        markTabClean(activeTab.id);
-      } else {
-        await handleSaveAs();
-        return;
-      }
-    } catch (error) {
-      console.error('Failed to save file:', error);
-      alert('Failed to save file: ' + error);
-    }
+    await handleSaveFile(activeTab, markTabClean, updateTabPath);
     setIsOpen(false);
   };
 

@@ -1,7 +1,6 @@
 import { create } from 'zustand';
 import { Tab } from '../types';
 import { v4 as uuidv4 } from 'uuid';
-import { ask } from '@tauri-apps/plugin-dialog';
 
 interface EditorState {
   tabs: Tab[];
@@ -9,12 +8,19 @@ interface EditorState {
   showPreview: boolean;
   theme: 'dark' | 'light';
   lineWrap: boolean;
+  unsavedChangesDialog: {
+    isOpen: boolean;
+    tabId: string | null;
+  };
 }
 
 interface EditorStore extends EditorState {
   // Tab management
   addTab: (tab?: Partial<Tab>) => string;
-  closeTab: (tabId: string) => Promise<void>;
+  closeTab: (tabId: string) => void;
+  confirmCloseTab: () => void;
+  cancelCloseTab: () => void;
+  saveAndCloseTab: () => Promise<void>;
   setActiveTab: (tabId: string) => void;
   updateTabContent: (tabId: string, content: string) => void;
   updateTabPath: (tabId: string, path: string, title: string) => void;
@@ -28,14 +34,27 @@ interface EditorStore extends EditorState {
 
   // Getters
   getActiveTab: () => Tab | null;
+  getUnsavedTab: () => Tab | null;
 }
 
+const initialTabId = uuidv4();
+
 export const useEditorStore = create<EditorStore>((set, get) => ({
-  tabs: [],
-  activeTabId: null,
+  tabs: [{
+    id: initialTabId,
+    title: 'Untitled',
+    filePath: null,
+    content: '',
+    isDirty: false,
+  }],
+  activeTabId: initialTabId,
   showPreview: true,
   theme: 'dark',
   lineWrap: true,
+  unsavedChangesDialog: {
+    isOpen: false,
+    tabId: null,
+  },
 
   addTab: (partialTab = {}) => {
     const newId = uuidv4();
@@ -56,18 +75,43 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
     return newId;
   },
 
-  closeTab: async (tabId: string) => {
+  closeTab: (tabId: string) => {
     const state = get();
     const tab = state.tabs.find((t) => t.id === tabId);
 
-    // Warn if tab has unsaved changes
+    // Show dialog if tab has unsaved changes
     if (tab?.isDirty) {
-      const confirmed = await ask(`${tab.title} has unsaved changes. Close anyway?`, {
-        title: 'Unsaved Changes',
-        kind: 'warning',
+      set({
+        unsavedChangesDialog: {
+          isOpen: true,
+          tabId,
+        },
       });
-      if (!confirmed) return;
+      return;
     }
+
+    // Close tab immediately if no unsaved changes
+    set((state) => {
+      const newTabs = state.tabs.filter((t) => t.id !== tabId);
+      let newActiveId = state.activeTabId;
+
+      // If closing active tab, switch to another
+      if (state.activeTabId === tabId) {
+        newActiveId = newTabs.length > 0 ? newTabs[newTabs.length - 1].id : null;
+      }
+
+      return {
+        tabs: newTabs,
+        activeTabId: newActiveId,
+      };
+    });
+  },
+
+  confirmCloseTab: () => {
+    const state = get();
+    const tabId = state.unsavedChangesDialog.tabId;
+
+    if (!tabId) return;
 
     set((state) => {
       const newTabs = state.tabs.filter((t) => t.id !== tabId);
@@ -81,6 +125,55 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
       return {
         tabs: newTabs,
         activeTabId: newActiveId,
+        unsavedChangesDialog: {
+          isOpen: false,
+          tabId: null,
+        },
+      };
+    });
+  },
+
+  cancelCloseTab: () => {
+    set({
+      unsavedChangesDialog: {
+        isOpen: false,
+        tabId: null,
+      },
+    });
+  },
+
+  saveAndCloseTab: async () => {
+    const state = get();
+    const tabId = state.unsavedChangesDialog.tabId;
+
+    if (!tabId) return;
+
+    const tab = state.tabs.find((t) => t.id === tabId);
+    if (!tab) return;
+
+    // Import here to avoid circular dependency
+    const { handleSaveFile } = await import('../components/FileMenu');
+
+    // Save the file
+    await handleSaveFile(tab, get().markTabClean, get().updateTabPath);
+
+    // Then close the tab
+    set((state) => {
+      const newTabs = state.tabs.filter((t) => t.id !== tabId);
+      let newActiveId = state.activeTabId;
+
+      // If closing active tab, switch to another
+      if (state.activeTabId === tabId) {
+        newActiveId = newTabs.length > 0 ? newTabs[newTabs.length - 1].id : null;
+      }
+
+      return {
+        tabs: newTabs,
+        activeTabId: newActiveId,
+        unsavedChangesDialog: {
+          isOpen: false,
+          tabId: null,
+        },
       };
     });
   },
@@ -138,5 +231,12 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   getActiveTab: () => {
     const state = get();
     return state.tabs.find((t) => t.id === state.activeTabId) || null;
+  },
+
+  getUnsavedTab: () => {
+    const state = get();
+    const tabId = state.unsavedChangesDialog.tabId;
+    if (!tabId) return null;
+    return state.tabs.find((t) => t.id === tabId) || null;
   },
 }));

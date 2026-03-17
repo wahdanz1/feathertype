@@ -104,18 +104,20 @@ export function Editor() {
   }
 
   return (
-    <CodeMirror
-      value={activeTab.content}
-      height="100%"
-      theme={theme}
-      extensions={extensions}
-      onChange={(value) => updateContent(activeTab.id, value)}
-      basicSetup={{
-        lineNumbers: true,
-        highlightActiveLineGutter: true,
-        highlightActiveLine: true,
-        foldGutter: true,
-      }}
-    />
+    <div className="h-full overflow-auto">
+      <CodeMirror
+        value={activeTab.content}
+        height="100%"
+        theme={theme}
+        extensions={extensions}
+        onChange={(value) => updateContent(activeTab.id, value)}
+        basicSetup={{
+          lineNumbers: true,
+          highlightActiveLineGutter: true,
+          highlightActiveLine: true,
+          foldGutter: true,
+        }}
+      />
+    </div>
   );
 }

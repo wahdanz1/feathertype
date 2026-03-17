@@ -6,6 +6,12 @@ async fn read_file(path: String) -> Result<String, String> {
 }
 
 #[tauri::command]
+async fn read_file_binary(path: String) -> Result<Vec<u8>, String> {
+    std::fs::read(&path)
+        .map_err(|e| format!("Failed to read file: {}", e))
+}
+
+#[tauri::command]
 async fn write_file(path: String, content: String) -> Result<(), String> {
     std::fs::write(&path, content)
         .map_err(|e| format!("Failed to write file: {}", e))
@@ -17,7 +23,7 @@ pub fn run() {
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_dialog::init())
-        .invoke_handler(tauri::generate_handler![read_file, write_file])
+        .invoke_handler(tauri::generate_handler![read_file, read_file_binary, write_file])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

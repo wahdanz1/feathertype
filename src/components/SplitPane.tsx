@@ -25,7 +25,7 @@ export function SplitPane() {
           </svg>
         </Button>
       </div>
-      <div className={showPreview ? 'w-1/2 h-full' : 'w-full h-full'}>
+      <div className={showPreview ? 'w-1/2 h-full overflow-hidden' : 'w-full h-full overflow-hidden'}>
         <Editor />
       </div>
       {showPreview && (

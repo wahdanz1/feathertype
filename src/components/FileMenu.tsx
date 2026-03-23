@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { Menu } from 'lucide-react';
 import { useEditorStore } from '../store/useEditorStore';
 import { openFileDialog, saveFileDialog, openAndReadFile, writeFile, getFileName, handleSaveFile, exportAsDocx } from '../utils/fileOperations';
 import { Button } from './Button';
@@ -93,7 +94,7 @@ export function FileMenu() {
         onClick={() => setIsOpen(!isOpen)}
         title="File menu"
       >
-        <span className="w-4 h-4 flex items-center justify-center text-sm leading-none">☰</span>
+        <Menu className="w-6 h-6" />
       </Button>
 
       {isOpen && (

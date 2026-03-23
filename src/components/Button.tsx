@@ -21,10 +21,10 @@ export function Button({
   const theme = useEditorStore((s) => s.theme);
 
   // Base styles with explicit height for consistency
-  const baseStyles = 'rounded text-sm leading-none flex items-center justify-center h-8';
+  const baseStyles = 'rounded text-sm leading-none flex items-center justify-center h-9';
 
-  // Padding based on iconOnly
-  const paddingStyles = iconOnly ? 'px-2' : 'px-3';
+  // Padding based on iconOnly - px-1.5 (6px) + w-6 (24px) icon + px-1.5 (6px) = 36px square
+  const paddingStyles = iconOnly ? 'px-1.5' : 'px-3';
 
   // Border styles - primary buttons get theme-colored border, secondary get subtle grey border
   const borderStyles = variant === 'primary'

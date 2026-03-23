@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Bold, Italic, Strikethrough, List, ListOrdered, Link2, Code2, FileCode2, WrapText } from 'lucide-react';
 import { Button } from './Button';
 import { Dropdown } from './Dropdown';
 import { TableGridSelector } from './TableGridSelector';
@@ -86,10 +87,7 @@ export function FormattingToolbar() {
         title="Bold (Ctrl+B)"
         className={getButtonClass(activeFormats.bold)}
       >
-        <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-          <path d="M6 4h8a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z" />
-          <path d="M6 12h9a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z" />
-        </svg>
+        <Bold className="w-6 h-6" />
       </Button>
 
       <Button
@@ -99,11 +97,7 @@ export function FormattingToolbar() {
         title="Italic (Ctrl+I)"
         className={getButtonClass(activeFormats.italic)}
       >
-        <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <line x1="19" y1="4" x2="10" y2="4" />
-          <line x1="14" y1="20" x2="5" y2="20" />
-          <line x1="15" y1="4" x2="9" y2="20" />
-        </svg>
+        <Italic className="w-6 h-6" />
       </Button>
 
       <Button
@@ -113,11 +107,7 @@ export function FormattingToolbar() {
         title="Strikethrough"
         className={getButtonClass(activeFormats.strikethrough)}
       >
-        <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <path d="M16 4H9a3 3 0 0 0-2.83 4" strokeLinecap="round" strokeLinejoin="round" />
-          <path d="M14 12a4 4 0 0 1 0 8H6" strokeLinecap="round" strokeLinejoin="round" />
-          <line x1="4" y1="12" x2="20" y2="12" strokeLinecap="round" />
-        </svg>
+        <Strikethrough className="w-6 h-6" />
       </Button>
 
       <Dropdown
@@ -162,14 +152,7 @@ export function FormattingToolbar() {
         title="Bullet List (Ctrl+Shift+B)"
         className={getButtonClass(activeFormats.bulletList)}
       >
-        <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <line x1="8" y1="6" x2="21" y2="6" />
-          <line x1="8" y1="12" x2="21" y2="12" />
-          <line x1="8" y1="18" x2="21" y2="18" />
-          <circle cx="3" cy="6" r="1" fill="currentColor" />
-          <circle cx="3" cy="12" r="1" fill="currentColor" />
-          <circle cx="3" cy="18" r="1" fill="currentColor" />
-        </svg>
+        <List className="w-6 h-6" />
       </Button>
 
       <Button
@@ -179,15 +162,7 @@ export function FormattingToolbar() {
         title="Numbered List (Ctrl+Shift+N)"
         className={getButtonClass(activeFormats.numberedList)}
       >
-        <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <line x1="10" y1="6" x2="21" y2="6" />
-          <line x1="10" y1="12" x2="21" y2="12" />
-          <line x1="10" y1="18" x2="21" y2="18" />
-          <path d="M4 6h1v4" strokeLinecap="round" />
-          <path d="M4 10h2" strokeLinecap="round" />
-          <path d="M6 14H4c0-1 2-2 2-3s-1-1.5-1-1.5" strokeLinecap="round" />
-          <path d="M4 18h2v-2H4" strokeLinecap="round" />
-        </svg>
+        <ListOrdered className="w-6 h-6" />
       </Button>
 
       {/* Category Divider with extra spacing */}
@@ -204,10 +179,7 @@ export function FormattingToolbar() {
         onClick={() => formats.link(editorView)}
         title="Link (Ctrl+K)"
       >
-        <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" strokeLinecap="round" strokeLinejoin="round" />
-          <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
+        <Link2 className="w-6 h-6" />
       </Button>
 
       <Button
@@ -217,10 +189,7 @@ export function FormattingToolbar() {
         title="Code Block (Ctrl+`)"
         className={getButtonClass(activeFormats.code)}
       >
-        <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <polyline points="16 18 22 12 16 6" strokeLinecap="round" strokeLinejoin="round" />
-          <polyline points="8 6 2 12 8 18" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
+        <Code2 className="w-6 h-6" />
       </Button>
 
       <Button
@@ -229,11 +198,7 @@ export function FormattingToolbar() {
         onClick={() => formats.comment(editorView)}
         title="Comment (Ctrl+Shift+/)"
       >
-        <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <path d="M9 3h6l2 2h4a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h4l2-2z" strokeLinecap="round" strokeLinejoin="round" />
-          <path d="M8 12h8" strokeLinecap="round" strokeLinejoin="round" />
-          <path d="M8 16h8" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
+        <FileCode2 className="w-6 h-6" />
       </Button>
 
       {/* Category Divider with extra spacing */}
@@ -247,12 +212,7 @@ export function FormattingToolbar() {
         title="Word Wrap (Alt+Z)"
         className={getButtonClass(lineWrap)}
       >
-        <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <path d="M21 6H3" strokeLinecap="round" strokeLinejoin="round" />
-          <path d="M21 10H3" strokeLinecap="round" strokeLinejoin="round" />
-          <path d="M14 18H3" strokeLinecap="round" strokeLinejoin="round" />
-          <path d="M18 14l4 4-4 4" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
+        <WrapText className="w-6 h-6" />
       </Button>
     </div>
   );

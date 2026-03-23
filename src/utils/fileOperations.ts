@@ -2,6 +2,7 @@ import { invoke } from '@tauri-apps/api/core';
 import { open, save } from '@tauri-apps/plugin-dialog';
 import mammoth from 'mammoth';
 import type { Tab } from '../types';
+import { markdownToDocxBuffer } from './docxExport';
 
 export async function openFileDialog(): Promise<string | null> {
   const selected = await open({
@@ -109,5 +110,33 @@ export async function handleSaveFile(
     console.error('Failed to save file:', error);
     alert('Failed to save file: ' + error);
     throw error;
+  }
+}
+
+export async function writeFileBinary(path: string, data: ArrayBuffer): Promise<void> {
+  // Tauri expects Vec<u8> — convert ArrayBuffer to a plain number array
+  const bytes = Array.from(new Uint8Array(data));
+  await invoke('write_file_binary', { path, data: bytes });
+}
+
+export async function exportAsDocx(content: string, currentFilePath?: string | null): Promise<void> {
+  try {
+    // Derive a sensible default filename from the current file path (if any)
+    const defaultName = currentFilePath
+      ? getFileName(currentFilePath).replace(/\.(md|markdown|txt)$/i, '.docx')
+      : 'document.docx';
+
+    const path = await save({
+      defaultPath: defaultName,
+      filters: [{ name: 'Word Document', extensions: ['docx'] }],
+    });
+
+    if (!path) return; // user cancelled
+
+    const arrayBuffer = await markdownToDocxBuffer(content);
+    await writeFileBinary(path, arrayBuffer);
+  } catch (error) {
+    console.error('Failed to export DOCX:', error);
+    alert('Failed to export as DOCX: ' + error);
   }
 }

@@ -1,4 +1,5 @@
 import { Tab } from '../types';
+import { useEditorStore } from '../store/useEditorStore';
 
 interface UnsavedChangesDialogProps {
   tab: Tab;
@@ -13,9 +14,17 @@ export function UnsavedChangesDialog({
   onDiscardChanges,
   onSaveAndClose,
 }: UnsavedChangesDialogProps) {
+  const theme = useEditorStore((s) => s.theme);
+
+  const isDark = theme === 'dark';
+
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-[#252526] border border-[#3e3e42] rounded-lg shadow-xl p-6 min-w-[400px]">
+      <div className={`border rounded-lg shadow-xl p-6 min-w-[400px] ${
+        isDark
+          ? 'bg-[#252526] border-[#3e3e42] text-gray-200'
+          : 'bg-white border-gray-300 text-gray-900'
+      }`}>
         <div className="flex items-start gap-3 mb-4">
           <div className="flex-shrink-0 w-8 h-8 rounded-full bg-yellow-500/20 flex items-center justify-center">
             <svg className="w-5 h-5 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -24,7 +33,7 @@ export function UnsavedChangesDialog({
           </div>
           <div>
             <h2 className="text-base font-semibold mb-1">Unsaved Changes</h2>
-            <p className="text-sm text-gray-400">
+            <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
               {tab.title} has unsaved changes.
             </p>
           </div>
@@ -34,13 +43,21 @@ export function UnsavedChangesDialog({
           <button
             onClick={onContinueEditing}
             autoFocus
-            className="px-3 py-1.5 text-sm rounded border border-[#3e3e42] bg-[#2d2d2d] hover:bg-[#3e3e42] text-gray-200 transition-colors"
+            className={`px-3 py-1.5 text-sm rounded border transition-colors ${
+              isDark
+                ? 'border-[#3e3e42] bg-[#2d2d2d] hover:bg-[#3e3e42] text-gray-200'
+                : 'border-gray-300 bg-gray-100 hover:bg-gray-200 text-gray-800'
+            }`}
           >
             Continue editing
           </button>
           <button
             onClick={onDiscardChanges}
-            className="px-3 py-1.5 text-sm rounded border border-[#3e3e42] bg-[#2d2d2d] hover:border-red-500 hover:bg-[#3e3e42] text-gray-200 transition-colors"
+            className={`px-3 py-1.5 text-sm rounded border transition-colors ${
+              isDark
+                ? 'border-[#3e3e42] bg-[#2d2d2d] hover:border-red-500 hover:bg-[#3e3e42] text-gray-200'
+                : 'border-gray-300 bg-gray-100 hover:border-red-500 hover:bg-gray-200 text-gray-800'
+            }`}
           >
             Discard changes
           </button>

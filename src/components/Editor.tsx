@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import CodeMirror from '@uiw/react-codemirror';
 import { markdown } from '@codemirror/lang-markdown';
 import { EditorView } from '@codemirror/view';
@@ -89,27 +89,36 @@ export function Editor() {
   const setEditorView = useEditorStore((s) => s.setEditorView);
   const setZoom = useEditorStore((s) => s.setZoom);
 
+  const containerRef = useRef<HTMLDivElement>(null);
+
   // Cleanup editor view reference on unmount
   useEffect(() => {
     return () => setEditorView(null);
   }, [setEditorView]);
 
-  // Mouse wheel zoom handler
+  // Apply zoom via font-size — avoids the clipping/scrollbar issues of CSS transform scale
+  useEffect(() => {
+    if (containerRef.current) {
+      containerRef.current.style.setProperty('--editor-font-size', `${(zoom / 100) * 14}px`);
+    }
+  }, [zoom]);
+
+  // Ctrl+wheel zoom — reads zoom directly from store so the handler never needs to re-register
   useEffect(() => {
     const handleWheel = (e: WheelEvent) => {
       if (e.ctrlKey) {
         e.preventDefault();
         const delta = e.deltaY > 0 ? -10 : 10;
-        setZoom(zoom + delta);
+        setZoom(useEditorStore.getState().zoom + delta);
       }
     };
 
-    const editorElement = document.querySelector('.cm-editor');
-    if (editorElement) {
-      editorElement.addEventListener('wheel', handleWheel, { passive: false });
-      return () => editorElement.removeEventListener('wheel', handleWheel);
+    const container = containerRef.current;
+    if (container) {
+      container.addEventListener('wheel', handleWheel, { passive: false });
+      return () => container.removeEventListener('wheel', handleWheel);
     }
-  }, [zoom, setZoom]);
+  }, []); // stable — reads live state via getState()
 
   if (!activeTab) {
     return (
@@ -132,23 +141,21 @@ export function Editor() {
   }
 
   return (
-    <div className="h-full overflow-auto">
-      <div style={{ transform: `scale(${zoom / 100})`, transformOrigin: 'top left', width: `${10000 / zoom}%`, height: `${10000 / zoom}%` }}>
-        <CodeMirror
-          value={activeTab.content}
-          height="100%"
-          theme={theme}
-          extensions={extensions}
-          onChange={(value) => updateContent(activeTab.id, value)}
-          onCreateEditor={(view) => setEditorView(view)}
-          basicSetup={{
-            lineNumbers: true,
-            highlightActiveLineGutter: true,
-            highlightActiveLine: true,
-            foldGutter: true,
-          }}
-        />
-      </div>
+    <div ref={containerRef} className="h-full overflow-hidden editor-zoom-container">
+      <CodeMirror
+        value={activeTab.content}
+        height="100%"
+        theme={theme}
+        extensions={extensions}
+        onChange={(value) => updateContent(activeTab.id, value)}
+        onCreateEditor={(view) => setEditorView(view)}
+        basicSetup={{
+          lineNumbers: true,
+          highlightActiveLineGutter: true,
+          highlightActiveLine: true,
+          foldGutter: true,
+        }}
+      />
     </div>
   );
 }

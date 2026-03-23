@@ -1,35 +1,9 @@
 import { useState, useRef, useEffect } from 'react';
 import { useEditorStore } from '../store/useEditorStore';
-import { openFileDialog, saveFileDialog, openAndReadFile, writeFile, getFileName } from '../utils/fileOperations';
+import { openFileDialog, saveFileDialog, openAndReadFile, writeFile, getFileName, handleSaveFile } from '../utils/fileOperations';
 import { Button } from './Button';
-import { Tab } from '../types';
 
-// Exported helper for saving files (used by store's saveAndCloseTab)
-export async function handleSaveFile(
-  tab: Tab,
-  markTabClean: (tabId: string) => void,
-  updateTabPath: (tabId: string, path: string, title: string) => void
-): Promise<void> {
-  try {
-    if (tab.filePath) {
-      await writeFile(tab.filePath, tab.content);
-      markTabClean(tab.id);
-    } else {
-      // Save As
-      const path = await saveFileDialog(tab.filePath || undefined);
-      if (path) {
-        await writeFile(path, tab.content);
-        const title = getFileName(path);
-        updateTabPath(tab.id, path, title);
-        markTabClean(tab.id);
-      }
-    }
-  } catch (error) {
-    console.error('Failed to save file:', error);
-    alert('Failed to save file: ' + error);
-    throw error;
-  }
-}
+
 
 export function FileMenu() {
   const [isOpen, setIsOpen] = useState(false);

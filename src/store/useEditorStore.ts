@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { Tab } from '../types';
 import { v4 as uuidv4 } from 'uuid';
 import type { EditorView } from '@codemirror/view';
+import { handleSaveFile } from '../utils/fileOperations';
 
 interface EditorState {
   tabs: Tab[];
@@ -160,9 +161,6 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
 
     const tab = state.tabs.find((t) => t.id === tabId);
     if (!tab) return;
-
-    // Import here to avoid circular dependency
-    const { handleSaveFile } = await import('../components/FileMenu');
 
     // Save the file
     await handleSaveFile(tab, get().markTabClean, get().updateTabPath);

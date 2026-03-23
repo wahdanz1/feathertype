@@ -35,9 +35,13 @@ body {
   width: 100vw;
 }
 
+.editor-zoom-container {
+  --editor-font-size: 14px;
+}
+
 .cm-editor {
   height: 100%;
-  font-size: 14px;
+  font-size: var(--editor-font-size);
 }
 
 .cm-scroller {

@@ -1,6 +1,7 @@
 import { invoke } from '@tauri-apps/api/core';
 import { open, save } from '@tauri-apps/plugin-dialog';
 import mammoth from 'mammoth';
+import type { Tab } from '../types';
 
 export async function openFileDialog(): Promise<string | null> {
   const selected = await open({
@@ -75,10 +76,38 @@ export async function openAndReadFile(path: string): Promise<string> {
   if (ext === 'docx') {
     // Read .docx file as binary and convert to markdown
     const arrayBuffer = await readFileBinary(path);
-    const result = await mammoth.convertToMarkdown({ arrayBuffer });
+    // mammoth's TS types omit convertToMarkdown — cast to any to bypass
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const result = await (mammoth as any).convertToMarkdown({ arrayBuffer });
     return cleanMammothMarkdown(result.value);
   } else {
     // Read as text file (.md, .markdown, .txt)
     return readFile(path);
+  }
+}
+
+export async function handleSaveFile(
+  tab: Tab,
+  markTabClean: (tabId: string) => void,
+  updateTabPath: (tabId: string, path: string, title: string) => void
+): Promise<void> {
+  try {
+    if (tab.filePath) {
+      await writeFile(tab.filePath, tab.content);
+      markTabClean(tab.id);
+    } else {
+      // Save As
+      const path = await saveFileDialog(tab.filePath || undefined);
+      if (path) {
+        await writeFile(path, tab.content);
+        const title = getFileName(path);
+        updateTabPath(tab.id, path, title);
+        markTabClean(tab.id);
+      }
+    }
+  } catch (error) {
+    console.error('Failed to save file:', error);
+    alert('Failed to save file: ' + error);
+    throw error;
   }
 }

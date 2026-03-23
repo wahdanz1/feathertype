@@ -32,9 +32,9 @@ body {
   overflow: auto;
 }
 
-/* Markdown syntax highlighting - style the markers */
+/* Markdown syntax highlighting - style the markers with cyan/green color */
 .cm-strikethrough {
-  color: #858585; /* Dimmed color for strikethrough text and markers */
+  color: #4EC9B0; /* Cyan color for strikethrough markers - matches other markdown syntax */
 }
 
 /* Style markdown formatting markers (bold, italic, strikethrough, etc.) */
@@ -42,7 +42,7 @@ body {
 .cm-strong,
 .cm-link,
 .cm-monospace {
-  color: #858585; /* Dimmed color for markdown syntax markers */
+  color: #4EC9B0; /* Cyan color for markdown syntax markers */
 }
 
 /* Dropdown menu styling */

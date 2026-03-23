@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Button } from './Button';
 import { TableGridSelector } from './TableGridSelector';
 import { useEditorStore } from '../store/useEditorStore';
-import { formats, hasFormat, hasBulletList, hasNumberedList, hasHeading } from '../utils/markdownFormatting';
+import { formats, hasFormat, hasBulletList, hasNumberedList, hasHeading, getHeadingLevel } from '../utils/markdownFormatting';
 
 export function FormattingToolbar() {
   const theme = useEditorStore((s) => s.theme);
@@ -14,7 +14,8 @@ export function FormattingToolbar() {
     code: false,
     bulletList: false,
     numberedList: false,
-    heading: false
+    heading: false,
+    headingLevel: 0 // 0 = no heading, 1-6 = heading level
   });
 
   // Update active formats when selection changes
@@ -33,6 +34,7 @@ export function FormattingToolbar() {
           bulletList: hasBulletList(editorView),
           numberedList: hasNumberedList(editorView),
           heading: hasHeading(editorView),
+          headingLevel: getHeadingLevel(editorView),
         });
       }, 0);
     };
@@ -121,20 +123,32 @@ export function FormattingToolbar() {
       <select
         onChange={(e) => {
           const value = e.target.value;
-          if (value === 'h1') formats.heading1(editorView);
-          else if (value === 'h2') formats.heading2(editorView);
-          else if (value === 'h3') formats.heading3(editorView);
-          e.target.value = ''; // Reset to placeholder
+          const currentLevel = activeFormats.headingLevel;
+
+          // If clicking the same heading level, toggle it off
+          if ((value === 'h1' && currentLevel === 1) ||
+              (value === 'h2' && currentLevel === 2) ||
+              (value === 'h3' && currentLevel === 3)) {
+            // Toggle off by applying the format again (it removes it)
+            if (value === 'h1') formats.heading1(editorView);
+            else if (value === 'h2') formats.heading2(editorView);
+            else if (value === 'h3') formats.heading3(editorView);
+          } else {
+            // Apply new heading format
+            if (value === 'h1') formats.heading1(editorView);
+            else if (value === 'h2') formats.heading2(editorView);
+            else if (value === 'h3') formats.heading3(editorView);
+          }
         }}
-        value=""
-        className={`px-2 py-1 text-sm rounded transition-colors ${
+        value={activeFormats.headingLevel > 0 ? `h${activeFormats.headingLevel}` : ''}
+        className={`px-2 py-2 text-sm rounded transition-colors cursor-pointer ${
           theme === 'dark'
-            ? 'bg-[#2d2d2d] hover:bg-[#3e3e42] text-gray-300 border border-[#3e3e42]'
-            : 'bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-300'
-        }`}
+            ? 'bg-button-inactive-dark hover:bg-button-hover-dark text-gray-300'
+            : 'bg-button-inactive-light hover:bg-button-hover-light text-gray-700'
+        } ${activeFormats.heading ? 'border border-theme-primary' : theme === 'dark' ? 'border border-[#3e3e42]' : 'border border-gray-300'}`}
         title="Insert Heading"
       >
-        <option value="" disabled>Heading</option>
+        <option value="">No Heading</option>
         <option value="h1">Heading 1</option>
         <option value="h2">Heading 2</option>
         <option value="h3">Heading 3</option>

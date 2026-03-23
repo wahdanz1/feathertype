@@ -7,17 +7,67 @@ export interface FormatAction {
   placeholder?: string; // text when nothing selected
 }
 
+// Helper function to find word boundaries around cursor
+function getWordAtCursor(view: EditorView, from: number, to: number): { start: number; end: number; text: string } | null {
+  // Only do word detection if cursor is at a single point (no selection)
+  if (from !== to) return null;
+
+  const line = view.state.doc.lineAt(from);
+  const lineText = line.text;
+  const cursorPosInLine = from - line.from;
+
+  // Check if cursor is on whitespace or at line boundaries
+  const charBefore = cursorPosInLine > 0 ? lineText[cursorPosInLine - 1] : ' ';
+  const charAfter = cursorPosInLine < lineText.length ? lineText[cursorPosInLine] : ' ';
+
+  // If both surrounding characters are non-word characters, cursor is not within a word
+  if (!/\w/.test(charBefore) && !/\w/.test(charAfter)) {
+    return null;
+  }
+
+  // Find word start (search backwards)
+  let wordStart = cursorPosInLine;
+  while (wordStart > 0 && /\w/.test(lineText[wordStart - 1])) {
+    wordStart--;
+  }
+
+  // Find word end (search forwards)
+  let wordEnd = cursorPosInLine;
+  while (wordEnd < lineText.length && /\w/.test(lineText[wordEnd])) {
+    wordEnd++;
+  }
+
+  // Convert line-relative positions to document positions
+  const docStart = line.from + wordStart;
+  const docEnd = line.from + wordEnd;
+
+  return {
+    start: docStart,
+    end: docEnd,
+    text: lineText.substring(wordStart, wordEnd)
+  };
+}
+
 export function applyMarkdownFormat(
   view: EditorView | null,
   action: FormatAction
 ): void {
   if (!view) return;
 
-  const { from, to } = view.state.selection.main;
-  const selectedText = view.state.sliceDoc(from, to);
+  let { from, to } = view.state.selection.main;
+  let selectedText = view.state.sliceDoc(from, to);
 
   // For inline formats (bold, italic, code)
   if (action.prefix && action.suffix) {
+    // Smart word detection: if cursor is within a word, select the entire word
+    if (from === to) {
+      const wordInfo = getWordAtCursor(view, from, to);
+      if (wordInfo) {
+        from = wordInfo.start;
+        to = wordInfo.end;
+        selectedText = wordInfo.text;
+      }
+    }
     // Check if text is already wrapped with this format
     const isWrapped = selectedText.startsWith(action.prefix) && selectedText.endsWith(action.suffix);
 
@@ -162,13 +212,47 @@ export function applyMarkdownFormat(
 }
 
 // Check if current selection has a specific format
+// Now also returns true if cursor is anywhere within formatted text (not just when markers are selected)
 export function hasFormat(view: EditorView | null, prefix: string, suffix: string): boolean {
   if (!view) return false;
 
   const { from, to } = view.state.selection.main;
-  const selectedText = view.state.sliceDoc(from, to);
 
-  return selectedText.startsWith(prefix) && selectedText.endsWith(suffix) && selectedText.length > prefix.length + suffix.length;
+  // Check if selection includes the markers
+  if (from !== to) {
+    const selectedText = view.state.sliceDoc(from, to);
+    if (selectedText.startsWith(prefix) && selectedText.endsWith(suffix) && selectedText.length > prefix.length + suffix.length) {
+      return true;
+    }
+  }
+
+  // Check if cursor is within formatted text by looking at surrounding context
+  const line = view.state.doc.lineAt(from);
+  const lineText = line.text;
+  const cursorPosInLine = from - line.from;
+
+  // Search backwards for prefix - start from cursor position and go backwards
+  let prefixStart = -1;
+  for (let i = cursorPosInLine; i >= 0; i--) {
+    if (lineText.substring(i, i + prefix.length) === prefix) {
+      prefixStart = i;
+      break;
+    }
+  }
+
+  if (prefixStart === -1) return false;
+
+  // Search forwards for suffix - must be after the prefix we found
+  for (let i = prefixStart + prefix.length; i <= lineText.length - suffix.length; i++) {
+    if (lineText.substring(i, i + suffix.length) === suffix) {
+      // Found matching suffix - check if cursor is between prefix and suffix
+      if (cursorPosInLine >= prefixStart && cursorPosInLine <= i + suffix.length) {
+        return true;
+      }
+    }
+  }
+
+  return false;
 }
 
 // Check if current line has a specific line prefix (for lists, headings)
@@ -207,6 +291,15 @@ export function hasHeading(view: EditorView | null): boolean {
   const { from } = view.state.selection.main;
   const line = view.state.doc.lineAt(from);
   return /^\s*#{1,6}\s/.test(line.text);
+}
+
+// Get current heading level (0 if not a heading, 1-6 for heading levels)
+export function getHeadingLevel(view: EditorView | null): number {
+  if (!view) return 0;
+  const { from } = view.state.selection.main;
+  const line = view.state.doc.lineAt(from);
+  const match = line.text.match(/^\s*(#{1,6})\s/);
+  return match ? match[1].length : 0;
 }
 
 // Pre-configured format actions

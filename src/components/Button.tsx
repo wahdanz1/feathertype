@@ -26,6 +26,11 @@ export function Button({
   // Padding based on iconOnly
   const paddingStyles = iconOnly ? 'p-2' : 'px-3 py-2';
 
+  // Border styles - primary buttons get theme-colored border, secondary get subtle grey border
+  const borderStyles = variant === 'primary'
+    ? 'border border-theme-primary'
+    : (theme === 'dark' ? 'border border-[#3e3e42]' : 'border border-gray-300');
+
   // Variant styles
   const variantStyles = {
     primary: 'bg-theme-primary hover:bg-theme-primary-hover text-white',
@@ -39,7 +44,7 @@ export function Button({
     <button
       onClick={onClick}
       title={title}
-      className={`${baseStyles} ${paddingStyles} ${variantStyles[variant]} ${className}`}
+      className={`${baseStyles} ${paddingStyles} ${borderStyles} ${variantStyles[variant]} ${className}`}
     >
       {children}
     </button>

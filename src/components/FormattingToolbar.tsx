@@ -159,7 +159,7 @@ export function FormattingToolbar() {
         variant="secondary"
         iconOnly
         onClick={() => formats.bulletList(editorView)}
-        title="Bullet List"
+        title="Bullet List (Ctrl+Shift+B)"
         className={getButtonClass(activeFormats.bulletList)}
       >
         <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -176,7 +176,7 @@ export function FormattingToolbar() {
         variant="secondary"
         iconOnly
         onClick={() => formats.numberedList(editorView)}
-        title="Numbered List"
+        title="Numbered List (Ctrl+Shift+N)"
         className={getButtonClass(activeFormats.numberedList)}
       >
         <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -220,6 +220,19 @@ export function FormattingToolbar() {
         <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
           <polyline points="16 18 22 12 16 6" strokeLinecap="round" strokeLinejoin="round" />
           <polyline points="8 6 2 12 8 18" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </Button>
+
+      <Button
+        variant="secondary"
+        iconOnly
+        onClick={() => formats.comment(editorView)}
+        title="Comment (Ctrl+Shift+/)"
+      >
+        <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M9 3h6l2 2h4a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h4l2-2z" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M8 12h8" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M8 16h8" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       </Button>
 

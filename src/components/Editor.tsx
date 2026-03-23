@@ -4,7 +4,8 @@ import { markdown } from '@codemirror/lang-markdown';
 import { EditorView } from '@codemirror/view';
 import { search, searchKeymap } from '@codemirror/search';
 import { keymap } from '@codemirror/view';
-import { indentUnit } from '@codemirror/language';
+import { indentUnit, HighlightStyle, syntaxHighlighting } from '@codemirror/language';
+import { tags } from '@lezer/highlight';
 import { useEditorStore } from '../store/useEditorStore';
 import { tableExtension } from '../utils/tableExtension';
 import { listExtension } from '../utils/listExtension';
@@ -82,6 +83,19 @@ const lightTheme = EditorView.theme({
   },
 });
 
+// Custom markdown syntax highlighting - only color the markers, not the content
+// Dark mode: lighter cyan/teal for good contrast on dark background
+const darkSyntaxHighlight = HighlightStyle.define([
+  { tag: tags.processingInstruction, color: '#4EC9B0' }, // Formatting markers like ** ~~ _
+  { tag: tags.meta, color: '#4EC9B0' },
+]);
+
+// Light mode: darker teal/blue for good contrast on light background
+const lightSyntaxHighlight = HighlightStyle.define([
+  { tag: tags.processingInstruction, color: '#0070C0' }, // Formatting markers like ** ~~ _
+  { tag: tags.meta, color: '#0070C0' },
+]);
+
 export function Editor() {
   const activeTab = useEditorStore((s) => s.getActiveTab());
   const updateContent = useEditorStore((s) => s.updateTabContent);
@@ -132,6 +146,7 @@ export function Editor() {
 
   const extensions: Extension[] = [
     markdown(),
+    syntaxHighlighting(theme === 'dark' ? darkSyntaxHighlight : lightSyntaxHighlight), // Custom syntax colors
     search(),
     keymap.of(searchKeymap),
     listExtension, // Smart Enter key for lists
@@ -149,6 +164,7 @@ export function Editor() {
       <CodeMirror
         value={activeTab.content}
         height="100%"
+        theme={theme}
         extensions={extensions}
         onChange={(value) => updateContent(activeTab.id, value)}
         onCreateEditor={(view) => setEditorView(view)}

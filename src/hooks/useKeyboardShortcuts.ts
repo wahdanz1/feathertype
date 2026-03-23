@@ -124,11 +124,29 @@ export function useKeyboardShortcuts() {
         formats.inlineCode(editorView);
       }
 
+      // Ctrl+Shift+/ - Comment
+      if (isMod && e.shiftKey && e.key === '?') {
+        e.preventDefault();
+        formats.comment(editorView);
+      }
+
       // Ctrl+1-3 - Headings
       if (isMod && e.key >= '1' && e.key <= '3') {
         e.preventDefault();
         const headingFormats = [formats.heading1, formats.heading2, formats.heading3];
         headingFormats[parseInt(e.key) - 1](editorView);
+      }
+
+      // Ctrl+Shift+B - Bullet List
+      if (isMod && e.shiftKey && e.key === 'B') {
+        e.preventDefault();
+        formats.bulletList(editorView);
+      }
+
+      // Ctrl+Shift+N - Numbered List
+      if (isMod && e.shiftKey && e.key === 'N') {
+        e.preventDefault();
+        formats.numberedList(editorView);
       }
 
       // Ctrl+Plus/Equals - Zoom in

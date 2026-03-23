@@ -419,4 +419,7 @@ export const formats = {
     });
     view.focus();
   },
+
+  comment: (view: EditorView | null) =>
+    applyMarkdownFormat(view, { prefix: '<!-- ', suffix: ' -->', placeholder: 'comment' }),
 };

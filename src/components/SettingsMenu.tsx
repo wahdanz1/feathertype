@@ -7,8 +7,6 @@ export function SettingsMenu() {
   const menuRef = useRef<HTMLDivElement>(null);
 
   const theme = useEditorStore((s) => s.theme);
-  const toggleLineWrap = useEditorStore((s) => s.toggleLineWrap);
-  const lineWrap = useEditorStore((s) => s.lineWrap);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -25,11 +23,6 @@ export function SettingsMenu() {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [isOpen]);
-
-  const handleToggleLineWrap = () => {
-    toggleLineWrap();
-    setIsOpen(false);
-  };
 
   return (
     <div className="relative" ref={menuRef}>
@@ -50,15 +43,11 @@ export function SettingsMenu() {
             ? 'bg-[#252526] border-[#3e3e42]'
             : 'bg-white border-gray-300'
         }`}>
-          <button
-            onClick={handleToggleLineWrap}
-            className={`w-full px-4 py-2 text-left text-sm transition-colors flex justify-between items-center ${
-              theme === 'dark' ? 'hover:bg-[#2a2d2e]' : 'hover:bg-gray-100'
-            }`}
-          >
-            <span>{lineWrap ? '✓ ' : ''}Word Wrap</span>
-            <span className="text-xs text-gray-400">Alt+Z</span>
-          </button>
+          <div className={`px-4 py-3 text-sm text-center ${
+            theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+          }`}>
+            Settings coming soon...
+          </div>
         </div>
       )}
     </div>

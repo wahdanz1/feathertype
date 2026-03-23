@@ -8,6 +8,9 @@ import { formats, hasFormat, hasBulletList, hasNumberedList, hasHeading, getHead
 export function FormattingToolbar() {
   const theme = useEditorStore((s) => s.theme);
   const editorView = useEditorStore((s) => s.editorView);
+  const lineWrap = useEditorStore((s) => s.lineWrap);
+  const toggleLineWrap = useEditorStore((s) => s.toggleLineWrap);
+
   const [activeFormats, setActiveFormats] = useState({
     bold: false,
     italic: false,
@@ -75,7 +78,7 @@ export function FormattingToolbar() {
 
   return (
     <div className={`flex items-center gap-1 px-3 py-1.5 border-b ${borderColor} ${bgColor}`}>
-      {/* Text formatting */}
+      {/* === FORMAT CATEGORY === */}
       <Button
         variant="secondary"
         iconOnly
@@ -117,10 +120,6 @@ export function FormattingToolbar() {
         </svg>
       </Button>
 
-      {/* Divider */}
-      <div className={`w-px h-5 ${dividerColor}`} />
-
-      {/* Headings Dropdown */}
       <Dropdown
         value={activeFormats.headingLevel > 0 ? `h${activeFormats.headingLevel}` : ''}
         onChange={(value) => {
@@ -156,10 +155,6 @@ export function FormattingToolbar() {
         <option value="h3">Heading 3</option>
       </Dropdown>
 
-      {/* Divider */}
-      <div className={`w-px h-5 ${dividerColor}`} />
-
-      {/* Lists & Other */}
       <Button
         variant="secondary"
         iconOnly
@@ -195,16 +190,13 @@ export function FormattingToolbar() {
         </svg>
       </Button>
 
-      {/* Divider */}
-      <div className={`w-px h-5 ${dividerColor}`} />
+      {/* Category Divider with extra spacing */}
+      <div className={`w-px h-5 ${dividerColor} mx-2`} />
 
-      {/* Table */}
+      {/* === INSERT CATEGORY === */}
       <TableGridSelector
         onInsert={(rows, cols) => formats.table(editorView, rows, cols)}
       />
-
-      {/* Divider */}
-      <div className={`w-px h-5 ${dividerColor}`} />
 
       <Button
         variant="secondary"
@@ -222,12 +214,31 @@ export function FormattingToolbar() {
         variant="secondary"
         iconOnly
         onClick={() => formats.inlineCode(editorView)}
-        title="Inline Code (Ctrl+`)"
+        title="Code Block (Ctrl+`)"
         className={getButtonClass(activeFormats.code)}
       >
         <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
           <polyline points="16 18 22 12 16 6" strokeLinecap="round" strokeLinejoin="round" />
           <polyline points="8 6 2 12 8 18" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </Button>
+
+      {/* Category Divider with extra spacing */}
+      <div className={`w-px h-5 ${dividerColor} mx-2`} />
+
+      {/* === VIEW CATEGORY === */}
+      <Button
+        variant="secondary"
+        iconOnly
+        onClick={toggleLineWrap}
+        title="Word Wrap (Alt+Z)"
+        className={getButtonClass(lineWrap)}
+      >
+        <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M21 6H3" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M21 10H3" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M14 18H3" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M18 14l4 4-4 4" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       </Button>
     </div>

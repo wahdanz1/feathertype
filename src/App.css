@@ -32,6 +32,47 @@ body {
   overflow: auto;
 }
 
+/* Markdown syntax highlighting - style the markers */
+.cm-strikethrough {
+  color: #858585; /* Dimmed color for strikethrough text and markers */
+}
+
+/* Style markdown formatting markers (bold, italic, strikethrough, etc.) */
+.cm-em,
+.cm-strong,
+.cm-link,
+.cm-monospace {
+  color: #858585; /* Dimmed color for markdown syntax markers */
+}
+
+/* Dropdown menu styling */
+select option {
+  border-radius: 4px;
+  padding: 0.5rem;
+}
+
+/* Dark theme dropdown options */
+body:not(.light-theme) select option {
+  background-color: #2d2d2d;
+  color: #d4d4d4;
+}
+
+body:not(.light-theme) select option:hover,
+body:not(.light-theme) select option:checked {
+  background-color: #3e3e42;
+}
+
+/* Light theme dropdown options */
+body.light-theme select option {
+  background-color: #ffffff;
+  color: #1e1e1e;
+}
+
+body.light-theme select option:hover,
+body.light-theme select option:checked {
+  background-color: #f0f0f0;
+}
+
 /* Scrollbar styling - Dark theme */
 ::-webkit-scrollbar {
   width: 14px;

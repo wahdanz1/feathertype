@@ -20,8 +20,8 @@ export function Dropdown({
 }: DropdownProps) {
   const theme = useEditorStore((s) => s.theme);
 
-  // Base styles
-  const baseStyles = 'px-2 py-2 text-sm rounded transition-colors cursor-pointer';
+  // Base styles with explicit height to match buttons
+  const baseStyles = 'px-2 h-8 text-sm rounded transition-colors cursor-pointer';
 
   // Background and text colors based on theme
   const colorStyles = theme === 'dark'

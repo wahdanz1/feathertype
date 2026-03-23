@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Button } from './Button';
+import { Dropdown } from './Dropdown';
 import { TableGridSelector } from './TableGridSelector';
 import { useEditorStore } from '../store/useEditorStore';
 import { formats, hasFormat, hasBulletList, hasNumberedList, hasHeading, getHeadingLevel } from '../utils/markdownFormatting';
@@ -120,15 +121,21 @@ export function FormattingToolbar() {
       <div className={`w-px h-5 ${dividerColor}`} />
 
       {/* Headings Dropdown */}
-      <select
-        onChange={(e) => {
-          const value = e.target.value;
+      <Dropdown
+        value={activeFormats.headingLevel > 0 ? `h${activeFormats.headingLevel}` : ''}
+        onChange={(value) => {
           const currentLevel = activeFormats.headingLevel;
 
-          // If clicking the same heading level, toggle it off
-          if ((value === 'h1' && currentLevel === 1) ||
-              (value === 'h2' && currentLevel === 2) ||
-              (value === 'h3' && currentLevel === 3)) {
+          if (value === '') {
+            // "No Heading" selected - remove heading if there is one
+            if (currentLevel > 0) {
+              if (currentLevel === 1) formats.heading1(editorView);
+              else if (currentLevel === 2) formats.heading2(editorView);
+              else if (currentLevel === 3) formats.heading3(editorView);
+            }
+          } else if ((value === 'h1' && currentLevel === 1) ||
+                     (value === 'h2' && currentLevel === 2) ||
+                     (value === 'h3' && currentLevel === 3)) {
             // Toggle off by applying the format again (it removes it)
             if (value === 'h1') formats.heading1(editorView);
             else if (value === 'h2') formats.heading2(editorView);
@@ -140,19 +147,14 @@ export function FormattingToolbar() {
             else if (value === 'h3') formats.heading3(editorView);
           }
         }}
-        value={activeFormats.headingLevel > 0 ? `h${activeFormats.headingLevel}` : ''}
-        className={`px-2 py-2 text-sm rounded transition-colors cursor-pointer ${
-          theme === 'dark'
-            ? 'bg-button-inactive-dark hover:bg-button-hover-dark text-gray-300'
-            : 'bg-button-inactive-light hover:bg-button-hover-light text-gray-700'
-        } ${activeFormats.heading ? 'border border-theme-primary' : theme === 'dark' ? 'border border-[#3e3e42]' : 'border border-gray-300'}`}
+        isActive={activeFormats.heading}
         title="Insert Heading"
       >
         <option value="">No Heading</option>
         <option value="h1">Heading 1</option>
         <option value="h2">Heading 2</option>
         <option value="h3">Heading 3</option>
-      </select>
+      </Dropdown>
 
       {/* Divider */}
       <div className={`w-px h-5 ${dividerColor}`} />

@@ -59,6 +59,55 @@ export function applyMarkdownFormat(
 
   // For inline formats (bold, italic, code)
   if (action.prefix && action.suffix) {
+    // Check if cursor is within formatted text (when no selection)
+    if (from === to && hasFormat(view, action.prefix, action.suffix)) {
+      // Find and remove the markers surrounding the cursor
+      const line = view.state.doc.lineAt(from);
+      const lineText = line.text;
+      const cursorPosInLine = from - line.from;
+
+      // Find all prefix positions
+      const prefixPositions: number[] = [];
+      for (let i = 0; i <= lineText.length - action.prefix.length; i++) {
+        if (lineText.substring(i, i + action.prefix.length) === action.prefix) {
+          prefixPositions.push(i);
+        }
+      }
+
+      // Find the pair that contains the cursor
+      for (const prefixStart of prefixPositions) {
+        for (let i = prefixStart + action.prefix.length; i <= lineText.length - action.suffix.length; i++) {
+          if (lineText.substring(i, i + action.suffix.length) === action.suffix) {
+            // Check if cursor is between this pair
+            if (cursorPosInLine >= prefixStart && cursorPosInLine <= i + action.suffix.length) {
+              // Remove this pair of markers
+              const beforePrefix = lineText.substring(0, prefixStart);
+              const content = lineText.substring(prefixStart + action.prefix.length, i);
+              const afterSuffix = lineText.substring(i + action.suffix.length);
+              const newLineText = beforePrefix + content + afterSuffix;
+
+              // Calculate new cursor position
+              let newCursorPos = cursorPosInLine;
+              if (cursorPosInLine > prefixStart) {
+                newCursorPos = Math.min(cursorPosInLine - action.prefix.length, beforePrefix.length + content.length);
+              }
+
+              view.dispatch({
+                changes: { from: line.from, to: line.to, insert: newLineText },
+                selection: {
+                  anchor: line.from + newCursorPos,
+                  head: line.from + newCursorPos
+                }
+              });
+              view.focus();
+              return;
+            }
+            break; // Found matching suffix for this prefix
+          }
+        }
+      }
+    }
+
     // Smart word detection: if cursor is within a word, select the entire word
     if (from === to) {
       const wordInfo = getWordAtCursor(view, from, to);
@@ -226,28 +275,29 @@ export function hasFormat(view: EditorView | null, prefix: string, suffix: strin
     }
   }
 
-  // Check if cursor is within formatted text by looking at surrounding context
+  // Check if cursor is within formatted text by finding all prefix/suffix pairs
   const line = view.state.doc.lineAt(from);
   const lineText = line.text;
   const cursorPosInLine = from - line.from;
 
-  // Search backwards for prefix - start from cursor position and go backwards
-  let prefixStart = -1;
-  for (let i = cursorPosInLine; i >= 0; i--) {
+  // Find all prefix positions
+  const prefixPositions: number[] = [];
+  for (let i = 0; i <= lineText.length - prefix.length; i++) {
     if (lineText.substring(i, i + prefix.length) === prefix) {
-      prefixStart = i;
-      break;
+      prefixPositions.push(i);
     }
   }
 
-  if (prefixStart === -1) return false;
-
-  // Search forwards for suffix - must be after the prefix we found
-  for (let i = prefixStart + prefix.length; i <= lineText.length - suffix.length; i++) {
-    if (lineText.substring(i, i + suffix.length) === suffix) {
-      // Found matching suffix - check if cursor is between prefix and suffix
-      if (cursorPosInLine >= prefixStart && cursorPosInLine <= i + suffix.length) {
-        return true;
+  // For each prefix, find its matching suffix and check if cursor is between them
+  for (const prefixStart of prefixPositions) {
+    for (let i = prefixStart + prefix.length; i <= lineText.length - suffix.length; i++) {
+      if (lineText.substring(i, i + suffix.length) === suffix) {
+        // Found a matching pair - check if cursor is between or at the edges
+        if (cursorPosInLine >= prefixStart && cursorPosInLine <= i + suffix.length) {
+          return true;
+        }
+        // Found the matching suffix for this prefix, move to next prefix
+        break;
       }
     }
   }

@@ -171,6 +171,44 @@ export function hasFormat(view: EditorView | null, prefix: string, suffix: strin
   return selectedText.startsWith(prefix) && selectedText.endsWith(suffix) && selectedText.length > prefix.length + suffix.length;
 }
 
+// Check if current line has a specific line prefix (for lists, headings)
+export function hasLineFormat(view: EditorView | null, linePrefix: string): boolean {
+  if (!view) return false;
+
+  const { from } = view.state.selection.main;
+  const line = view.state.doc.lineAt(from);
+  const lineText = line.text;
+
+  // Extract text after leading whitespace
+  const match = lineText.match(/^\s*(.*)/);
+  const textAfterWhitespace = match ? match[1] : lineText;
+
+  return textAfterWhitespace.startsWith(linePrefix);
+}
+
+// Check if current line is a bullet list
+export function hasBulletList(view: EditorView | null): boolean {
+  return hasLineFormat(view, '- ');
+}
+
+// Check if current line is a numbered list
+export function hasNumberedList(view: EditorView | null): boolean {
+  if (!view) return false;
+  const { from } = view.state.selection.main;
+  const line = view.state.doc.lineAt(from);
+  const match = line.text.match(/^\s*(.*)/);
+  const textAfterWhitespace = match ? match[1] : line.text;
+  return /^\d+\.\s/.test(textAfterWhitespace);
+}
+
+// Check if current line is a heading (any level)
+export function hasHeading(view: EditorView | null): boolean {
+  if (!view) return false;
+  const { from } = view.state.selection.main;
+  const line = view.state.doc.lineAt(from);
+  return /^\s*#{1,6}\s/.test(line.text);
+}
+
 // Pre-configured format actions
 export const formats = {
   bold: (view: EditorView | null) =>
@@ -205,4 +243,37 @@ export const formats = {
 
   codeBlock: (view: EditorView | null) =>
     applyMarkdownFormat(view, { prefix: '```\n', suffix: '\n```', placeholder: 'code' }),
+
+  table: (view: EditorView | null, rows: number, cols: number) => {
+    if (!view) return;
+
+    // Generate markdown table
+    const headerCells = Array(cols).fill('Header').map((h, i) => ` ${h} ${i + 1} `);
+    const headerRow = `|${headerCells.join('|')}|`;
+
+    const separatorCells = Array(cols).fill('--------');
+    const separatorRow = `|${separatorCells.join('|')}|`;
+
+    const dataCells = Array(cols).fill('        ');
+    const dataRows = Array(rows - 1).fill(`|${dataCells.join('|')}|`).join('\n');
+
+    const table = `${headerRow}\n${separatorRow}\n${dataRows}\n`;
+
+    // Insert at cursor
+    const { from } = view.state.selection.main;
+    const line = view.state.doc.lineAt(from);
+
+    // If not at start of line, add newline before table
+    const prefix = from > line.from ? '\n' : '';
+
+    view.dispatch({
+      changes: { from, to: from, insert: `${prefix}${table}` },
+      selection: {
+        // Position cursor in first header cell (after "| ")
+        anchor: from + prefix.length + 2,
+        head: from + prefix.length + 2
+      }
+    });
+    view.focus();
+  },
 };

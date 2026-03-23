@@ -6,6 +6,8 @@ import { search, searchKeymap } from '@codemirror/search';
 import { keymap } from '@codemirror/view';
 import { indentUnit } from '@codemirror/language';
 import { useEditorStore } from '../store/useEditorStore';
+import { tableExtension } from '../utils/tableExtension';
+import { listExtension } from '../utils/listExtension';
 import type { Extension } from '@codemirror/state';
 
 const darkTheme = EditorView.theme({
@@ -132,6 +134,8 @@ export function Editor() {
     markdown(),
     search(),
     keymap.of(searchKeymap),
+    listExtension, // Smart Enter key for lists
+    tableExtension, // Smart Enter key for tables
     theme === 'dark' ? darkTheme : lightTheme,
     indentUnit.of('    '), // 4 spaces for Tab key
   ];

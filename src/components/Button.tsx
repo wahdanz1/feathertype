@@ -28,11 +28,11 @@ export function Button({
 
   // Variant styles
   const variantStyles = {
-    primary: 'bg-primary hover:bg-primary-hover text-white',
+    primary: 'bg-theme-primary hover:bg-theme-primary-hover text-white',
     secondary:
       theme === 'dark'
-        ? 'bg-secondary-dark hover:bg-secondary-dark-hover text-gray-300'
-        : 'bg-secondary-light hover:bg-secondary-light-hover text-gray-700',
+        ? 'bg-button-inactive-dark hover:bg-button-hover-dark text-gray-300'
+        : 'bg-button-inactive-light hover:bg-button-hover-light text-gray-700',
   };
 
   return (

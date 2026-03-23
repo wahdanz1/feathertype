@@ -1,0 +1,25 @@
+/* Global color tokens for FeatherType */
+/* These can be easily changed in one place to update the entire theme */
+
+@theme {
+  /* === Primary Theme Color === */
+  --color-theme-primary: #0e639c;
+  --color-theme-primary-hover: #1177bb;
+
+  /* === Button Colors - Dark Theme === */
+  --color-button-inactive-dark: #2d2d2d;        /* Darker than before for better contrast */
+  --color-button-hover-dark: #3e3e42;           /* Hover state */
+  --color-button-active-dark: #3e3e42;          /* Active state background (same as current) */
+
+  /* === Button Colors - Light Theme === */
+  --color-button-inactive-light: #f0f0f0;       /* Light gray for inactive */
+  --color-button-hover-light: #e5e7eb;          /* Hover state */
+  --color-button-active-light: #e5e7eb;         /* Active state background */
+
+  /* === Editor Colors === */
+  --color-editor-bg: #1e1e1e;
+  --color-editor-gutter: #252526;
+  --color-tab-active: #2d2d2d;
+  --color-tab-inactive: #252526;
+  --color-border: #3e3e42;
+}

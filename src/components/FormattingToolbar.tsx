@@ -1,34 +1,62 @@
 import { useState, useEffect } from 'react';
 import { Button } from './Button';
+import { TableGridSelector } from './TableGridSelector';
 import { useEditorStore } from '../store/useEditorStore';
-import { formats, hasFormat } from '../utils/markdownFormatting';
+import { formats, hasFormat, hasBulletList, hasNumberedList, hasHeading } from '../utils/markdownFormatting';
 
 export function FormattingToolbar() {
   const theme = useEditorStore((s) => s.theme);
   const editorView = useEditorStore((s) => s.editorView);
-  const [activeFormats, setActiveFormats] = useState({ bold: false, italic: false, strikethrough: false, code: false });
+  const [activeFormats, setActiveFormats] = useState({
+    bold: false,
+    italic: false,
+    strikethrough: false,
+    code: false,
+    bulletList: false,
+    numberedList: false,
+    heading: false
+  });
 
   // Update active formats when selection changes
   useEffect(() => {
     if (!editorView) return;
 
     const updateActiveFormats = () => {
-      setActiveFormats({
-        bold: hasFormat(editorView, '**', '**'),
-        italic: hasFormat(editorView, '_', '_'),
-        strikethrough: hasFormat(editorView, '~~', '~~'),
-        code: hasFormat(editorView, '`', '`'),
-      });
+      // Use setTimeout to ensure we get the updated state after any changes
+      setTimeout(() => {
+        if (!editorView) return;
+        setActiveFormats({
+          bold: hasFormat(editorView, '**', '**'),
+          italic: hasFormat(editorView, '_', '_'),
+          strikethrough: hasFormat(editorView, '~~', '~~'),
+          code: hasFormat(editorView, '`', '`'),
+          bulletList: hasBulletList(editorView),
+          numberedList: hasNumberedList(editorView),
+          heading: hasHeading(editorView),
+        });
+      }, 0);
     };
 
-    // Update on selection change
+    // Initial update
+    updateActiveFormats();
+
+    // Update on various events
     const handleUpdate = () => updateActiveFormats();
+    const interval = setInterval(updateActiveFormats, 100); // Poll every 100ms as fallback
+
     editorView.dom.addEventListener('mouseup', handleUpdate);
     editorView.dom.addEventListener('keyup', handleUpdate);
+    editorView.dom.addEventListener('click', handleUpdate);
+    editorView.dom.addEventListener('input', handleUpdate);
+    editorView.dom.addEventListener('focus', handleUpdate);
 
     return () => {
+      clearInterval(interval);
       editorView.dom.removeEventListener('mouseup', handleUpdate);
       editorView.dom.removeEventListener('keyup', handleUpdate);
+      editorView.dom.removeEventListener('click', handleUpdate);
+      editorView.dom.removeEventListener('input', handleUpdate);
+      editorView.dom.removeEventListener('focus', handleUpdate);
     };
   }, [editorView]);
 
@@ -38,9 +66,9 @@ export function FormattingToolbar() {
   const bgColor = theme === 'dark' ? 'bg-[#252526]' : 'bg-white';
   const dividerColor = theme === 'dark' ? 'bg-[#3e3e42]' : 'bg-gray-300';
 
-  // Active button styling
+  // Active button styling - adds a 1px blue border around active buttons
   const getButtonClass = (isActive: boolean) =>
-    isActive ? (theme === 'dark' ? 'bg-[#3e3e42]' : 'bg-gray-300') : '';
+    isActive ? 'border border-theme-primary' : '';
 
   return (
     <div className={`flex items-center gap-1 px-3 py-1.5 border-b ${borderColor} ${bgColor}`}>
@@ -121,6 +149,7 @@ export function FormattingToolbar() {
         iconOnly
         onClick={() => formats.bulletList(editorView)}
         title="Bullet List"
+        className={getButtonClass(activeFormats.bulletList)}
       >
         <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
           <line x1="8" y1="6" x2="21" y2="6" />
@@ -137,6 +166,7 @@ export function FormattingToolbar() {
         iconOnly
         onClick={() => formats.numberedList(editorView)}
         title="Numbered List"
+        className={getButtonClass(activeFormats.numberedList)}
       >
         <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
           <line x1="10" y1="6" x2="21" y2="6" />
@@ -148,6 +178,17 @@ export function FormattingToolbar() {
           <path d="M4 18h2v-2H4" strokeLinecap="round" />
         </svg>
       </Button>
+
+      {/* Divider */}
+      <div className={`w-px h-5 ${dividerColor}`} />
+
+      {/* Table */}
+      <TableGridSelector
+        onInsert={(rows, cols) => formats.table(editorView, rows, cols)}
+      />
+
+      {/* Divider */}
+      <div className={`w-px h-5 ${dividerColor}`} />
 
       <Button
         variant="secondary"

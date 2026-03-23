@@ -149,7 +149,6 @@ export function Editor() {
       <CodeMirror
         value={activeTab.content}
         height="100%"
-        theme={theme}
         extensions={extensions}
         onChange={(value) => updateContent(activeTab.id, value)}
         onCreateEditor={(view) => setEditorView(view)}

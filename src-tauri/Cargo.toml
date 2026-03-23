@@ -3,6 +3,8 @@ name = "feathertype"
 version = "1.0.0"
 description = "A lightweight local Markdown editor built with Tauri and React"
 authors = ["Daniel Wahlgren"]
+homepage = "https://wahdanz.vercel.app/"
+repository = "https://github.com/wahdanz1/feathertype"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html

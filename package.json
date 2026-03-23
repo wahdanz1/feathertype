@@ -3,6 +3,12 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
+  "author": "Daniel Wahlgren",
+  "homepage": "https://wahdanz.vercel.app/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wahdanz1/feathertype"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",

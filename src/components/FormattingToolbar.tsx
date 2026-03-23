@@ -147,7 +147,7 @@ export function FormattingToolbar() {
           }
         }}
         isActive={activeFormats.heading}
-        title="Insert Heading"
+        title="Heading (Ctrl+1/2/3)"
       >
         <option value="">No Heading</option>
         <option value="h1">Heading 1</option>

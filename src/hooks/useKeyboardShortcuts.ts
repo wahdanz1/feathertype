@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useEditorStore } from '../store/useEditorStore';
 import { openFileDialog, saveFileDialog, openAndReadFile, writeFile, getFileName } from '../utils/fileOperations';
+import { formats } from '../utils/markdownFormatting';
 
 export function useKeyboardShortcuts() {
   const addTab = useEditorStore((s) => s.addTab);
@@ -9,6 +10,10 @@ export function useKeyboardShortcuts() {
   const markTabClean = useEditorStore((s) => s.markTabClean);
   const togglePreview = useEditorStore((s) => s.togglePreview);
   const toggleLineWrap = useEditorStore((s) => s.toggleLineWrap);
+  const editorView = useEditorStore((s) => s.editorView);
+  const zoomIn = useEditorStore((s) => s.zoomIn);
+  const zoomOut = useEditorStore((s) => s.zoomOut);
+  const resetZoom = useEditorStore((s) => s.resetZoom);
 
   useEffect(() => {
     const handleKeyDown = async (e: KeyboardEvent) => {
@@ -94,9 +99,58 @@ export function useKeyboardShortcuts() {
         e.preventDefault();
         toggleLineWrap();
       }
+
+      // Ctrl+B - Bold
+      if (isMod && e.key === 'b') {
+        e.preventDefault();
+        formats.bold(editorView);
+      }
+
+      // Ctrl+I - Italic
+      if (isMod && e.key === 'i') {
+        e.preventDefault();
+        formats.italic(editorView);
+      }
+
+      // Ctrl+K - Link
+      if (isMod && e.key === 'k') {
+        e.preventDefault();
+        formats.link(editorView);
+      }
+
+      // Ctrl+` - Inline Code
+      if (isMod && e.key === '`') {
+        e.preventDefault();
+        formats.inlineCode(editorView);
+      }
+
+      // Ctrl+1-3 - Headings
+      if (isMod && e.key >= '1' && e.key <= '3') {
+        e.preventDefault();
+        const headingFormats = [formats.heading1, formats.heading2, formats.heading3];
+        headingFormats[parseInt(e.key) - 1](editorView);
+      }
+
+      // Ctrl+Plus/Equals - Zoom in
+      if (isMod && (e.key === '+' || e.key === '=')) {
+        e.preventDefault();
+        zoomIn();
+      }
+
+      // Ctrl+Minus - Zoom out
+      if (isMod && e.key === '-') {
+        e.preventDefault();
+        zoomOut();
+      }
+
+      // Ctrl+0 - Reset zoom
+      if (isMod && e.key === '0') {
+        e.preventDefault();
+        resetZoom();
+      }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [addTab, getActiveTab, updateTabPath, markTabClean, togglePreview, toggleLineWrap]);
+  }, [addTab, getActiveTab, updateTabPath, markTabClean, togglePreview, toggleLineWrap, editorView, zoomIn, zoomOut, resetZoom]);
 }

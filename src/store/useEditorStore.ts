@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { Tab } from '../types';
 import { v4 as uuidv4 } from 'uuid';
+import type { EditorView } from '@codemirror/view';
 
 interface EditorState {
   tabs: Tab[];
@@ -8,6 +9,8 @@ interface EditorState {
   showPreview: boolean;
   theme: 'dark' | 'light';
   lineWrap: boolean;
+  editorView: EditorView | null;
+  zoom: number;
   unsavedChangesDialog: {
     isOpen: boolean;
     tabId: string | null;
@@ -31,6 +34,11 @@ interface EditorStore extends EditorState {
   setShowPreview: (show: boolean) => void;
   toggleTheme: () => void;
   toggleLineWrap: () => void;
+  setEditorView: (view: EditorView | null) => void;
+  setZoom: (zoom: number) => void;
+  zoomIn: () => void;
+  zoomOut: () => void;
+  resetZoom: () => void;
 
   // Getters
   getActiveTab: () => Tab | null;
@@ -51,6 +59,8 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   showPreview: true,
   theme: 'dark',
   lineWrap: true,
+  editorView: null,
+  zoom: 100,
   unsavedChangesDialog: {
     isOpen: false,
     tabId: null,
@@ -226,6 +236,32 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
 
   toggleLineWrap: () => {
     set((state) => ({ lineWrap: !state.lineWrap }));
+  },
+
+  setEditorView: (view) => {
+    set({ editorView: view });
+  },
+
+  setZoom: (zoom: number) => {
+    // Clamp zoom between 50% and 200%
+    const clampedZoom = Math.max(50, Math.min(200, zoom));
+    set({ zoom: clampedZoom });
+  },
+
+  zoomIn: () => {
+    const state = get();
+    const newZoom = Math.min(200, state.zoom + 10);
+    set({ zoom: newZoom });
+  },
+
+  zoomOut: () => {
+    const state = get();
+    const newZoom = Math.max(50, state.zoom - 10);
+    set({ zoom: newZoom });
+  },
+
+  resetZoom: () => {
+    set({ zoom: 100 });
   },
 
   getActiveTab: () => {

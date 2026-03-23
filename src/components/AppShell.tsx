@@ -1,6 +1,8 @@
 import { Toolbar } from './Toolbar';
+import { FormattingToolbar } from './FormattingToolbar';
 import { TabBar } from './TabBar';
 import { SplitPane } from './SplitPane';
+import { StatusBar } from './StatusBar';
 import { UnsavedChangesDialog } from './UnsavedChangesDialog';
 import { useEditorStore } from '../store/useEditorStore';
 
@@ -17,10 +19,12 @@ export function AppShell() {
   return (
     <div className={`h-screen flex flex-col ${theme === 'dark' ? 'bg-[#1e1e1e] text-gray-200' : 'bg-white text-gray-900'}`}>
       <Toolbar />
+      <FormattingToolbar />
       <TabBar />
       <div className="flex-1 overflow-hidden">
         <SplitPane />
       </div>
+      <StatusBar />
 
       {unsavedChangesDialog.isOpen && unsavedTab && (
         <UnsavedChangesDialog

@@ -1,8 +1,10 @@
+import { useEffect } from 'react';
 import CodeMirror from '@uiw/react-codemirror';
 import { markdown } from '@codemirror/lang-markdown';
 import { EditorView } from '@codemirror/view';
 import { search, searchKeymap } from '@codemirror/search';
 import { keymap } from '@codemirror/view';
+import { indentUnit } from '@codemirror/language';
 import { useEditorStore } from '../store/useEditorStore';
 import type { Extension } from '@codemirror/state';
 
@@ -83,6 +85,31 @@ export function Editor() {
   const updateContent = useEditorStore((s) => s.updateTabContent);
   const theme = useEditorStore((s) => s.theme);
   const lineWrap = useEditorStore((s) => s.lineWrap);
+  const zoom = useEditorStore((s) => s.zoom);
+  const setEditorView = useEditorStore((s) => s.setEditorView);
+  const setZoom = useEditorStore((s) => s.setZoom);
+
+  // Cleanup editor view reference on unmount
+  useEffect(() => {
+    return () => setEditorView(null);
+  }, [setEditorView]);
+
+  // Mouse wheel zoom handler
+  useEffect(() => {
+    const handleWheel = (e: WheelEvent) => {
+      if (e.ctrlKey) {
+        e.preventDefault();
+        const delta = e.deltaY > 0 ? -10 : 10;
+        setZoom(zoom + delta);
+      }
+    };
+
+    const editorElement = document.querySelector('.cm-editor');
+    if (editorElement) {
+      editorElement.addEventListener('wheel', handleWheel, { passive: false });
+      return () => editorElement.removeEventListener('wheel', handleWheel);
+    }
+  }, [zoom, setZoom]);
 
   if (!activeTab) {
     return (
@@ -97,6 +124,7 @@ export function Editor() {
     search(),
     keymap.of(searchKeymap),
     theme === 'dark' ? darkTheme : lightTheme,
+    indentUnit.of('    '), // 4 spaces for Tab key
   ];
 
   if (lineWrap) {
@@ -105,19 +133,22 @@ export function Editor() {
 
   return (
     <div className="h-full overflow-auto">
-      <CodeMirror
-        value={activeTab.content}
-        height="100%"
-        theme={theme}
-        extensions={extensions}
-        onChange={(value) => updateContent(activeTab.id, value)}
-        basicSetup={{
-          lineNumbers: true,
-          highlightActiveLineGutter: true,
-          highlightActiveLine: true,
-          foldGutter: true,
-        }}
-      />
+      <div style={{ transform: `scale(${zoom / 100})`, transformOrigin: 'top left', width: `${10000 / zoom}%`, height: `${10000 / zoom}%` }}>
+        <CodeMirror
+          value={activeTab.content}
+          height="100%"
+          theme={theme}
+          extensions={extensions}
+          onChange={(value) => updateContent(activeTab.id, value)}
+          onCreateEditor={(view) => setEditorView(view)}
+          basicSetup={{
+            lineNumbers: true,
+            highlightActiveLineGutter: true,
+            highlightActiveLine: true,
+            foldGutter: true,
+          }}
+        />
+      </div>
     </div>
   );
 }

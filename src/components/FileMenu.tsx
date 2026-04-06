@@ -40,8 +40,8 @@ export function FileMenu() {
   const handleOpen = async () => {
     try {
       const path = await openFileDialog();
-      if (path) {
-        const content = await openAndReadFile(path);
+      if (path !== null) {
+        const content = await openAndReadFile(path as string | File);
         const title = getFileName(path);
         addTab({ filePath: path, content, title, isDirty: false });
       }
@@ -65,7 +65,7 @@ export function FileMenu() {
     if (!activeTab) return;
 
     try {
-      const path = await saveFileDialog(activeTab.filePath || undefined);
+      const path = await saveFileDialog(activeTab.filePath || undefined) as string | File | null;
       if (path) {
         await writeFile(path, activeTab.content);
         const title = getFileName(path);
@@ -82,7 +82,7 @@ export function FileMenu() {
   const handleExportDocx = async () => {
     const activeTab = getActiveTab();
     if (!activeTab) return;
-    await exportAsDocx(activeTab.content, activeTab.filePath);
+    await exportAsDocx(activeTab.content, activeTab.filePath as string | File | null);
     setIsOpen(false);
   };
 

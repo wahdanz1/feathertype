@@ -27,7 +27,7 @@ interface EditorStore extends EditorState {
   saveAndCloseTab: () => Promise<void>;
   setActiveTab: (tabId: string) => void;
   updateTabContent: (tabId: string, content: string) => void;
-  updateTabPath: (tabId: string, path: string, title: string) => void;
+  updateTabPath: (tabId: string, path: string | File, title: string) => void;
   markTabClean: (tabId: string) => void;
 
   // UI state
@@ -200,7 +200,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
     }));
   },
 
-  updateTabPath: (tabId: string, path: string, title: string) => {
+  updateTabPath: (tabId: string, path: string | File, title: string) => {
     set((state) => ({
       tabs: state.tabs.map((tab) =>
         tab.id === tabId

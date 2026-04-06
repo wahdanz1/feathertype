@@ -17,11 +17,11 @@ export function AppShell() {
   const unsavedTab = getUnsavedTab();
 
   return (
-    <div className={`h-screen flex flex-col ${theme === 'dark' ? 'bg-[#1e1e1e] text-gray-200' : 'bg-white text-gray-900'}`}>
+    <div className={`h-full flex flex-col ${theme === 'dark' ? 'bg-[#1e1e1e] text-gray-200' : 'bg-white text-gray-900'}`}>
       <Toolbar />
       <FormattingToolbar />
       <TabBar />
-      <div className="flex-1 overflow-hidden">
+      <div className="flex-1 overflow-hidden min-h-0">
         <SplitPane />
       </div>
       <StatusBar />

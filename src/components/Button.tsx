@@ -28,7 +28,7 @@ export function Button({
 
   // Border styles - primary buttons get theme-colored border, secondary get subtle grey border
   const borderStyles = variant === 'primary'
-    ? 'border border-theme-primary'
+    ? (theme === 'dark' ? 'border border-[#2563eb]' : 'border border-[#2563eb]')
     : (theme === 'dark' ? 'border border-[#3e3e42]' : 'border border-gray-300');
 
   // Variant styles

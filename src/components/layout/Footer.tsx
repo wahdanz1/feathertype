@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Feather, Feather as Github, Heart } from 'lucide-react';
+import { Feather, Feather as Github } from 'lucide-react';
 
 export function Footer() {
   return (

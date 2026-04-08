@@ -149,6 +149,18 @@ export function FileMenu() {
           >
             <span>Export as DOCX</span>
           </button>
+          <div className={`border-t my-1 ${theme === 'dark' ? 'border-[#3e3e42]' : 'border-gray-300'}`}></div>
+          <button
+            onClick={() => {
+              useEditorStore.getState().setShowAboutDialog(true);
+              setIsOpen(false);
+            }}
+            className={`w-full px-4 py-2 text-left text-sm transition-colors flex justify-between items-center ${
+              theme === 'dark' ? 'hover:bg-[#2a2d2e]' : 'hover:bg-gray-100'
+            }`}
+          >
+            <span>About FeatherType</span>
+          </button>
         </div>
       )}
     </div>

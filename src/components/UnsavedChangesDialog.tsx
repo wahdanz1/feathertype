@@ -1,28 +1,23 @@
-import { Tab } from '../types';
 import { useEditorStore } from '../store/useEditorStore';
+import { Undo2, Trash2, Save } from 'lucide-react';
 
-interface UnsavedChangesDialogProps {
-  tab: Tab;
-  onContinueEditing: () => void;
-  onDiscardChanges: () => void;
-  onSaveAndClose: () => void;
-}
-
-export function UnsavedChangesDialog({
-  tab,
-  onContinueEditing,
-  onDiscardChanges,
-  onSaveAndClose,
-}: UnsavedChangesDialogProps) {
+export function UnsavedChangesDialog() {
+  const isOpen = useEditorStore((s) => s.unsavedChangesDialog.isOpen);
+  const tab = useEditorStore((s) => s.getUnsavedTab());
+  const onContinueEditing = useEditorStore((s) => s.cancelCloseTab);
+  const onDiscardChanges = useEditorStore((s) => s.confirmCloseTab);
+  const onSaveAndClose = useEditorStore((s) => s.saveAndCloseTab);
   const theme = useEditorStore((s) => s.theme);
+
+  if (!isOpen || !tab) return null;
 
   const isDark = theme === 'dark';
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className={`border rounded-lg shadow-xl p-6 min-w-[400px] ${
-        isDark
-          ? 'bg-[#252526] border-[#3e3e42] text-gray-200'
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50">
+      <div className={`w-full max-w-md p-6 rounded-lg shadow-xl border ${
+        isDark 
+          ? 'bg-[#252526] border-[#3e3e42] text-gray-200' 
           : 'bg-white border-gray-300 text-gray-900'
       }`}>
         <div className="flex items-start gap-3 mb-4">
@@ -32,40 +27,48 @@ export function UnsavedChangesDialog({
             </svg>
           </div>
           <div>
-            <h2 className="text-base font-semibold mb-1">Unsaved Changes</h2>
-            <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
-              {tab.title} has unsaved changes.
+            <h3 className="text-lg font-bold">Unsaved Changes</h3>
+            <p className={`mt-1 text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+              "{tab.title}" has unsaved changes. Do you want to save them before closing?
             </p>
           </div>
         </div>
-
-        <div className="flex gap-2 justify-end">
+        
+        <div className="flex flex-row flex-wrap gap-2 mt-6 justify-end">
           <button
-            onClick={onContinueEditing}
-            autoFocus
-            className={`px-3 py-1.5 text-sm rounded border transition-colors ${
+            onClick={() => onContinueEditing()}
+            className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md border transition-colors whitespace-nowrap ${
               isDark
                 ? 'border-[#3e3e42] bg-[#2d2d2d] hover:bg-[#3e3e42] text-gray-200'
                 : 'border-gray-300 bg-gray-100 hover:bg-gray-200 text-gray-800'
             }`}
           >
-            Continue editing
+            <Undo2 size={16} />
+            Cancel
           </button>
+          
           <button
-            onClick={onDiscardChanges}
-            className={`px-3 py-1.5 text-sm rounded border transition-colors ${
+            onClick={() => onDiscardChanges()}
+            className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md border transition-colors whitespace-nowrap ${
               isDark
-                ? 'border-[#3e3e42] bg-[#2d2d2d] hover:border-red-500 hover:bg-[#3e3e42] text-gray-200'
-                : 'border-gray-300 bg-gray-100 hover:border-red-500 hover:bg-gray-200 text-gray-800'
+                ? 'border-[#3e3e42] bg-[#2d2d2d] hover:bg-red-900/30 hover:border-red-900/50 hover:text-red-400'
+                : 'border-gray-300 bg-gray-100 hover:bg-red-100 hover:border-red-200 hover:text-red-700'
             }`}
           >
-            Discard changes
+            <Trash2 size={16} />
+            Discard
           </button>
+          
           <button
-            onClick={onSaveAndClose}
-            className="px-3 py-1.5 text-sm rounded border border-blue-600 bg-blue-700 hover:bg-blue-600 text-white transition-colors"
+            onClick={() => onSaveAndClose()}
+            className={`flex items-center gap-2 px-4 py-2 text-sm font-medium text-white rounded-md border transition-colors whitespace-nowrap ${
+              isDark
+                ? 'bg-blue-600 border-blue-500 hover:bg-blue-500'
+                : 'bg-blue-600 border-blue-500 hover:bg-blue-500'
+            }`}
           >
-            Save &amp; Close
+            <Save size={16} />
+            Save
           </button>
         </div>
       </div>

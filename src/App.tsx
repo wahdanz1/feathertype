@@ -4,7 +4,6 @@ import {
   RouterProvider,
   Navigate,
   useLocation,
-  useBlocker,
   Outlet
 } from 'react-router-dom';
 import { useEditorStore } from './store/useEditorStore';
@@ -12,7 +11,6 @@ import { AppShell } from './components/AppShell';
 import { ScrollToTop } from './components/layout/ScrollToTop';
 import { Navbar } from './components/layout/Navbar';
 import { cn } from './lib/utils';
-import { UnsavedChangesDialog } from './components/UnsavedChangesDialog';
 import './App.css';
 
 // Lazy load website components to keep Tauri app lean
@@ -21,19 +19,28 @@ const Download = lazy(() => import('./pages/Download.tsx'));
 const Contact = lazy(() => import('./pages/Contact.tsx'));
 
 // Tauri detection
-const isTauri = typeof window !== 'undefined' && (window as any).__TAURI_INTERNALS__ !== undefined;
+// Tauri detection (Mode-specific for builds, runtime-specific for development)
+const isTauri = import.meta.env.MODE === 'tauri' || (import.meta.env.MODE === 'development' && typeof window !== 'undefined' && (window as any).__TAURI_INTERNALS__ !== undefined);
+
+console.log(`[FeatherType] Environment: ${isTauri ? 'Tauri' : 'Web'} (Mode: ${import.meta.env.MODE})`);
 
 function RootLayout() {
   const theme = useEditorStore((s) => s.theme);
-  const tabs = useEditorStore((s) => s.tabs);
   const location = useLocation();
 
-  const isDirty = tabs.some(t => t.isDirty);
-  const dirtyTab = tabs.find(t => t.isDirty);
+  const isDirty = useEditorStore((s) => s.tabs.some(t => t.isDirty));
 
-  const blocker = useBlocker(
-    ({ currentLocation, nextLocation }) => isDirty && currentLocation.pathname !== nextLocation.pathname
-  );
+  // App-level protection for unsaved changes (Browser Exit / Reload)
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (isDirty) {
+        e.preventDefault();
+        e.returnValue = ''; // Required for most browsers
+      }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [isDirty]);
 
   const isEditor = location.pathname === '/editor' || isTauri;
 
@@ -64,17 +71,6 @@ function RootLayout() {
           <Outlet />
         </Suspense>
       </main>
-
-      {blocker.state === "blocked" && dirtyTab && (
-        <UnsavedChangesDialog
-          tab={dirtyTab}
-          onContinueEditing={() => blocker.reset()}
-          onDiscardChanges={() => blocker.proceed()}
-          onSaveAndClose={async () => {
-            blocker.proceed();
-          }}
-        />
-      )}
     </div>
   );
 }

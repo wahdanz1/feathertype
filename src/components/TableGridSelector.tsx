@@ -76,9 +76,7 @@ export function TableGridSelector({ onInsert }: TableGridSelectorProps) {
                   onClick={handleCellClick}
                   className={`w-4 h-4 border cursor-pointer transition-colors ${
                     isHighlighted
-                      ? theme === 'dark'
-                        ? 'bg-blue-600 border-blue-500'
-                        : 'bg-blue-400 border-blue-500'
+                      ? 'bg-theme-primary border-theme-primary/80'
                       : theme === 'dark'
                       ? 'bg-[#1e1e1e] border-[#3e3e42] hover:bg-[#3e3e42]'
                       : 'bg-gray-100 border-gray-300 hover:bg-gray-200'

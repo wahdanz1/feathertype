@@ -1,39 +1,23 @@
 import { Toolbar } from './Toolbar';
-import { FormattingToolbar } from './FormattingToolbar';
 import { TabBar } from './TabBar';
 import { SplitPane } from './SplitPane';
 import { StatusBar } from './StatusBar';
 import { UnsavedChangesDialog } from './UnsavedChangesDialog';
+import { AboutDialog } from './AboutDialog';
 import { useEditorStore } from '../store/useEditorStore';
 
 export function AppShell() {
   const theme = useEditorStore((s) => s.theme);
-  const unsavedChangesDialog = useEditorStore((s) => s.unsavedChangesDialog);
-  const getUnsavedTab = useEditorStore((s) => s.getUnsavedTab);
-  const cancelCloseTab = useEditorStore((s) => s.cancelCloseTab);
-  const confirmCloseTab = useEditorStore((s) => s.confirmCloseTab);
-  const saveAndCloseTab = useEditorStore((s) => s.saveAndCloseTab);
-
-  const unsavedTab = getUnsavedTab();
-
   return (
-    <div className={`h-screen flex flex-col ${theme === 'dark' ? 'bg-[#1e1e1e] text-gray-200' : 'bg-white text-gray-900'}`}>
+    <div className={`h-full flex flex-col ${theme === 'dark' ? 'bg-[#1e1e1e] text-gray-200' : 'bg-white text-gray-900'}`}>
       <Toolbar />
-      <FormattingToolbar />
       <TabBar />
-      <div className="flex-1 overflow-hidden">
+      <div className="flex-1 overflow-hidden min-h-0">
         <SplitPane />
       </div>
       <StatusBar />
-
-      {unsavedChangesDialog.isOpen && unsavedTab && (
-        <UnsavedChangesDialog
-          tab={unsavedTab}
-          onContinueEditing={cancelCloseTab}
-          onDiscardChanges={confirmCloseTab}
-          onSaveAndClose={saveAndCloseTab}
-        />
-      )}
+      <UnsavedChangesDialog />
+      <AboutDialog />
     </div>
   );
 }

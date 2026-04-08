@@ -15,7 +15,8 @@ const darkTheme = EditorView.theme({
   '&': {
     backgroundColor: '#1e1e1e',
     color: '#d4d4d4',
-    height: '100%',
+    height: 'auto',
+    minHeight: '100%',
   },
   '.cm-content': {
     caretColor: '#ffffff',
@@ -51,7 +52,8 @@ const lightTheme = EditorView.theme({
   '&': {
     backgroundColor: '#ffffff',
     color: '#1e1e1e',
-    height: '100%',
+    height: 'auto',
+    minHeight: '100%',
   },
   '.cm-content': {
     caretColor: '#000000',
@@ -160,10 +162,11 @@ export function Editor() {
   }
 
   return (
-    <div ref={containerRef} className="h-full overflow-hidden editor-zoom-container">
+    <div ref={containerRef} className="h-full w-full overflow-y-auto min-h-0 editor-zoom-container">
       <CodeMirror
         value={activeTab.content}
-        height="100%"
+        height="auto"
+        minHeight="100%"
         theme={theme}
         extensions={extensions}
         onChange={(value) => updateContent(activeTab.id, value)}

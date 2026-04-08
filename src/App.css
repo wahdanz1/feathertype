@@ -8,15 +8,22 @@
 body {
   margin: 0;
   padding: 0;
-  overflow: hidden;
   background-color: #1e1e1e;
   color: #e5e7eb;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
 }
 
+body.is-editor-body {
+  overflow: hidden;
+}
+
 #root {
+  min-height: 100vh;
+  width: 100%;
+}
+
+#root.is-editor-root {
   height: 100vh;
-  width: 100vw;
 }
 
 .editor-zoom-container {
@@ -24,12 +31,13 @@ body {
 }
 
 .cm-editor {
-  height: 100%;
+  height: min-content;
+  min-height: 100%;
   font-size: var(--editor-font-size);
 }
 
 .cm-scroller {
-  overflow: auto;
+  overflow: visible;
 }
 
 /* Markdown syntax highlighting - style all formatting markers with cyan color */
@@ -44,7 +52,8 @@ body {
 .cm-strikethrough,
 .cm-link,
 .cm-monospace {
-  color: #4EC9B0 !important; /* Cyan color for all markdown syntax markers */
+  color: #4EC9B0 !important;
+  /* Cyan color for all markdown syntax markers */
 }
 
 /* Dropdown menu styling */

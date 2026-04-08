@@ -42,13 +42,13 @@ export default function Home() {
             
             <div className="flex flex-col gap-4 sm:flex-row sm:gap-6 mt-4">
               <Link to="/editor">
-                <Button variant="primary" className="h-14 px-10 text-lg font-semibold shadow-2xl shadow-theme-primary/30 group">
+                <Button variant="primary" size="lg" className="shadow-2xl shadow-theme-primary/30 group">
                   Try Editor Online
                   <ArrowRight className="ml-2 transition-transform group-hover:translate-x-1" size={20} />
                 </Button>
               </Link>
               <Link to="/download">
-                <Button variant="secondary" className="h-14 px-10 text-lg font-semibold bg-white/5 border-white/10 hover:bg-white/10 transition-all backdrop-blur-sm">
+                <Button variant="secondary" size="lg">
                   Download for Desktop
                 </Button>
               </Link>
@@ -164,13 +164,13 @@ export default function Home() {
               </p>
               <div className="flex flex-col gap-4 sm:flex-row">
                  <Link to="/download">
-                    <Button variant="primary" className="h-12 px-8 font-medium shadow-lg shadow-theme-primary/20">
+                    <Button variant="primary" className="px-8 shadow-lg shadow-theme-primary/20">
                        <Download className="mr-2" size={18} />
                        Download Latest
                     </Button>
                  </Link>
                  <Link to="/editor">
-                    <Button variant="secondary" className="h-12 px-8 font-medium">
+                    <Button variant="secondary" className="px-8">
                        Launch Web Editor
                     </Button>
                  </Link>

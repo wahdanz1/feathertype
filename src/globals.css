@@ -5,6 +5,7 @@
   /* === Primary Theme Color === */
   --color-theme-primary: #0e639c;
   --color-theme-primary-hover: #1177bb;
+  --color-theme-primary-border: #248ad2;
 
   /* === Button Colors - Dark Theme === */
   --color-button-inactive-dark: #2d2d2d;        /* Darker than before for better contrast */

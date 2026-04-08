@@ -8,40 +8,34 @@ export function Navbar() {
   const isEditor = location.pathname === '/editor';
 
   const navItems = [
-    { name: 'Home', path: '/' },
     { name: 'Download', path: '/download' },
     { name: 'Contact', path: '/contact' },
   ];
 
   return (
-    <nav className={cn(
-      "sticky top-0 left-0 right-0 z-50 border-b border-border/40 bg-editor-bg backdrop-blur-md transition-all",
-      isEditor && "h-12"
-    )}>
+    <nav className="sticky top-0 left-0 right-0 z-50 border-b border-border/40 bg-editor-bg backdrop-blur-md transition-all h-12">
       <div className={cn(
-        "container mx-auto flex items-center justify-between px-4 transition-all",
-        isEditor ? "h-12" : "h-16"
+        "h-12 grid grid-cols-3 items-center transition-all",
+        isEditor ? "px-3" : "container mx-auto px-4"
       )}>
-        {!isEditor && (
+        {/* Left: Logo */}
+        <div className="flex justify-start">
           <Link to="/" className="flex items-center gap-2 transition-opacity hover:opacity-80">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-theme-primary text-white">
-              <Feather size={20} />
+            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-theme-primary text-white">
+              <Feather size={18} />
             </div>
-            <span className="text-lg font-bold tracking-tight text-white">FeatherType</span>
+            <span className="text-md font-bold tracking-tight text-white">FeatherType</span>
           </Link>
-        )}
+        </div>
 
-        <div className={cn(
-          "flex items-center gap-8",
-          isEditor ? "mx-auto" : "hidden md:flex"
-        )}>
+        {/* Center: Navigation Links */}
+        <div className="flex justify-center gap-8">
           {navItems.map((item) => {
             const isActive = location.pathname === item.path;
-            if (isEditor && item.path === '/editor') return null;
             return (
-              <Link key={item.path} to={item.path} className="relative group py-1">
+              <Link key={item.path} to={item.path} className="relative group py-1 hidden md:block">
                 <span className={cn(
-                  "text-sm font-medium transition-colors hover:text-white",
+                  "text-sm font-medium transition-colors group-hover:text-white",
                   isActive ? "text-white" : "text-gray-400"
                 )}>
                   {item.name}
@@ -55,17 +49,18 @@ export function Navbar() {
           })}
         </div>
 
-        {!isEditor && (
-          <div className="flex items-center gap-2">
+        {/* Right: CTA Button or Spacer */}
+        <div className="flex justify-end">
+          {!isEditor ? (
             <Link to="/editor">
-              <Button variant="primary" className="h-9 px-6 font-medium shadow-lg shadow-theme-primary/30">
-                Launch Editor
+              <Button variant="primary" size="sm" className="shadow-lg shadow-theme-primary/30">
+                Online Editor
               </Button>
             </Link>
-          </div>
-        )}
-        
-        {isEditor && <div className="w-0" />} 
+          ) : (
+            <div className="w-8" /> /* Spacer to match editor toolbar right-side icons if any */
+          )}
+        </div>
       </div>
     </nav>
   );

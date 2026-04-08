@@ -40,8 +40,6 @@ export default defineConfig(async () => ({
             '@codemirror/language',
             '@codemirror/commands',
             '@codemirror/search',
-            '@codemirror/autocomplete',
-            '@codemirror/lint',
           ],
         },
       },

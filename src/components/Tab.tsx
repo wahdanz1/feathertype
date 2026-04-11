@@ -1,3 +1,4 @@
+import { useState, useRef, useEffect } from 'react';
 import { Tab as TabType } from '../types';
 import { useEditorStore } from '../store/useEditorStore';
 
@@ -11,8 +12,38 @@ interface TabProps {
 
 export function Tab({ tab, isActive, index, onSelect, onClose }: TabProps) {
   const theme = useEditorStore((s) => s.theme);
+  const renameTab = useEditorStore((s) => s.renameTab);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editValue, setEditValue] = useState(tab.title);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const isDark = theme === 'dark';
+
+  useEffect(() => {
+    if (isEditing && inputRef.current) {
+      inputRef.current.focus();
+      inputRef.current.select();
+    }
+  }, [isEditing]);
+
+  const handleDoubleClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setEditValue(tab.title);
+    setIsEditing(true);
+  };
+
+  const commitRename = () => {
+    const trimmed = editValue.trim();
+    if (trimmed && trimmed !== tab.title) {
+      renameTab(tab.id, trimmed);
+    }
+    setIsEditing(false);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') commitRename();
+    if (e.key === 'Escape') setIsEditing(false);
+  };
 
   const styles = isDark ? {
     active: 'bg-[#1e1e1e] text-white border-x border-t border-[#3e3e42] z-10 -mb-[1px] rounded-t-lg shadow-sm font-medium',
@@ -40,7 +71,7 @@ export function Tab({ tab, isActive, index, onSelect, onClose }: TabProps) {
       {!isActive && index > 0 && (
         <div className={`absolute -left-[2px] w-[1px] h-4 top-1/2 -translate-y-1/2 ${isDark ? 'bg-white/10' : 'bg-black/10'}`} />
       )}
-      
+
       <div className="flex items-center gap-2 overflow-hidden">
         {/* Fixed-width container for status dot to prevent horizontal jumping */}
         <div className="w-1.5 flex-shrink-0 flex items-center justify-start">
@@ -48,9 +79,26 @@ export function Tab({ tab, isActive, index, onSelect, onClose }: TabProps) {
             <span className="w-1.5 h-1.5 bg-blue-500 rounded-full" title="Unsaved changes" />
           )}
         </div>
-        <span className="text-sm truncate select-none leading-none">{tab.title}</span>
+        {isEditing ? (
+          <input
+            ref={inputRef}
+            value={editValue}
+            onChange={(e) => setEditValue(e.target.value)}
+            onBlur={commitRename}
+            onKeyDown={handleKeyDown}
+            onClick={(e) => e.stopPropagation()}
+            className="text-sm bg-transparent border-b border-theme-primary outline-none w-full min-w-0 leading-none"
+          />
+        ) : (
+          <span
+            className="text-sm truncate select-none leading-none"
+            onDoubleClick={handleDoubleClick}
+          >
+            {tab.title}
+          </span>
+        )}
       </div>
-      
+
       <button
         onClick={(e) => {
           e.stopPropagation();

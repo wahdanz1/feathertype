@@ -148,7 +148,8 @@ export async function handleSaveFile(
       const path = await saveFileDialog(tab.filePath || undefined);
       if (path) {
         await writeFile(path, tab.content);
-        const title = getFileName(path);
+        // In browser mode, keep the current tab title instead of "browser-save"
+        const title = path === 'browser-save' ? tab.title : getFileName(path);
         updateTabPath(tab.id, path, title);
         markTabClean(tab.id);
       }

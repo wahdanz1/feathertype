@@ -30,6 +30,7 @@ interface EditorStore extends EditorState {
   setActiveTab: (tabId: string) => void;
   updateTabContent: (tabId: string, content: string) => void;
   updateTabPath: (tabId: string, path: string | File, title: string) => void;
+  renameTab: (tabId: string, title: string) => void;
   markTabClean: (tabId: string) => void;
 
   // UI state
@@ -212,6 +213,14 @@ export const useEditorStore = create<EditorStore>()(
             tab.id === tabId
               ? { ...tab, filePath: path, title }
               : tab
+          ),
+        }));
+      },
+
+      renameTab: (tabId: string, title: string) => {
+        set((state) => ({
+          tabs: state.tabs.map((tab) =>
+            tab.id === tabId ? { ...tab, title } : tab
           ),
         }));
       },

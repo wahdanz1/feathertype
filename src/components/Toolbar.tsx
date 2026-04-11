@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import type { EditorView } from '@codemirror/view';
 import { LuSun, LuMoon, LuBold, LuItalic, LuStrikethrough, LuList, LuListOrdered, LuLink2, LuCode, LuFileCode, LuWrapText } from 'react-icons/lu';
 import { FileMenu } from './FileMenu';
 import { Button } from './Button';
@@ -25,36 +26,43 @@ export function Toolbar() {
     headingLevel: 0
   });
 
+  const refreshActiveFormats = () => {
+    setTimeout(() => {
+      if (!editorView) return;
+      setActiveFormats({
+        bold: hasFormat(editorView, '**', '**'),
+        italic: hasFormat(editorView, '_', '_'),
+        strikethrough: hasFormat(editorView, '~~', '~~'),
+        code: hasFormat(editorView, '`', '`'),
+        bulletList: hasBulletList(editorView),
+        numberedList: hasNumberedList(editorView),
+        heading: hasHeading(editorView),
+        headingLevel: getHeadingLevel(editorView),
+      });
+    }, 0);
+  };
+
   useEffect(() => {
     if (!editorView) return;
-    const updateActiveFormats = () => {
-      setTimeout(() => {
-        if (!editorView) return;
-        setActiveFormats({
-          bold: hasFormat(editorView, '**', '**'),
-          italic: hasFormat(editorView, '_', '_'),
-          strikethrough: hasFormat(editorView, '~~', '~~'),
-          code: hasFormat(editorView, '`', '`'),
-          bulletList: hasBulletList(editorView),
-          numberedList: hasNumberedList(editorView),
-          heading: hasHeading(editorView),
-          headingLevel: getHeadingLevel(editorView),
-        });
-      }, 0);
-    };
-    updateActiveFormats();
-    const handleUpdate = () => updateActiveFormats();
-    editorView.dom.addEventListener('mouseup', handleUpdate);
-    editorView.dom.addEventListener('keyup', handleUpdate);
-    editorView.dom.addEventListener('click', handleUpdate);
-    editorView.dom.addEventListener('focus', handleUpdate);
+    refreshActiveFormats();
+    editorView.dom.addEventListener('mouseup', refreshActiveFormats);
+    editorView.dom.addEventListener('keyup', refreshActiveFormats);
+    editorView.dom.addEventListener('click', refreshActiveFormats);
+    editorView.dom.addEventListener('focus', refreshActiveFormats);
     return () => {
-      editorView.dom.removeEventListener('mouseup', handleUpdate);
-      editorView.dom.removeEventListener('keyup', handleUpdate);
-      editorView.dom.removeEventListener('click', handleUpdate);
-      editorView.dom.removeEventListener('focus', handleUpdate);
+      editorView.dom.removeEventListener('mouseup', refreshActiveFormats);
+      editorView.dom.removeEventListener('keyup', refreshActiveFormats);
+      editorView.dom.removeEventListener('click', refreshActiveFormats);
+      editorView.dom.removeEventListener('focus', refreshActiveFormats);
     };
   }, [editorView]);
+
+  /** Apply a format and refresh active state indicators */
+  const applyFormat = (formatFn: (view: EditorView) => void) => {
+    if (!editorView) return;
+    formatFn(editorView);
+    refreshActiveFormats();
+  };
 
   const dividerColor = theme === 'dark' ? 'bg-[#3e3e42]' : 'bg-gray-300';
   const getButtonClass = (isActive: boolean) => isActive ? 'border border-theme-primary bg-white/10 dark:bg-white/5 shadow-sm scale-[0.98]' : '';
@@ -75,29 +83,27 @@ export function Toolbar() {
       
       <div className={`w-px h-6 ${dividerColor} mx-1`} />
 
-      <Button variant="secondary" iconOnly onClick={() => formats.bold(editorView!)} title="Bold" className={getButtonClass(activeFormats.bold)}>
+      <Button variant="secondary" iconOnly onClick={() => applyFormat(formats.bold)} title="Bold" className={getButtonClass(activeFormats.bold)}>
         <LuBold className="w-5 h-5" />
       </Button>
-      <Button variant="secondary" iconOnly onClick={() => formats.italic(editorView!)} title="Italic" className={getButtonClass(activeFormats.italic)}>
+      <Button variant="secondary" iconOnly onClick={() => applyFormat(formats.italic)} title="Italic" className={getButtonClass(activeFormats.italic)}>
         <LuItalic className="w-5 h-5" />
       </Button>
-      <Button variant="secondary" iconOnly onClick={() => formats.strikethrough(editorView!)} title="Strikethrough" className={getButtonClass(activeFormats.strikethrough)}>
+      <Button variant="secondary" iconOnly onClick={() => applyFormat(formats.strikethrough)} title="Strikethrough" className={getButtonClass(activeFormats.strikethrough)}>
         <LuStrikethrough className="w-5 h-5" />
       </Button>
 
       <Dropdown
         value={activeFormats.headingLevel > 0 ? `h${activeFormats.headingLevel}` : ''}
         onChange={(value) => {
-          if (!editorView) return;
-          if (value === 'h1') formats.heading1(editorView);
-          else if (value === 'h2') formats.heading2(editorView);
-          else if (value === 'h3') formats.heading3(editorView);
+          if (value === 'h1') applyFormat(formats.heading1);
+          else if (value === 'h2') applyFormat(formats.heading2);
+          else if (value === 'h3') applyFormat(formats.heading3);
           else if (value === '' && activeFormats.headingLevel > 0) {
-            // Remove current heading
             const level = activeFormats.headingLevel;
-            if (level === 1) formats.heading1(editorView);
-            else if (level === 2) formats.heading2(editorView);
-            else if (level === 3) formats.heading3(editorView);
+            if (level === 1) applyFormat(formats.heading1);
+            else if (level === 2) applyFormat(formats.heading2);
+            else if (level === 3) applyFormat(formats.heading3);
           }
         }}
         options={[
@@ -112,24 +118,24 @@ export function Toolbar() {
 
       <div className={`w-px h-6 ${dividerColor} mx-1`} />
 
-      <Button variant="secondary" iconOnly onClick={() => formats.bulletList(editorView!)} title="Bullet List" className={getButtonClass(activeFormats.bulletList)}>
+      <Button variant="secondary" iconOnly onClick={() => applyFormat(formats.bulletList)} title="Bullet List" className={getButtonClass(activeFormats.bulletList)}>
         <LuList className="w-5 h-5" />
       </Button>
-      <Button variant="secondary" iconOnly onClick={() => formats.numberedList(editorView!)} title="Numbered List" className={getButtonClass(activeFormats.numberedList)}>
+      <Button variant="secondary" iconOnly onClick={() => applyFormat(formats.numberedList)} title="Numbered List" className={getButtonClass(activeFormats.numberedList)}>
         <LuListOrdered className="w-5 h-5" />
       </Button>
 
-      <TableGridSelector onInsert={(rows, cols) => formats.table(editorView!, rows, cols)} />
+      <TableGridSelector onInsert={(rows, cols) => { if (editorView) formats.table(editorView, rows, cols); refreshActiveFormats(); }} />
 
       <div className={`w-px h-6 ${dividerColor} mx-1`} />
 
-      <Button variant="secondary" iconOnly onClick={() => formats.link(editorView!)} title="Link">
+      <Button variant="secondary" iconOnly onClick={() => applyFormat(formats.link)} title="Link">
         <LuLink2 className="w-5 h-5" />
       </Button>
-      <Button variant="secondary" iconOnly onClick={() => formats.inlineCode(editorView!)} title="Code" className={getButtonClass(activeFormats.code)}>
+      <Button variant="secondary" iconOnly onClick={() => applyFormat(formats.inlineCode)} title="Code" className={getButtonClass(activeFormats.code)}>
         <LuCode className="w-5 h-5" />
       </Button>
-      <Button variant="secondary" iconOnly onClick={() => formats.comment(editorView!)} title="Docx Tooltip">
+      <Button variant="secondary" iconOnly onClick={() => applyFormat(formats.comment)} title="Docx Tooltip">
         <LuFileCode className="w-5 h-5" />
       </Button>
 

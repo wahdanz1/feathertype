@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Sun, Moon, Bold, Italic, Strikethrough, List, ListOrdered, Link2, Code2, FileCode2, WrapText } from 'lucide-react';
+import { LuSun, LuMoon, LuBold, LuItalic, LuStrikethrough, LuList, LuListOrdered, LuLink2, LuCode, LuFileCode, LuWrapText } from 'react-icons/lu';
 import { FileMenu } from './FileMenu';
 import { Button } from './Button';
 import { Dropdown } from './Dropdown';
@@ -68,13 +68,13 @@ export function Toolbar() {
       <div className={`w-px h-6 ${dividerColor} mx-1`} />
 
       <Button variant="secondary" iconOnly onClick={() => formats.bold(editorView!)} title="Bold" className={getButtonClass(activeFormats.bold)}>
-        <Bold className="w-5 h-5" />
+        <LuBold className="w-5 h-5" />
       </Button>
       <Button variant="secondary" iconOnly onClick={() => formats.italic(editorView!)} title="Italic" className={getButtonClass(activeFormats.italic)}>
-        <Italic className="w-5 h-5" />
+        <LuItalic className="w-5 h-5" />
       </Button>
       <Button variant="secondary" iconOnly onClick={() => formats.strikethrough(editorView!)} title="Strikethrough" className={getButtonClass(activeFormats.strikethrough)}>
-        <Strikethrough className="w-5 h-5" />
+        <LuStrikethrough className="w-5 h-5" />
       </Button>
 
       <Dropdown
@@ -98,10 +98,10 @@ export function Toolbar() {
       <div className={`w-px h-6 ${dividerColor} mx-1`} />
 
       <Button variant="secondary" iconOnly onClick={() => formats.bulletList(editorView!)} title="Bullet List" className={getButtonClass(activeFormats.bulletList)}>
-        <List className="w-5 h-5" />
+        <LuList className="w-5 h-5" />
       </Button>
       <Button variant="secondary" iconOnly onClick={() => formats.numberedList(editorView!)} title="Numbered List" className={getButtonClass(activeFormats.numberedList)}>
-        <ListOrdered className="w-5 h-5" />
+        <LuListOrdered className="w-5 h-5" />
       </Button>
 
       <TableGridSelector onInsert={(rows, cols) => formats.table(editorView!, rows, cols)} />
@@ -109,25 +109,25 @@ export function Toolbar() {
       <div className={`w-px h-6 ${dividerColor} mx-1`} />
 
       <Button variant="secondary" iconOnly onClick={() => formats.link(editorView!)} title="Link">
-        <Link2 className="w-5 h-5" />
+        <LuLink2 className="w-5 h-5" />
       </Button>
       <Button variant="secondary" iconOnly onClick={() => formats.inlineCode(editorView!)} title="Code" className={getButtonClass(activeFormats.code)}>
-        <Code2 className="w-5 h-5" />
+        <LuCode className="w-5 h-5" />
       </Button>
       <Button variant="secondary" iconOnly onClick={() => formats.comment(editorView!)} title="Docx Tooltip">
-        <FileCode2 className="w-5 h-5" />
+        <LuFileCode className="w-5 h-5" />
       </Button>
 
       <div className={`w-px h-6 ${dividerColor} mx-1`} />
 
       <Button variant="secondary" iconOnly onClick={toggleLineWrap} title="Word Wrap" className={getButtonClass(lineWrap)}>
-        <WrapText className="w-5 h-5" />
+        <LuWrapText className="w-5 h-5" />
       </Button>
 
       <div className="flex-1" />
       
       <Button variant="secondary" iconOnly onClick={toggleTheme} title="Toggle Theme">
-        {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+        {theme === 'dark' ? <LuSun className="w-5 h-5" /> : <LuMoon className="w-5 h-5" />}
       </Button>
     </div>
   );

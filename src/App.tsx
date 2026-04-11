@@ -10,6 +10,7 @@ import { useEditorStore } from './store/useEditorStore';
 import { AppShell } from './components/AppShell';
 import { ScrollToTop } from './components/layout/ScrollToTop';
 import { Navbar } from './components/layout/Navbar';
+import { Footer } from './components/layout/Footer';
 import { cn } from './lib/utils';
 import './App.css';
 
@@ -18,7 +19,6 @@ const Home = lazy(() => import('./pages/Home.tsx'));
 const Download = lazy(() => import('./pages/Download.tsx'));
 const Contact = lazy(() => import('./pages/Contact.tsx'));
 
-// Tauri detection
 // Tauri detection (Mode-specific for builds, runtime-specific for development)
 const isTauri = import.meta.env.MODE === 'tauri' || (import.meta.env.MODE === 'development' && typeof window !== 'undefined' && (window as any).__TAURI_INTERNALS__ !== undefined);
 
@@ -27,20 +27,6 @@ console.log(`[FeatherType] Environment: ${isTauri ? 'Tauri' : 'Web'} (Mode: ${im
 function RootLayout() {
   const theme = useEditorStore((s) => s.theme);
   const location = useLocation();
-
-  const isDirty = useEditorStore((s) => s.tabs.some(t => t.isDirty));
-
-  // App-level protection for unsaved changes (Browser Exit / Reload)
-  useEffect(() => {
-    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      if (isDirty) {
-        e.preventDefault();
-        e.returnValue = ''; // Required for most browsers
-      }
-    };
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-  }, [isDirty]);
 
   const isEditor = location.pathname === '/editor' || isTauri;
 
@@ -66,11 +52,13 @@ function RootLayout() {
       {!isTauri && <ScrollToTop />}
       {!isTauri && <Navbar />}
 
-      <main className={cn("flex-1 min-h-0", isEditor ? "overflow-hidden" : "overflow-visible")}>
+      <main className={cn("flex-1 flex flex-col min-h-0", isEditor ? "overflow-hidden" : "overflow-visible")}>
         <Suspense fallback={<div className="h-full w-full bg-editor-bg" />}>
           <Outlet />
         </Suspense>
       </main>
+
+      {!isEditor && <Footer />}
     </div>
   );
 }

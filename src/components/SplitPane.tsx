@@ -1,4 +1,4 @@
-import { Eye, EyeOff } from 'lucide-react';
+import { LuEye, LuEyeOff } from 'react-icons/lu';
 import { Editor } from './Editor';
 import { Preview } from './Preview';
 import { Button } from './Button';
@@ -17,7 +17,7 @@ export function SplitPane() {
           onClick={togglePreview}
           title="Toggle Preview (Ctrl+\)"
         >
-          {showPreview ? <Eye className="w-6 h-6" /> : <EyeOff className="w-6 h-6" />}
+          {showPreview ? <LuEye className="w-6 h-6" /> : <LuEyeOff className="w-6 h-6" />}
         </Button>
       </div>
       <div className={showPreview ? 'w-1/2 h-full overflow-hidden' : 'w-full h-full overflow-hidden'}>

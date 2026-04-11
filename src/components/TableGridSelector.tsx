@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Table } from 'lucide-react';
+import { LuTable } from 'react-icons/lu';
 import { Button } from './Button';
 import { useEditorStore } from '../store/useEditorStore';
 
@@ -34,7 +34,7 @@ export function TableGridSelector({ onInsert }: TableGridSelectorProps) {
   };
 
   const handleCellClick = () => {
-    if (hoverCell.row > 0 && hoverCell.col > 0) {
+    if (hoverCell.row > 0 || hoverCell.col > 0) {
       onInsert(hoverCell.row + 1, hoverCell.col + 1); // +1 to include header row
       setIsOpen(false);
       setHoverCell({ row: 0, col: 0 });
@@ -50,7 +50,7 @@ export function TableGridSelector({ onInsert }: TableGridSelectorProps) {
         onClick={() => setIsOpen(!isOpen)}
         title="Insert Table"
       >
-        <Table className="w-6 h-6" />
+        <LuTable className="w-5 h-5" />
       </Button>
 
       {/* Dropdown Grid */}

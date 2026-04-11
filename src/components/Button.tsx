@@ -44,9 +44,9 @@ export function Button({
     : (animateIcon === 'horizontal' || animateIcon === true ? 'animate-icons' : '');
   
   const sizeStyles = {
-    sm: iconOnly ? 'h-8 w-8' : 'h-8 px-2.5',
-    md: iconOnly ? 'h-9 w-9' : 'h-9 px-4',
-    lg: iconOnly ? 'h-14 w-14' : 'h-14 px-10 text-lg font-semibold',
+    sm: iconOnly ? 'h-8 w-8 [&>div>svg]:w-4 [&>div>svg]:h-4' : 'h-8 px-2.5',
+    md: iconOnly ? 'h-9 w-9 [&>div>svg]:w-5 [&>div>svg]:h-5' : 'h-9 px-4',
+    lg: iconOnly ? 'h-14 w-14 [&>div>svg]:w-7 [&>div>svg]:h-7' : 'h-14 px-10 text-lg font-semibold',
   };
 
   const variantStyles = {

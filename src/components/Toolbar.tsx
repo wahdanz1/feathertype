@@ -82,13 +82,13 @@ export function Toolbar() {
       <div className={`w-px h-6 ${dividerColor} mx-1`} />
 
       <Button variant="secondary" iconOnly onClick={() => applyFormat(formats.bold)} title="Bold (Ctrl+B)" className={getButtonClass(activeFormats.bold)}>
-        <LuBold className="w-5 h-5" />
+        <LuBold  />
       </Button>
       <Button variant="secondary" iconOnly onClick={() => applyFormat(formats.italic)} title="Italic (Ctrl+I)" className={getButtonClass(activeFormats.italic)}>
-        <LuItalic className="w-5 h-5" />
+        <LuItalic  />
       </Button>
       <Button variant="secondary" iconOnly onClick={() => applyFormat(formats.strikethrough)} title="Strikethrough" className={getButtonClass(activeFormats.strikethrough)}>
-        <LuStrikethrough className="w-5 h-5" />
+        <LuStrikethrough  />
       </Button>
 
       <Dropdown
@@ -117,10 +117,10 @@ export function Toolbar() {
       <div className={`w-px h-6 ${dividerColor} mx-1`} />
 
       <Button variant="secondary" iconOnly onClick={() => applyFormat(formats.bulletList)} title="Bullet List (Ctrl+Shift+B)" className={getButtonClass(activeFormats.bulletList)}>
-        <LuList className="w-5 h-5" />
+        <LuList  />
       </Button>
       <Button variant="secondary" iconOnly onClick={() => applyFormat(formats.numberedList)} title="Numbered List (Ctrl+Shift+N)" className={getButtonClass(activeFormats.numberedList)}>
-        <LuListOrdered className="w-5 h-5" />
+        <LuListOrdered  />
       </Button>
 
       <TableGridSelector onInsert={(rows, cols) => { if (editorView) formats.table(editorView, rows, cols); refreshActiveFormats(); }} />
@@ -128,25 +128,25 @@ export function Toolbar() {
       <div className={`w-px h-6 ${dividerColor} mx-1`} />
 
       <Button variant="secondary" iconOnly onClick={() => applyFormat(formats.link)} title="Link (Ctrl+K)">
-        <LuLink2 className="w-5 h-5" />
+        <LuLink2  />
       </Button>
       <Button variant="secondary" iconOnly onClick={() => applyFormat(formats.inlineCode)} title="Inline Code (Ctrl+`)" className={getButtonClass(activeFormats.code)}>
-        <LuCode className="w-5 h-5" />
+        <LuCode  />
       </Button>
       <Button variant="secondary" iconOnly onClick={() => applyFormat(formats.comment)} title="Comment (Ctrl+Shift+/)">
-        <LuFileCode className="w-5 h-5" />
+        <LuFileCode  />
       </Button>
 
       <div className={`w-px h-6 ${dividerColor} mx-1`} />
 
       <Button variant="secondary" iconOnly onClick={toggleLineWrap} title="Word Wrap (Alt+Z)" className={getButtonClass(lineWrap)}>
-        <LuWrapText className="w-5 h-5" />
+        <LuWrapText  />
       </Button>
 
       <div className="flex-1" />
       
       <Button variant="secondary" iconOnly onClick={toggleTheme} title="Toggle Theme">
-        {theme === 'dark' ? <LuSun className="w-5 h-5" /> : <LuMoon className="w-5 h-5" />}
+        {theme === 'dark' ? <LuSun  /> : <LuMoon  />}
       </Button>
     </div>
   );

@@ -72,7 +72,7 @@ export function FileMenu() {
   return (
     <div className="relative" ref={menuRef}>
       <Button variant="primary" iconOnly onClick={() => setIsOpen(!isOpen)} title="File menu">
-        <LuMenu className="w-6 h-6" />
+        <LuMenu />
       </Button>
 
       {isOpen && (

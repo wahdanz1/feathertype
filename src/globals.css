@@ -130,6 +130,48 @@
     @apply flex items-center justify-center h-full text-theme-text-muted;
   }
 
+  /* === Dialog === */
+  .dialog-overlay {
+    @apply fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200;
+  }
+  .panel h3 {
+    @apply text-lg;
+  }
+
+  /* === Editor viewport === */
+  .editor-viewport {
+    @apply h-full w-full overflow-y-auto min-h-0;
+  }
+  .preview-pane {
+    @apply overflow-auto h-full bg-editor-bg;
+  }
+  .status-bar {
+    @apply flex items-center justify-between px-4 py-1 text-xs border-t editor-chrome text-muted;
+  }
+
+  /* === Tab styling === */
+  .tab {
+    @apply px-3.5 h-full min-w-[120px] max-w-[200px] flex items-center justify-between gap-3 cursor-pointer relative transition-all duration-150 group mx-[2px];
+  }
+  .tab-active {
+    @apply bg-editor-bg text-white border-x border-t border-border z-10 -mb-[1px] rounded-t-lg shadow-sm font-medium;
+  }
+  .light-theme .tab-active {
+    @apply bg-editor-bg-light text-text-light border-border-light;
+  }
+  .tab-inactive {
+    @apply bg-transparent text-theme-text-muted hover:bg-white/5 hover:rounded-t-lg border-transparent font-medium;
+  }
+  .light-theme .tab-inactive {
+    @apply text-text-muted-light hover:bg-black/5;
+  }
+  .tab-close {
+    @apply flex items-center justify-center w-5 h-5 text-theme-text-muted hover:text-red-500 transition-colors rounded hover:bg-white/10 opacity-0 group-hover:opacity-100;
+  }
+  .dirty-dot {
+    @apply w-1.5 h-1.5 bg-theme-primary rounded-full;
+  }
+
   /* === Mockup Component === */
   .mockup-frame {
     @apply mt-8 w-full max-w-6xl shadow-2xl shadow-black/50;

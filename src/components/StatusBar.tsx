@@ -49,7 +49,7 @@ export function StatusBar() {
 
   return (
     <div
-      className="flex items-center justify-between px-4 py-1 text-xs border-t editor-chrome text-muted"
+      className="status-bar"
     >
       <div className="flex items-center gap-4">
         <span>Ln {line}, Col {col}</span>

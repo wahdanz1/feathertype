@@ -57,10 +57,10 @@ export function Dialog({
   const headerFooterClass = 'panel-header';
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+    <div className="dialog-overlay">
       <div
         className={cn(
-          "w-full overflow-hidden rounded-xl shadow-2xl border animate-in zoom-in duration-200",
+          "w-full overflow-hidden rounded-xl animate-in zoom-in duration-200",
           maxWidthClasses[maxWidth],
           panelClass
         )}
@@ -74,7 +74,7 @@ export function Dialog({
             {icon && (
               <IconBox icon={icon} size="sm" variant="ghost" className="text-yellow-500" />
             )}
-            <h3 className="text-lg font-bold">{title}</h3>
+            <h3>{title}</h3>
           </Flex>
           <Button
             variant="ghost"

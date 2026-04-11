@@ -275,7 +275,7 @@ export function Editor() {
   }
 
   return (
-    <div ref={containerRef} className="h-full w-full overflow-y-auto min-h-0 editor-zoom-container">
+    <div ref={containerRef} className="editor-viewport editor-zoom-container">
       <CodeMirror
         value={activeTab.content}
         height="auto"

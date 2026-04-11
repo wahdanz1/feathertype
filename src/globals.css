@@ -71,6 +71,65 @@
   .lead {
     @apply text-lg sm:text-xl md:text-2xl text-theme-text-secondary font-medium;
   }
+  /* === Editor Component Semantics === */
+  .editor-shell {
+    @apply h-full flex flex-col bg-editor-bg text-editor-text;
+  }
+  .light-theme .editor-shell {
+    @apply bg-editor-bg-light text-text-light;
+  }
+  .editor-chrome {
+    @apply bg-editor-surface;
+  }
+  .light-theme .editor-chrome {
+    @apply bg-editor-surface-light;
+  }
+  .panel {
+    @apply border rounded shadow-xl bg-editor-surface border-border;
+  }
+  .light-theme .panel {
+    @apply bg-editor-bg-light border-border-light;
+  }
+  .panel-header {
+    @apply border-border bg-editor-surface-raised;
+  }
+  .light-theme .panel-header {
+    @apply border-border-light bg-editor-surface-light;
+  }
+  .menu-item {
+    @apply w-full px-4 py-2 text-left text-sm transition-colors flex justify-between items-center hover:bg-editor-surface-raised;
+  }
+  .light-theme .menu-item {
+    @apply hover:bg-button-inactive-light;
+  }
+  .menu-divider {
+    @apply border-t my-1 border-border;
+  }
+  .light-theme .menu-divider {
+    @apply border-border-light;
+  }
+  .text-muted {
+    @apply text-theme-text-muted;
+  }
+  .light-theme .text-muted {
+    @apply text-text-muted-light;
+  }
+  .text-secondary {
+    @apply text-theme-text-secondary;
+  }
+  .light-theme .text-secondary {
+    @apply text-text-secondary-light;
+  }
+  .dropdown-trigger {
+    @apply px-2 pr-1 h-9 text-sm rounded transition-all border flex items-center gap-1 bg-button-inactive-dark hover:bg-button-hover-dark border-border;
+  }
+  .light-theme .dropdown-trigger {
+    @apply bg-button-inactive-light hover:bg-button-hover-light border-border-light;
+  }
+  .empty-state {
+    @apply flex items-center justify-center h-full text-theme-text-muted;
+  }
+
   /* === Mockup Component === */
   .mockup-frame {
     @apply mt-8 w-full max-w-6xl shadow-2xl shadow-black/50;

@@ -40,7 +40,12 @@ const darkTheme = EditorView.theme({
   '.cm-foldGutter': {
     width: '16px',
   },
-  // Search panel — bottom positioned, styled to match app
+  // Search panel — force to bottom via flex order, styled to match app
+  '.cm-panels-top': {
+    order: '1',
+    borderTop: '1px solid #3e3e42',
+    borderBottom: 'none',
+  },
   '.cm-panels-bottom': {
     borderTop: '1px solid #3e3e42',
     borderBottom: 'none',
@@ -130,7 +135,12 @@ const lightTheme = EditorView.theme({
   '.cm-foldGutter': {
     width: '16px',
   },
-  // Search panel — bottom positioned, styled to match app
+  // Search panel — force to bottom via flex order, styled to match app
+  '.cm-panels-top': {
+    order: '1',
+    borderTop: '1px solid #d0d0d0',
+    borderBottom: 'none',
+  },
   '.cm-panels-bottom': {
     borderTop: '1px solid #d0d0d0',
     borderBottom: 'none',

@@ -78,7 +78,7 @@ export function Dropdown({
               className={cn(
                 "w-full px-4 py-1.5 text-sm text-left transition-colors",
                 option.value === value
-                  ? isDark ? "bg-theme-primary/20 text-white" : "bg-theme-primary/10 text-theme-primary"
+                  ? "bg-theme-primary text-white"
                   : isDark ? "text-gray-300 hover:bg-white/5" : "text-gray-700 hover:bg-gray-100"
               )}
             >

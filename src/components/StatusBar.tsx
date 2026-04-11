@@ -51,8 +51,8 @@ export function StatusBar() {
     <div
       className={`flex items-center justify-between px-4 py-1 text-xs border-t ${
         theme === 'dark'
-          ? 'bg-[#1e1e1e] text-[#d4d4d4] border-[#3e3e42]'
-          : 'bg-[#f5f5f5] text-[#1e1e1e] border-gray-300'
+          ? 'bg-editor-bg text-editor-text border-border'
+          : 'bg-editor-surface-light text-text-light border-border-light'
       }`}
     >
       <div className="flex items-center gap-4">

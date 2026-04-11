@@ -10,7 +10,7 @@ export function Preview() {
   }
 
   return (
-    <div className="markdown-preview overflow-auto h-full bg-[var(--color-editor-bg)] text-gray-200">
+    <div className="markdown-preview overflow-auto h-full bg-editor-bg text-theme-text-secondary">
       <ReactMarkdown remarkPlugins={[remarkGfm]}>
         {activeTab.content}
       </ReactMarkdown>

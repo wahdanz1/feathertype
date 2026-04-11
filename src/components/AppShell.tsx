@@ -11,7 +11,7 @@ export function AppShell() {
   const theme = useEditorStore((s) => s.theme);
   useKeyboardShortcuts();
   return (
-    <div className={`h-full flex flex-col ${theme === 'dark' ? 'bg-[#1e1e1e] text-gray-200' : 'bg-white text-gray-900'}`}>
+    <div className={`h-full flex flex-col ${theme === 'dark' ? 'bg-editor-bg text-editor-text' : 'bg-editor-bg-light text-text-light'}`}>
       <Toolbar />
       <TabBar />
       <div className="flex-1 overflow-hidden min-h-0">

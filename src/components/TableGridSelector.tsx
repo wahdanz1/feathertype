@@ -58,8 +58,8 @@ export function TableGridSelector({ onInsert }: TableGridSelectorProps) {
         <div
           className={`absolute top-full left-0 mt-1 p-2 rounded shadow-lg border z-50 ${
             theme === 'dark'
-              ? 'bg-[#2d2d2d] border-[#3e3e42]'
-              : 'bg-white border-gray-300'
+              ? 'bg-tab-active border-border'
+              : 'bg-editor-bg-light border-border-light'
           }`}
         >
           {/* Grid */}
@@ -78,8 +78,8 @@ export function TableGridSelector({ onInsert }: TableGridSelectorProps) {
                     isHighlighted
                       ? 'bg-theme-primary border-theme-primary/80'
                       : theme === 'dark'
-                      ? 'bg-[#1e1e1e] border-[#3e3e42] hover:bg-[#3e3e42]'
-                      : 'bg-gray-100 border-gray-300 hover:bg-gray-200'
+                      ? 'bg-editor-bg border-border hover:bg-button-hover-dark'
+                      : 'bg-button-inactive-light border-border-light hover:bg-button-hover-light'
                   }`}
                 />
               );
@@ -87,7 +87,7 @@ export function TableGridSelector({ onInsert }: TableGridSelectorProps) {
           </div>
 
           {/* Label */}
-          <div className={`text-center text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+          <div className={`text-center text-sm ${theme === 'dark' ? 'text-theme-text-secondary' : 'text-text-secondary-light'}`}>
             {hoverCell.row > 0 || hoverCell.col > 0
               ? `${hoverCell.col + 1} × ${hoverCell.row + 1} Table`
               : 'Select table size'}

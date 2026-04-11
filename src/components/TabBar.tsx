@@ -19,8 +19,8 @@ export function TabBar() {
 
   return (
     <div className={`flex items-center group/tabbar ${
-      theme === 'dark' ? 'bg-[#252526] text-[#969696]' : 'bg-[#f5f5f5] text-gray-500'
-    } h-9 border-b ${theme === 'dark' ? 'border-[#3e3e42]' : 'border-gray-200'}`}>
+      theme === 'dark' ? 'bg-editor-surface text-editor-gutter-text' : 'bg-editor-surface-light text-text-muted-light'
+    } h-9 border-b ${theme === 'dark' ? 'border-border' : 'border-border-light'}`}>
       <div 
         ref={scrollRef}
         className="flex h-full overflow-x-auto overflow-y-hidden no-scrollbar flex-1"
@@ -40,7 +40,7 @@ export function TabBar() {
       <button
         onClick={handleAddTab}
         className={`flex items-center justify-center w-8 h-full transition-colors ${
-          theme === 'dark' ? 'hover:bg-[#2d2d2d] hover:text-white' : 'hover:bg-gray-200 hover:text-gray-900'
+          theme === 'dark' ? 'hover:bg-tab-active hover:text-white' : 'hover:bg-button-hover-light hover:text-text-light'
         }`}
         title="New Tab (Ctrl+N)"
       >

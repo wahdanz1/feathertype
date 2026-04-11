@@ -46,12 +46,12 @@ export function Tab({ tab, isActive, index, onSelect, onClose }: TabProps) {
   };
 
   const styles = isDark ? {
-    active: 'bg-[#1e1e1e] text-white border-x border-t border-[#3e3e42] z-10 -mb-[1px] rounded-t-lg shadow-sm font-medium',
-    inactive: 'bg-transparent text-gray-500 hover:bg-white/5 border-transparent font-medium',
+    active: 'bg-editor-bg text-white border-x border-t border-border z-10 -mb-[1px] rounded-t-lg shadow-sm font-medium',
+    inactive: 'bg-transparent text-theme-text-muted hover:bg-white/5 border-transparent font-medium',
     closeHover: 'hover:text-red-500',
   } : {
-    active: 'bg-white text-gray-900 border-x border-t border-[#d0d0d0] z-10 -mb-[1px] rounded-t-lg shadow-sm font-medium',
-    inactive: 'bg-transparent text-gray-500 hover:bg-black/5 border-transparent font-medium',
+    active: 'bg-editor-bg-light text-text-light border-x border-t border-border-light z-10 -mb-[1px] rounded-t-lg shadow-sm font-medium',
+    inactive: 'bg-transparent text-text-muted-light hover:bg-black/5 border-transparent font-medium',
     closeHover: 'hover:text-red-500',
   };
 
@@ -104,7 +104,7 @@ export function Tab({ tab, isActive, index, onSelect, onClose }: TabProps) {
           e.stopPropagation();
           onClose();
         }}
-        className={`flex items-center justify-center w-5 h-5 text-gray-500 ${styles.closeHover} transition-colors rounded hover:bg-white/10 dark:hover:bg-white/5 opacity-0 group-hover:opacity-100 ${isActive ? 'opacity-100' : ''}`}
+        className={`flex items-center justify-center w-5 h-5 text-theme-text-muted ${styles.closeHover} transition-colors rounded hover:bg-white/10 dark:hover:bg-white/5 opacity-0 group-hover:opacity-100 ${isActive ? 'opacity-100' : ''}`}
         title="Close"
       >
         <span className="text-lg" style={{ marginTop: '-2px' }}>×</span>

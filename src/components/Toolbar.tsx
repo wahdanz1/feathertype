@@ -64,13 +64,13 @@ export function Toolbar() {
     refreshActiveFormats();
   };
 
-  const dividerColor = theme === 'dark' ? 'bg-[#3e3e42]' : 'bg-gray-300';
+  const dividerColor = theme === 'dark' ? 'bg-border' : 'bg-border-light';
   const getButtonClass = (isActive: boolean) => isActive ? 'border border-theme-primary bg-white/10 dark:bg-white/5 shadow-sm scale-[0.98]' : '';
 
   return (
     <div
       className={`flex items-center gap-1.5 px-3 py-1.5 ${
-        theme === 'dark' ? 'bg-[#252526]' : 'bg-[#f5f5f5]'
+        theme === 'dark' ? 'bg-editor-surface' : 'bg-editor-surface-light'
       }`}
       onMouseDown={(e) => {
         // Prevent toolbar clicks from stealing focus from the editor

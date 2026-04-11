@@ -69,10 +69,10 @@ export function FileMenu() {
 
   const itemClass = cn(
     "w-full px-4 py-2 text-left text-sm transition-colors flex justify-between items-center",
-    isDark ? "hover:bg-editor-surface-raised" : "hover:bg-gray-100"
+    isDark ? "hover:bg-editor-surface-raised" : "hover:bg-button-inactive-light"
   );
 
-  const dividerClass = cn("border-t my-1", isDark ? "border-border" : "border-gray-300");
+  const dividerClass = cn("border-t my-1", isDark ? "border-border" : "border-border-light");
 
   return (
     <div className="relative" ref={menuRef}>
@@ -83,7 +83,7 @@ export function FileMenu() {
       {isOpen && (
         <div className={cn(
           "absolute top-full left-0 mt-1 border rounded shadow-xl min-w-[200px] z-50 py-1",
-          isDark ? "bg-editor-surface border-border" : "bg-white border-gray-300"
+          isDark ? "bg-editor-surface border-border" : "bg-editor-bg-light border-border-light"
         )}>
           <MenuItem label="New" shortcut="Ctrl+N" onClick={handleNew} className={itemClass} />
           <MenuItem label="Open" shortcut="Ctrl+O" onClick={handleOpen} className={itemClass} />

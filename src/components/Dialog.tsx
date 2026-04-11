@@ -58,11 +58,11 @@ export function Dialog({
 
   const panelStyles = isDark
     ? 'bg-editor-surface border-border text-theme-text'
-    : 'bg-white border-gray-300 text-gray-900';
+    : 'bg-editor-bg-light border-border-light text-text-light';
 
   const headerFooterStyles = isDark
     ? 'border-border bg-editor-surface-raised'
-    : 'border-gray-200 bg-gray-50';
+    : 'border-border-light bg-editor-surface-light';
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
@@ -97,7 +97,7 @@ export function Dialog({
         {/* Body */}
         <div className="p-8">
           {description && (
-            <p className={cn("text-sm mb-6", isDark ? 'text-theme-text-muted' : 'text-gray-500')}>
+            <p className={cn("text-sm mb-6", isDark ? 'text-theme-text-muted' : 'text-text-muted-light')}>
               {description}
             </p>
           )}

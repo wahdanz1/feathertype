@@ -57,20 +57,22 @@ export function Button({
     ),
     secondary: cn(
       'border transition-colors',
-      isDark 
-        ? 'bg-button-inactive-dark border-border text-gray-300 hover:bg-button-hover-dark' 
-        : 'bg-button-inactive-light border-gray-300 text-gray-700 hover:bg-button-hover-light',
+      isDark
+        ? 'bg-button-inactive-dark border-border text-theme-text-secondary hover:bg-button-hover-dark'
+        : 'bg-button-inactive-light border-border-light text-text-secondary-light hover:bg-button-hover-light',
       isActive && (isDark ? 'bg-button-active-dark border-theme-primary' : 'bg-button-active-light border-theme-primary shadow-inner')
     ),
     ghost: cn(
-      'bg-transparent hover:bg-black/5 dark:hover:bg-white/5 text-gray-500 hover:text-gray-900 dark:hover:text-white',
+      isDark
+        ? 'bg-transparent hover:bg-white/5 text-theme-text-muted hover:text-white'
+        : 'bg-transparent hover:bg-black/5 text-text-muted-light hover:text-text-light',
       isActive && 'text-theme-primary'
     ),
     destructive: cn(
       'border transition-colors',
       isDark
-        ? 'bg-button-inactive-dark border-border text-gray-300 hover:bg-red-900/30 hover:border-red-900/50 hover:text-red-400'
-        : 'bg-button-inactive-light border-gray-300 text-gray-700 hover:bg-red-100 hover:border-red-200 hover:text-red-700'
+        ? 'bg-button-inactive-dark border-border text-theme-text-secondary hover:bg-red-900/30 hover:border-red-900/50 hover:text-red-400'
+        : 'bg-button-inactive-light border-border-light text-text-secondary-light hover:bg-red-100 hover:border-red-200 hover:text-red-700'
     )
   };
 

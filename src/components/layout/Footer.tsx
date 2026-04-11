@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { Stack, Flex, Grid, Container } from '../ui/Layout';
 import { BrandLogo } from '../ui/BrandLogo';
 import { Badge } from '../ui/Badge';
+import { APP_NAME, APP_VERSION } from '../../config';
 
 export function Footer() {
   return (
@@ -29,8 +30,8 @@ export function Footer() {
         </Grid>
 
         <Flex justify="between" className="mt-12 pt-8 border-t border-border/20 text-xs text-theme-text-muted">
-          <p>© {new Date().getFullYear()} FeatherType.</p>
-          <Badge label="v1.0.0 Stable" />
+          <p>© {new Date().getFullYear()} {APP_NAME}.</p>
+          <Badge label={`v${APP_VERSION} Stable`} />
         </Flex>
       </Container>
     </footer>

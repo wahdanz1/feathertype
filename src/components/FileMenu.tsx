@@ -4,6 +4,7 @@ import { useEditorStore } from '../store/useEditorStore';
 import { openFileDialog, openAndReadFile, getFileName, handleSaveFile, handleSaveAsFile, exportAsDocx, isTauri } from '../utils/fileOperations';
 import { Button } from './Button';
 import { cn } from '../lib/utils';
+import { APP_NAME } from '../config';
 
 export function FileMenu() {
   const [isOpen, setIsOpen] = useState(false);
@@ -96,7 +97,7 @@ export function FileMenu() {
             <>
               <div className={dividerClass} />
               <MenuItem
-                label="About FeatherType"
+                label={`About ${APP_NAME}`}
                 onClick={() => { useEditorStore.getState().setShowAboutDialog(true); close(); }}
                 className={itemClass}
               />

@@ -83,10 +83,10 @@ export function Toolbar() {
       
       <div className={`w-px h-6 ${dividerColor} mx-1`} />
 
-      <Button variant="secondary" iconOnly onClick={() => applyFormat(formats.bold)} title="Bold" className={getButtonClass(activeFormats.bold)}>
+      <Button variant="secondary" iconOnly onClick={() => applyFormat(formats.bold)} title="Bold (Ctrl+B)" className={getButtonClass(activeFormats.bold)}>
         <LuBold className="w-5 h-5" />
       </Button>
-      <Button variant="secondary" iconOnly onClick={() => applyFormat(formats.italic)} title="Italic" className={getButtonClass(activeFormats.italic)}>
+      <Button variant="secondary" iconOnly onClick={() => applyFormat(formats.italic)} title="Italic (Ctrl+I)" className={getButtonClass(activeFormats.italic)}>
         <LuItalic className="w-5 h-5" />
       </Button>
       <Button variant="secondary" iconOnly onClick={() => applyFormat(formats.strikethrough)} title="Strikethrough" className={getButtonClass(activeFormats.strikethrough)}>
@@ -113,15 +113,15 @@ export function Toolbar() {
           { value: 'h3', label: 'H3' },
         ]}
         isActive={activeFormats.heading}
-        title="Heading"
+        title="Heading (Ctrl+1/2/3)"
       />
 
       <div className={`w-px h-6 ${dividerColor} mx-1`} />
 
-      <Button variant="secondary" iconOnly onClick={() => applyFormat(formats.bulletList)} title="Bullet List" className={getButtonClass(activeFormats.bulletList)}>
+      <Button variant="secondary" iconOnly onClick={() => applyFormat(formats.bulletList)} title="Bullet List (Ctrl+Shift+B)" className={getButtonClass(activeFormats.bulletList)}>
         <LuList className="w-5 h-5" />
       </Button>
-      <Button variant="secondary" iconOnly onClick={() => applyFormat(formats.numberedList)} title="Numbered List" className={getButtonClass(activeFormats.numberedList)}>
+      <Button variant="secondary" iconOnly onClick={() => applyFormat(formats.numberedList)} title="Numbered List (Ctrl+Shift+N)" className={getButtonClass(activeFormats.numberedList)}>
         <LuListOrdered className="w-5 h-5" />
       </Button>
 
@@ -129,19 +129,19 @@ export function Toolbar() {
 
       <div className={`w-px h-6 ${dividerColor} mx-1`} />
 
-      <Button variant="secondary" iconOnly onClick={() => applyFormat(formats.link)} title="Link">
+      <Button variant="secondary" iconOnly onClick={() => applyFormat(formats.link)} title="Link (Ctrl+K)">
         <LuLink2 className="w-5 h-5" />
       </Button>
-      <Button variant="secondary" iconOnly onClick={() => applyFormat(formats.inlineCode)} title="Code" className={getButtonClass(activeFormats.code)}>
+      <Button variant="secondary" iconOnly onClick={() => applyFormat(formats.inlineCode)} title="Inline Code (Ctrl+`)" className={getButtonClass(activeFormats.code)}>
         <LuCode className="w-5 h-5" />
       </Button>
-      <Button variant="secondary" iconOnly onClick={() => applyFormat(formats.comment)} title="Docx Tooltip">
+      <Button variant="secondary" iconOnly onClick={() => applyFormat(formats.comment)} title="Comment (Ctrl+Shift+/)">
         <LuFileCode className="w-5 h-5" />
       </Button>
 
       <div className={`w-px h-6 ${dividerColor} mx-1`} />
 
-      <Button variant="secondary" iconOnly onClick={toggleLineWrap} title="Word Wrap" className={getButtonClass(lineWrap)}>
+      <Button variant="secondary" iconOnly onClick={toggleLineWrap} title="Word Wrap (Alt+Z)" className={getButtonClass(lineWrap)}>
         <LuWrapText className="w-5 h-5" />
       </Button>
 

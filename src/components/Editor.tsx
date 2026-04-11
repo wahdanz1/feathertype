@@ -40,6 +40,59 @@ const darkTheme = EditorView.theme({
   '.cm-foldGutter': {
     width: '16px',
   },
+  // Search panel — bottom positioned, styled to match app
+  '.cm-panels-bottom': {
+    borderTop: '1px solid #3e3e42',
+    borderBottom: 'none',
+  },
+  '.cm-panel.cm-search': {
+    backgroundColor: '#252526',
+    color: '#d4d4d4',
+    padding: '8px 12px',
+    gap: '6px',
+    fontSize: '13px',
+  },
+  '.cm-panel.cm-search input': {
+    backgroundColor: '#1e1e1e',
+    color: '#d4d4d4',
+    border: '1px solid #3e3e42',
+    borderRadius: '4px',
+    padding: '4px 8px',
+    fontSize: '13px',
+    outline: 'none',
+  },
+  '.cm-panel.cm-search input:focus': {
+    borderColor: '#0e639c',
+  },
+  '.cm-panel.cm-search button': {
+    backgroundColor: '#2d2d2d',
+    color: '#d4d4d4',
+    border: '1px solid #3e3e42',
+    borderRadius: '4px',
+    padding: '4px 10px',
+    fontSize: '12px',
+    cursor: 'pointer',
+  },
+  '.cm-panel.cm-search button:hover': {
+    backgroundColor: '#3e3e42',
+  },
+  '.cm-panel.cm-search label': {
+    fontSize: '12px',
+    color: '#858585',
+  },
+  '.cm-panel.cm-search [name=close]': {
+    color: '#858585',
+    cursor: 'pointer',
+  },
+  '.cm-panel.cm-search [name=close]:hover': {
+    color: '#d4d4d4',
+  },
+  '.cm-searchMatch': {
+    backgroundColor: '#515c6a',
+  },
+  '.cm-searchMatch-selected': {
+    backgroundColor: '#264f78',
+  },
 });
 
 function makeFoldMarker(content: string) {
@@ -77,16 +130,58 @@ const lightTheme = EditorView.theme({
   '.cm-foldGutter': {
     width: '16px',
   },
-  '.cm-foldGutter .cm-gutterElement': {
-    position: 'relative',
+  // Search panel — bottom positioned, styled to match app
+  '.cm-panels-bottom': {
+    borderTop: '1px solid #d0d0d0',
+    borderBottom: 'none',
+  },
+  '.cm-panel.cm-search': {
+    backgroundColor: '#f5f5f5',
+    color: '#1e1e1e',
+    padding: '8px 12px',
+    gap: '6px',
+    fontSize: '13px',
+  },
+  '.cm-panel.cm-search input': {
+    backgroundColor: '#ffffff',
+    color: '#1e1e1e',
+    border: '1px solid #d0d0d0',
+    borderRadius: '4px',
+    padding: '4px 8px',
+    fontSize: '13px',
+    outline: 'none',
+  },
+  '.cm-panel.cm-search input:focus': {
+    borderColor: '#0e639c',
+  },
+  '.cm-panel.cm-search button': {
+    backgroundColor: '#e5e5e5',
+    color: '#1e1e1e',
+    border: '1px solid #d0d0d0',
+    borderRadius: '4px',
+    padding: '4px 10px',
+    fontSize: '12px',
     cursor: 'pointer',
   },
-  '.cm-foldGutter .cm-gutterElement span': {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    lineHeight: '1',
+  '.cm-panel.cm-search button:hover': {
+    backgroundColor: '#d0d0d0',
+  },
+  '.cm-panel.cm-search label': {
+    fontSize: '12px',
+    color: '#6e7681',
+  },
+  '.cm-panel.cm-search [name=close]': {
+    color: '#6e7681',
+    cursor: 'pointer',
+  },
+  '.cm-panel.cm-search [name=close]:hover': {
+    color: '#1e1e1e',
+  },
+  '.cm-searchMatch': {
+    backgroundColor: '#e8c97a',
+  },
+  '.cm-searchMatch-selected': {
+    backgroundColor: '#add6ff',
   },
 });
 
@@ -154,7 +249,7 @@ export function Editor() {
   const extensions: Extension[] = [
     markdown(),
     syntaxHighlighting(theme === 'dark' ? darkSyntaxHighlight : lightSyntaxHighlight), // Custom syntax colors
-    search(),
+    search({ top: false }),
     keymap.of(searchKeymap),
     listExtension, // Smart Enter key for lists
     tableExtension, // Smart Enter key for tables
@@ -186,6 +281,7 @@ export function Editor() {
           highlightActiveLineGutter: true,
           highlightActiveLine: true,
           foldGutter: false,
+          searchKeymap: false,
         }}
       />
     </div>

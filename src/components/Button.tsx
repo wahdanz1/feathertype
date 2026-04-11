@@ -1,12 +1,17 @@
 import { ReactNode } from 'react';
 import { useEditorStore } from '../store/useEditorStore';
+import { useLocation, Link } from 'react-router-dom';
 import { cn } from '../lib/utils';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'ghost';
+  variant?: 'primary' | 'secondary' | 'ghost' | 'destructive';
   size?: 'sm' | 'md' | 'lg';
   iconOnly?: boolean;
   isActive?: boolean;
+  justify?: 'center' | 'between';
+  animateIcon?: 'horizontal' | 'vertical' | boolean;
+  fullWidth?: boolean;
+  to?: string;
   children: ReactNode;
 }
 
@@ -15,14 +20,29 @@ export function Button({
   size = 'md',
   iconOnly = false,
   isActive = false,
+  animateIcon = false,
+  fullWidth = false,
+  justify = 'center',
+  to,
   className,
   children,
   ...props
 }: ButtonProps) {
   const theme = useEditorStore((s) => s.theme);
+  const location = useLocation();
+  const isEditor = location.pathname === '/editor';
   const isDark = theme === 'dark';
 
-  const baseStyles = 'rounded-md text-sm font-medium leading-none flex items-center justify-center flex-shrink-0 transition-all active:scale-[0.98]';
+  const baseStyles = cn(
+    'rounded-md text-sm font-medium leading-none flex items-center flex-shrink-0 transition-all group',
+    justify === 'center' ? 'justify-center' : 'justify-between',
+    fullWidth && 'w-full',
+    isEditor ? 'cursor-default' : 'cursor-pointer'
+  );
+
+  const animationClass = animateIcon === 'vertical' 
+    ? 'animate-icons-vertical' 
+    : (animateIcon === 'horizontal' || animateIcon === true ? 'animate-icons' : '');
   
   const sizeStyles = {
     sm: iconOnly ? 'h-8 w-8' : 'h-8 px-2.5',
@@ -46,15 +66,49 @@ export function Button({
     ghost: cn(
       'bg-transparent hover:bg-black/5 dark:hover:bg-white/5 text-gray-500 hover:text-gray-900 dark:hover:text-white',
       isActive && 'text-theme-primary'
+    ),
+    destructive: cn(
+      'border transition-colors',
+      isDark
+        ? 'bg-button-inactive-dark border-border text-gray-300 hover:bg-red-900/30 hover:border-red-900/50 hover:text-red-400'
+        : 'bg-button-inactive-light border-gray-300 text-gray-700 hover:bg-red-100 hover:border-red-200 hover:text-red-700'
     )
   };
 
+  const finalClasses = cn(
+    baseStyles, 
+    sizeStyles[size], 
+    variantStyles[variant], 
+    animationClass,
+    className
+  );
+
+  const content = (
+    <div className={cn(
+      "flex items-center gap-2",
+      justify === 'center' ? 'justify-center' : 'justify-between w-full'
+    )}>
+      {children}
+    </div>
+  );
+
+  if (to) {
+    return (
+      <Link 
+        to={to} 
+        className={finalClasses}
+      >
+        {content}
+      </Link>
+    );
+  }
+
   return (
     <button
-      className={cn(baseStyles, sizeStyles[size], variantStyles[variant], className)}
+      className={finalClasses}
       {...props}
     >
-      {children}
+      {content}
     </button>
   );
 }

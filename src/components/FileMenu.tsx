@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
-import { Menu } from 'lucide-react';
+import { LuMenu } from 'react-icons/lu';
 import { useEditorStore } from '../store/useEditorStore';
-import { openFileDialog, saveFileDialog, openAndReadFile, writeFile, getFileName, handleSaveFile, exportAsDocx } from '../utils/fileOperations';
+import { openFileDialog, saveFileDialog, openAndReadFile, writeFile, getFileName, handleSaveFile, exportAsDocx, isTauri } from '../utils/fileOperations';
 import { Button } from './Button';
 
 
@@ -94,7 +94,7 @@ export function FileMenu() {
         onClick={() => setIsOpen(!isOpen)}
         title="File menu"
       >
-        <Menu className="w-6 h-6" />
+        <LuMenu className="w-6 h-6" />
       </Button>
 
       {isOpen && (
@@ -149,18 +149,22 @@ export function FileMenu() {
           >
             <span>Export as DOCX</span>
           </button>
-          <div className={`border-t my-1 ${theme === 'dark' ? 'border-[#3e3e42]' : 'border-gray-300'}`}></div>
-          <button
-            onClick={() => {
-              useEditorStore.getState().setShowAboutDialog(true);
-              setIsOpen(false);
-            }}
-            className={`w-full px-4 py-2 text-left text-sm transition-colors flex justify-between items-center ${
-              theme === 'dark' ? 'hover:bg-[#2a2d2e]' : 'hover:bg-gray-100'
-            }`}
-          >
-            <span>About FeatherType</span>
-          </button>
+          {isTauri() && (
+            <>
+              <div className={`border-t my-1 ${theme === 'dark' ? 'border-border' : 'border-gray-300'}`}></div>
+              <button
+                onClick={() => {
+                  useEditorStore.getState().setShowAboutDialog(true);
+                  setIsOpen(false);
+                }}
+                className={`w-full px-4 py-2 text-left text-sm transition-colors flex justify-between items-center ${
+                  theme === 'dark' ? 'hover:bg-editor-surface-raised' : 'hover:bg-gray-100'
+                }`}
+              >
+                <span>About FeatherType</span>
+              </button>
+            </>
+          )}
         </div>
       )}
     </div>

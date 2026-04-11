@@ -1,14 +1,27 @@
 import React, { useEffect } from 'react';
-import { X } from 'lucide-react';
+import { LuX } from 'react-icons/lu';
 import { cn } from '../lib/utils';
 import { useEditorStore } from '../store/useEditorStore';
+import { Button } from './Button';
+import { Flex } from './ui/Layout';
+import { IconBox } from './ui/IconBox';
+
+export interface DialogAction {
+  label: string;
+  icon?: React.ReactNode;
+  variant?: 'primary' | 'secondary' | 'ghost' | 'destructive';
+  onClick: () => void;
+}
 
 interface DialogProps {
   isOpen: boolean;
   onClose: () => void;
   title: string;
-  children: React.ReactNode;
+  description?: string;
+  icon?: React.ReactNode;
+  children?: React.ReactNode;
   footer?: React.ReactNode;
+  actions?: DialogAction[];
   maxWidth?: 'sm' | 'md' | 'lg' | 'xl';
 }
 
@@ -16,14 +29,16 @@ export function Dialog({
   isOpen,
   onClose,
   title,
+  description,
+  icon,
   children,
   footer,
+  actions,
   maxWidth = 'md',
 }: DialogProps) {
   const theme = useEditorStore((s) => s.theme);
   const isDark = theme === 'dark';
 
-  // Handle ESC key to close
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
@@ -41,46 +56,76 @@ export function Dialog({
     xl: 'max-w-xl',
   };
 
+  const panelStyles = isDark
+    ? 'bg-editor-surface border-border text-theme-text'
+    : 'bg-white border-gray-300 text-gray-900';
+
+  const headerFooterStyles = isDark
+    ? 'border-border bg-editor-surface-raised'
+    : 'border-gray-200 bg-gray-50';
+
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-      <div 
+      <div
         className={cn(
           "w-full overflow-hidden rounded-xl shadow-2xl border animate-in zoom-in duration-200",
           maxWidthClasses[maxWidth],
-          isDark 
-            ? "bg-[#252526] border-border text-gray-200" 
-            : "bg-white border-gray-300 text-gray-900"
+          panelStyles
         )}
       >
         {/* Header */}
-        <div 
-          className={cn(
-            "px-6 py-4 border-b flex items-center justify-between",
-            isDark ? "border-border bg-[#2a2d2e]" : "border-gray-200 bg-gray-50"
-          )}
+        <Flex
+          justify="between"
+          className={cn("px-6 py-4 border-b", headerFooterStyles)}
         >
-          <h3 className="text-lg font-bold">{title}</h3>
-          <button
+          <Flex gap={3}>
+            {icon && (
+              <IconBox icon={icon} size="sm" variant="ghost" className="text-yellow-500" />
+            )}
+            <h3 className="text-lg font-bold">{title}</h3>
+          </Flex>
+          <Button
+            variant="ghost"
+            iconOnly
+            size="sm"
             onClick={onClose}
-            className="p-1 rounded-md hover:bg-black/5 dark:hover:bg-white/5 transition-colors text-gray-500 hover:text-gray-900 dark:hover:text-white"
           >
-            <X size={20} />
-          </button>
-        </div>
+            <LuX size={20} />
+          </Button>
+        </Flex>
 
-        {/* Content */}
+        {/* Body */}
         <div className="p-8">
+          {description && (
+            <p className={cn("text-sm mb-6", isDark ? 'text-theme-text-muted' : 'text-gray-500')}>
+              {description}
+            </p>
+          )}
           {children}
         </div>
 
-        {/* Footer */}
-        {footer && (
-          <div 
-            className={cn(
-              "px-6 py-4 border-t flex items-center justify-end gap-3",
-              isDark ? "border-border bg-[#2a2d2e]" : "border-gray-200 bg-gray-50"
-            )}
+        {/* Footer: actions or custom */}
+        {actions && (
+          <Flex
+            justify="end"
+            gap={2}
+            className={cn("px-6 py-4 border-t flex-wrap", headerFooterStyles)}
           >
+            {actions.map((action) => (
+              <Button
+                key={action.label}
+                variant={action.variant ?? 'secondary'}
+                size="sm"
+                onClick={action.onClick}
+              >
+                {action.icon}
+                {action.label}
+              </Button>
+            ))}
+          </Flex>
+        )}
+        {footer && !actions && (
+          <div className={cn("px-6 py-4 border-t", headerFooterStyles)}>
             {footer}
           </div>
         )}

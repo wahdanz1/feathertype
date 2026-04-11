@@ -250,9 +250,7 @@ export function Editor() {
 
   if (!activeTab) {
     return (
-      <div className="flex items-center justify-center h-full text-theme-text-muted">
-        No file open
-      </div>
+      <div className="empty-state">No file open</div>
     );
   }
 

@@ -3,6 +3,7 @@ import { LuFeather, LuExternalLink, LuDownload, LuMessageSquare } from 'react-ic
 import { Dialog } from './Dialog';
 import { Button } from './Button';
 import { Stack } from './ui/Layout';
+import { IconBox } from './ui/IconBox';
 import { Caption, Subtle } from './ui/Typography';
 import { isTauri } from '../utils/fileOperations';
 import { APP_NAME, APP_VERSION, LINKS } from '../config';
@@ -22,14 +23,12 @@ export function AboutDialog() {
       title={`About ${APP_NAME}`}
       footer={
         <Caption as="p" variant="muted" className="text-center w-full">
-          © {new Date().getFullYear()} {APP_NAME}. All rights reserved.
+          © 2026-{new Date().getFullYear()} {APP_NAME}. All rights reserved.
         </Caption>
       }
     >
       <Stack align="center" gap={4} className="text-center">
-        <div className="w-20 h-20 rounded-2xl bg-theme-primary flex items-center justify-center shadow-lg">
-          <LuFeather size={48} className="text-white" />
-        </div>
+        <IconBox icon={<LuFeather />} variant="solid" size="xl" />
 
         <Stack align="center" gap={1}>
           <h2>{APP_NAME}</h2>

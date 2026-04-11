@@ -6,7 +6,7 @@ export function StatusBar() {
   const editorView = useEditorStore((s) => s.editorView);
   const activeTab = useEditorStore((s) => s.getActiveTab());
   const zoom = useEditorStore((s) => s.zoom);
-  const theme = useEditorStore((s) => s.theme);
+
 
   const [line, setLine] = useState(1);
   const [col, setCol] = useState(1);
@@ -49,11 +49,7 @@ export function StatusBar() {
 
   return (
     <div
-      className={`flex items-center justify-between px-4 py-1 text-xs border-t ${
-        theme === 'dark'
-          ? 'bg-editor-bg text-editor-text border-border'
-          : 'bg-editor-surface-light text-text-light border-border-light'
-      }`}
+      className="flex items-center justify-between px-4 py-1 text-xs border-t editor-chrome text-muted"
     >
       <div className="flex items-center gap-4">
         <span>Ln {line}, Col {col}</span>

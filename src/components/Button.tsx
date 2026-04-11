@@ -50,11 +50,7 @@ export function Button({
   };
 
   const variantStyles = {
-    primary: cn(
-      'bg-theme-primary text-white border transition-colors',
-      isDark ? 'border-theme-primary-border' : 'border-theme-primary-border',
-      'hover:bg-theme-primary-hover shadow-sm'
-    ),
+    primary: 'bg-theme-primary text-white border border-theme-primary-border transition-colors hover:bg-theme-primary-hover shadow-sm',
     secondary: cn(
       'border transition-colors',
       isDark

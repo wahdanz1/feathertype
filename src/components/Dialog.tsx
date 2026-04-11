@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 import { LuX } from 'react-icons/lu';
 import { cn } from '../lib/utils';
-import { useEditorStore } from '../store/useEditorStore';
 import { Button } from './Button';
 import { Flex } from './ui/Layout';
 import { IconBox } from './ui/IconBox';
@@ -36,9 +35,6 @@ export function Dialog({
   actions,
   maxWidth = 'md',
 }: DialogProps) {
-  const theme = useEditorStore((s) => s.theme);
-  const isDark = theme === 'dark';
-
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
@@ -56,13 +52,9 @@ export function Dialog({
     xl: 'max-w-xl',
   };
 
-  const panelStyles = isDark
-    ? 'bg-editor-surface border-border text-theme-text'
-    : 'bg-editor-bg-light border-border-light text-text-light';
-
-  const headerFooterStyles = isDark
-    ? 'border-border bg-editor-surface-raised'
-    : 'border-border-light bg-editor-surface-light';
+  // These classes auto-switch via .light-theme in globals.css
+  const panelClass = 'panel';
+  const headerFooterClass = 'panel-header';
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
@@ -70,13 +62,13 @@ export function Dialog({
         className={cn(
           "w-full overflow-hidden rounded-xl shadow-2xl border animate-in zoom-in duration-200",
           maxWidthClasses[maxWidth],
-          panelStyles
+          panelClass
         )}
       >
         {/* Header */}
         <Flex
           justify="between"
-          className={cn("px-6 py-4 border-b", headerFooterStyles)}
+          className={cn("px-6 py-4 border-b", headerFooterClass)}
         >
           <Flex gap={3}>
             {icon && (
@@ -97,7 +89,7 @@ export function Dialog({
         {/* Body */}
         <div className="p-8">
           {description && (
-            <p className={cn("text-sm mb-6", isDark ? 'text-theme-text-muted' : 'text-text-muted-light')}>
+            <p className="text-sm mb-6 text-muted">
               {description}
             </p>
           )}
@@ -109,7 +101,7 @@ export function Dialog({
           <Flex
             justify="end"
             gap={2}
-            className={cn("px-6 py-4 border-t flex-wrap", headerFooterStyles)}
+            className={cn("px-6 py-4 border-t flex-wrap", headerFooterClass)}
           >
             {actions.map((action) => (
               <Button
@@ -125,7 +117,7 @@ export function Dialog({
           </Flex>
         )}
         {footer && !actions && (
-          <div className={cn("px-6 py-4 border-t", headerFooterStyles)}>
+          <div className={cn("px-6 py-4 border-t", headerFooterClass)}>
             {footer}
           </div>
         )}

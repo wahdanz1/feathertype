@@ -9,8 +9,6 @@ export function TabBar() {
   const setActiveTab = useEditorStore((s) => s.setActiveTab);
   const closeTab = useEditorStore((s) => s.closeTab);
   const addTab = useEditorStore((s) => s.addTab);
-  const theme = useEditorStore((s) => s.theme);
-
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const handleAddTab = () => {
@@ -18,9 +16,7 @@ export function TabBar() {
   };
 
   return (
-    <div className={`flex items-center group/tabbar ${
-      theme === 'dark' ? 'bg-editor-surface text-editor-gutter-text' : 'bg-editor-surface-light text-text-muted-light'
-    } h-9 border-b ${theme === 'dark' ? 'border-border' : 'border-border-light'}`}>
+    <div className="flex items-center group/tabbar editor-chrome text-muted h-9 border-b border-border">
       <div 
         ref={scrollRef}
         className="flex h-full overflow-x-auto overflow-y-hidden no-scrollbar flex-1"
@@ -39,9 +35,7 @@ export function TabBar() {
 
       <button
         onClick={handleAddTab}
-        className={`flex items-center justify-center w-8 h-full transition-colors ${
-          theme === 'dark' ? 'hover:bg-tab-active hover:text-white' : 'hover:bg-button-hover-light hover:text-text-light'
-        }`}
+        className="flex items-center justify-center w-8 h-full transition-colors hover:bg-tab-active hover:text-white"
         title="New Tab (Ctrl+N)"
       >
         <LuPlus size={16} />

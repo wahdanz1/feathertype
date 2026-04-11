@@ -3,7 +3,6 @@ import { LuMenu } from 'react-icons/lu';
 import { useEditorStore } from '../store/useEditorStore';
 import { openFileDialog, openAndReadFile, getFileName, handleSaveFile, handleSaveAsFile, exportAsDocx, isTauri } from '../utils/fileOperations';
 import { Button } from './Button';
-import { cn } from '../lib/utils';
 import { APP_NAME } from '../config';
 
 export function FileMenu() {
@@ -14,8 +13,7 @@ export function FileMenu() {
   const getActiveTab = useEditorStore((s) => s.getActiveTab);
   const updateTabPath = useEditorStore((s) => s.updateTabPath);
   const markTabClean = useEditorStore((s) => s.markTabClean);
-  const theme = useEditorStore((s) => s.theme);
-  const isDark = theme === 'dark';
+  useEditorStore((s) => s.theme); // subscribe for light-theme CSS reactivity
 
   useEffect(() => {
     if (!isOpen) return;
@@ -68,12 +66,8 @@ export function FileMenu() {
     close();
   };
 
-  const itemClass = cn(
-    "w-full px-4 py-2 text-left text-sm transition-colors flex justify-between items-center",
-    isDark ? "hover:bg-editor-surface-raised" : "hover:bg-button-inactive-light"
-  );
-
-  const dividerClass = cn("border-t my-1", isDark ? "border-border" : "border-border-light");
+  const itemClass = "menu-item";
+  const dividerClass = "menu-divider";
 
   return (
     <div className="relative" ref={menuRef}>
@@ -82,10 +76,7 @@ export function FileMenu() {
       </Button>
 
       {isOpen && (
-        <div className={cn(
-          "absolute top-full left-0 mt-1 border rounded shadow-xl min-w-[200px] z-50 py-1",
-          isDark ? "bg-editor-surface border-border" : "bg-editor-bg-light border-border-light"
-        )}>
+        <div className="panel absolute top-full left-0 mt-1 min-w-[200px] z-50 py-1">
           <MenuItem label="New" shortcut="Ctrl+N" onClick={handleNew} className={itemClass} />
           <MenuItem label="Open" shortcut="Ctrl+O" onClick={handleOpen} className={itemClass} />
           <div className={dividerClass} />

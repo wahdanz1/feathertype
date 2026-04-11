@@ -69,9 +69,7 @@ export function Toolbar() {
 
   return (
     <div
-      className={`flex items-center gap-1.5 px-3 py-1.5 ${
-        theme === 'dark' ? 'bg-editor-surface' : 'bg-editor-surface-light'
-      }`}
+      className="flex items-center gap-1.5 px-3 py-1.5 editor-chrome"
       onMouseDown={(e) => {
         // Prevent toolbar clicks from stealing focus from the editor
         if ((e.target as HTMLElement).tagName !== 'SELECT' && (e.target as HTMLElement).tagName !== 'INPUT') {

@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
 import { LuChevronDown } from 'react-icons/lu';
-import { useEditorStore } from '../store/useEditorStore';
 import { cn } from '../lib/utils';
 
 export interface DropdownOption {
@@ -27,9 +26,6 @@ export function Dropdown({
 }: DropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
-  const theme = useEditorStore((s) => s.theme);
-  const isDark = theme === 'dark';
-
   const selectedLabel = options.find((o) => o.value === value)?.label ?? options[0]?.label;
 
   useEffect(() => {
@@ -49,10 +45,7 @@ export function Dropdown({
         onClick={() => setIsOpen(!isOpen)}
         title={title}
         className={cn(
-          "px-2 pr-1 h-9 text-sm rounded transition-all border flex items-center gap-1",
-          isDark
-            ? "bg-button-inactive-dark hover:bg-button-hover-dark text-theme-text-secondary border-border"
-            : "bg-button-inactive-light hover:bg-button-hover-light text-text-secondary-light border-border-light",
+          "dropdown-trigger text-secondary",
           isActive && "border-theme-primary ring-1 ring-theme-primary/20",
           className
         )}
@@ -62,12 +55,7 @@ export function Dropdown({
       </button>
 
       {isOpen && (
-        <div className={cn(
-          "absolute top-full left-0 mt-1 min-w-full rounded-md border shadow-xl z-50 py-1 animate-in fade-in slide-in-from-top-1 duration-150",
-          isDark
-            ? "bg-editor-surface border-border"
-            : "bg-editor-bg-light border-border-light"
-        )}>
+        <div className="panel absolute top-full left-0 mt-1 min-w-full rounded-md z-50 py-1 animate-in fade-in slide-in-from-top-1 duration-150">
           {options.map((option) => (
             <button
               key={option.value}
@@ -79,7 +67,7 @@ export function Dropdown({
                 "w-full px-4 py-1.5 text-sm text-left transition-colors",
                 option.value === value
                   ? "bg-theme-primary text-white"
-                  : isDark ? "text-theme-text-secondary hover:bg-white/5" : "text-text-secondary-light hover:bg-button-inactive-light"
+                  : "text-secondary menu-item !px-4 !py-1.5"
               )}
             >
               {option.label}

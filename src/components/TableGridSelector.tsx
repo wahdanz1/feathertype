@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { LuTable } from 'react-icons/lu';
 import { Button } from './Button';
-import { useEditorStore } from '../store/useEditorStore';
 
 interface TableGridSelectorProps {
   onInsert: (rows: number, cols: number) => void;
@@ -10,7 +9,6 @@ interface TableGridSelectorProps {
 export function TableGridSelector({ onInsert }: TableGridSelectorProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [hoverCell, setHoverCell] = useState({ row: 0, col: 0 });
-  const theme = useEditorStore((s) => s.theme);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const GRID_SIZE = 8; // 8x8 grid
@@ -56,11 +54,7 @@ export function TableGridSelector({ onInsert }: TableGridSelectorProps) {
       {/* Dropdown Grid */}
       {isOpen && (
         <div
-          className={`absolute top-full left-0 mt-1 p-2 rounded shadow-lg border z-50 ${
-            theme === 'dark'
-              ? 'bg-tab-active border-border'
-              : 'bg-editor-bg-light border-border-light'
-          }`}
+          className="panel absolute top-full left-0 mt-1 p-2 z-50"
         >
           {/* Grid */}
           <div className="grid gap-[2px] mb-2" style={{ gridTemplateColumns: `repeat(${GRID_SIZE}, 1fr)` }}>
@@ -77,9 +71,7 @@ export function TableGridSelector({ onInsert }: TableGridSelectorProps) {
                   className={`w-4 h-4 border cursor-pointer transition-colors ${
                     isHighlighted
                       ? 'bg-theme-primary border-theme-primary/80'
-                      : theme === 'dark'
-                      ? 'bg-editor-bg border-border hover:bg-button-hover-dark'
-                      : 'bg-button-inactive-light border-border-light hover:bg-button-hover-light'
+                      : 'bg-editor-bg border-border hover:bg-button-hover-dark'
                   }`}
                 />
               );
@@ -87,7 +79,7 @@ export function TableGridSelector({ onInsert }: TableGridSelectorProps) {
           </div>
 
           {/* Label */}
-          <div className={`text-center text-sm ${theme === 'dark' ? 'text-theme-text-secondary' : 'text-text-secondary-light'}`}>
+          <div className="text-center text-sm text-secondary">
             {hoverCell.row > 0 || hoverCell.col > 0
               ? `${hoverCell.col + 1} × ${hoverCell.row + 1} Table`
               : 'Select table size'}

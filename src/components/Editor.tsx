@@ -12,10 +12,12 @@ import { tableExtension } from '../utils/tableExtension';
 import { listExtension } from '../utils/listExtension';
 import type { Extension } from '@codemirror/state';
 
+const v = (token: string) => `var(--color-${token})`;
+
 const darkTheme = EditorView.theme({
   '&': {
-    backgroundColor: '#1e1e1e',
-    color: '#d4d4d4',
+    backgroundColor: v('editor-bg'),
+    color: v('editor-text'),
     height: 'auto',
     minHeight: '100%',
   },
@@ -27,76 +29,75 @@ const darkTheme = EditorView.theme({
     borderLeftColor: '#ffffff',
   },
   '&.cm-focused .cm-selectionBackground, .cm-selectionBackground, .cm-content ::selection': {
-    backgroundColor: '#264f78',
+    backgroundColor: v('editor-selection'),
   },
   '.cm-gutters': {
-    backgroundColor: '#252526',
-    color: '#858585',
+    backgroundColor: v('editor-surface'),
+    color: v('editor-gutter-text'),
     border: 'none',
   },
   '.cm-activeLineGutter': {
-    backgroundColor: '#2d2d2d',
+    backgroundColor: v('tab-active'),
   },
   '.cm-foldGutter': {
     width: '16px',
   },
-  // Search panel — force to bottom via flex order, styled to match app
   '.cm-panels-top': {
     order: '1',
-    borderTop: '1px solid #3e3e42',
+    borderTop: `1px solid ${v('border')}`,
     borderBottom: 'none',
   },
   '.cm-panels-bottom': {
-    borderTop: '1px solid #3e3e42',
+    borderTop: `1px solid ${v('border')}`,
     borderBottom: 'none',
   },
   '.cm-panel.cm-search': {
-    backgroundColor: '#252526',
-    color: '#d4d4d4',
+    backgroundColor: v('editor-surface'),
+    color: v('editor-text'),
     padding: '8px 12px',
     gap: '6px',
     fontSize: '13px',
   },
   '.cm-panel.cm-search input': {
-    backgroundColor: '#1e1e1e',
-    color: '#d4d4d4',
-    border: '1px solid #3e3e42',
+    backgroundColor: v('editor-bg'),
+    color: v('editor-text'),
+    border: `1px solid ${v('border')}`,
     borderRadius: '4px',
     padding: '4px 8px',
     fontSize: '13px',
     outline: 'none',
   },
   '.cm-panel.cm-search input:focus': {
-    borderColor: '#0e639c',
+    borderColor: v('theme-primary'),
   },
   '.cm-panel.cm-search button': {
-    backgroundColor: '#2d2d2d',
-    color: '#d4d4d4',
-    border: '1px solid #3e3e42',
+    backgroundColor: v('tab-active'),
+    color: v('editor-text'),
+    border: `1px solid ${v('border')}`,
     borderRadius: '4px',
     padding: '4px 10px',
     fontSize: '12px',
     cursor: 'pointer',
   },
   '.cm-panel.cm-search button:hover': {
-    backgroundColor: '#3e3e42',
+    backgroundColor: v('button-hover-dark'),
   },
   '.cm-panel.cm-search label': {
     fontSize: '12px',
-    color: '#858585',
+    color: v('editor-gutter-text'),
   },
   '.cm-panel.cm-search [name=close]': {
-    color: '#858585',
+    color: v('editor-gutter-text'),
     cursor: 'pointer',
   },
   '.cm-panel.cm-search [name=close]:hover': {
-    color: '#d4d4d4',
+    color: v('editor-text'),
   },
   '.cm-searchMatch': {
-    backgroundColor: '#515c6a',
+    backgroundColor: v('editor-search-match'),
   },
   '.cm-searchMatch-selected': {
-    backgroundColor: '#264f78',
+    backgroundColor: v('editor-selection'),
   },
 });
 
@@ -109,8 +110,8 @@ function makeFoldMarker(content: string) {
 
 const lightTheme = EditorView.theme({
   '&': {
-    backgroundColor: '#ffffff',
-    color: '#1e1e1e',
+    backgroundColor: v('editor-bg-light'),
+    color: v('editor-text-light'),
     height: 'auto',
     minHeight: '100%',
   },
@@ -122,76 +123,75 @@ const lightTheme = EditorView.theme({
     borderLeftColor: '#000000',
   },
   '&.cm-focused .cm-selectionBackground, .cm-selectionBackground, .cm-content ::selection': {
-    backgroundColor: '#add6ff',
+    backgroundColor: v('editor-selection-light'),
   },
   '.cm-gutters': {
-    backgroundColor: '#f5f5f5',
-    color: '#6e7681',
+    backgroundColor: v('editor-gutter-light'),
+    color: v('editor-gutter-text-light'),
     border: 'none',
   },
   '.cm-activeLineGutter': {
-    backgroundColor: '#e8e8e8',
+    backgroundColor: v('editor-surface-raised-light'),
   },
   '.cm-foldGutter': {
     width: '16px',
   },
-  // Search panel — force to bottom via flex order, styled to match app
   '.cm-panels-top': {
     order: '1',
-    borderTop: '1px solid #d0d0d0',
+    borderTop: `1px solid ${v('border-light')}`,
     borderBottom: 'none',
   },
   '.cm-panels-bottom': {
-    borderTop: '1px solid #d0d0d0',
+    borderTop: `1px solid ${v('border-light')}`,
     borderBottom: 'none',
   },
   '.cm-panel.cm-search': {
-    backgroundColor: '#f5f5f5',
-    color: '#1e1e1e',
+    backgroundColor: v('editor-surface-light'),
+    color: v('text-light'),
     padding: '8px 12px',
     gap: '6px',
     fontSize: '13px',
   },
   '.cm-panel.cm-search input': {
-    backgroundColor: '#ffffff',
-    color: '#1e1e1e',
-    border: '1px solid #d0d0d0',
+    backgroundColor: v('editor-bg-light'),
+    color: v('text-light'),
+    border: `1px solid ${v('border-light')}`,
     borderRadius: '4px',
     padding: '4px 8px',
     fontSize: '13px',
     outline: 'none',
   },
   '.cm-panel.cm-search input:focus': {
-    borderColor: '#0e639c',
+    borderColor: v('theme-primary'),
   },
   '.cm-panel.cm-search button': {
-    backgroundColor: '#e5e5e5',
-    color: '#1e1e1e',
-    border: '1px solid #d0d0d0',
+    backgroundColor: v('button-hover-light'),
+    color: v('text-light'),
+    border: `1px solid ${v('border-light')}`,
     borderRadius: '4px',
     padding: '4px 10px',
     fontSize: '12px',
     cursor: 'pointer',
   },
   '.cm-panel.cm-search button:hover': {
-    backgroundColor: '#d0d0d0',
+    backgroundColor: v('border-light'),
   },
   '.cm-panel.cm-search label': {
     fontSize: '12px',
-    color: '#6e7681',
+    color: v('editor-gutter-text-light'),
   },
   '.cm-panel.cm-search [name=close]': {
-    color: '#6e7681',
+    color: v('editor-gutter-text-light'),
     cursor: 'pointer',
   },
   '.cm-panel.cm-search [name=close]:hover': {
-    color: '#1e1e1e',
+    color: v('text-light'),
   },
   '.cm-searchMatch': {
-    backgroundColor: '#e8c97a',
+    backgroundColor: v('editor-search-match-light'),
   },
   '.cm-searchMatch-selected': {
-    backgroundColor: '#add6ff',
+    backgroundColor: v('editor-selection-light'),
   },
 });
 
@@ -250,7 +250,7 @@ export function Editor() {
 
   if (!activeTab) {
     return (
-      <div className="flex items-center justify-center h-full text-gray-500">
+      <div className="flex items-center justify-center h-full text-theme-text-muted">
         No file open
       </div>
     );

@@ -154,7 +154,7 @@
 
   /* === Tab styling === */
   .tab {
-    @apply px-3.5 h-full min-w-[120px] max-w-[200px] flex items-center justify-between gap-3 cursor-pointer relative transition-all duration-150 mx-[2px];
+    @apply px-2.5 h-full min-w-[100px] max-w-[200px] flex items-center gap-2 cursor-pointer relative transition-all duration-150;
   }
   .tab-active {
     @apply bg-editor-bg text-white border-x border-t border-border z-10 -mb-[1px] rounded-t-lg shadow-sm font-medium;
@@ -163,7 +163,7 @@
     @apply bg-editor-bg-light text-text-light border-border-light;
   }
   .tab-inactive {
-    @apply bg-transparent text-theme-text-muted hover:bg-white/5 hover:rounded-t-lg border-transparent font-medium;
+    @apply bg-transparent text-theme-text-muted hover:bg-white/5 hover:rounded-t-lg border-x border-t border-transparent font-medium;
   }
   .light-theme .tab-inactive {
     @apply text-text-muted-light hover:bg-black/5;

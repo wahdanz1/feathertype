@@ -5,12 +5,11 @@ import { useEditorStore } from '../store/useEditorStore';
 interface TabProps {
   tab: TabType;
   isActive: boolean;
-  index: number;
   onSelect: () => void;
   onClose: () => void;
 }
 
-export function Tab({ tab, isActive, index, onSelect, onClose }: TabProps) {
+export function Tab({ tab, isActive, onSelect, onClose }: TabProps) {
   const renameTab = useEditorStore((s) => s.renameTab);
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(tab.title);
@@ -44,14 +43,8 @@ export function Tab({ tab, isActive, index, onSelect, onClose }: TabProps) {
 
   return (
     <div onClick={onSelect} className={`tab group ${isActive ? 'tab-active' : 'tab-inactive'}`}>
-      {!isActive && index > 0 && (
-        <div className="absolute -left-[2px] w-[1px] h-4 top-1/2 -translate-y-1/2 bg-white/10" />
-      )}
-
-      <div className="flex items-center gap-2 overflow-hidden">
-        <div className="w-1.5 shrink-0">
-          {tab.isDirty && <span className="dirty-dot" title="Unsaved changes" />}
-        </div>
+      <div className="flex items-center gap-1.5 overflow-hidden flex-1 min-w-0">
+        {tab.isDirty && <span className="dirty-dot shrink-0" title="Unsaved changes" />}
         {isEditing ? (
           <input
             ref={inputRef}
@@ -71,7 +64,7 @@ export function Tab({ tab, isActive, index, onSelect, onClose }: TabProps) {
 
       <button
         onClick={(e) => { e.stopPropagation(); onClose(); }}
-        className={`tab-close ${isActive ? 'opacity-100' : ''}`}
+        className={`tab-close shrink-0 ${isActive ? 'opacity-100' : ''}`}
         title="Close"
       >
         <span className="text-lg" style={{ marginTop: '-2px' }}>×</span>

@@ -21,11 +21,10 @@ export function TabBar() {
         ref={scrollRef}
         className="flex h-full overflow-x-auto overflow-y-hidden no-scrollbar flex-1"
       >
-        {tabs.map((tab, index) => (
+        {tabs.map((tab) => (
           <Tab
             key={tab.id}
             tab={tab}
-            index={index}
             isActive={tab.id === activeTabId}
             onSelect={() => setActiveTab(tab.id)}
             onClose={() => closeTab(tab.id)}

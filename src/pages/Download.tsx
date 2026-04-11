@@ -18,7 +18,8 @@ import {
   LuHistory,
   LuChevronDown,
   LuChevronUp,
-  LuLoader
+  LuLoader,
+  LuMessageCircle
 } from 'react-icons/lu';
 
 
@@ -28,6 +29,7 @@ export default function Download() {
     <Page>
       <HeroSection />
       <HistorySection />
+      <FeedbackSection />
     </Page>
   );
 }
@@ -167,5 +169,30 @@ function ReleaseItem({ rel }: { rel: (typeof RELEASES)[0] }) {
         </Stack>
       </AccordionContent>
     </AccordionItem>
+  );
+}
+
+function FeedbackSection() {
+  return (
+    <Section id="feedback" size="lg" className="pb-24">
+      <GlassCard variant="muted" border="subtle" hoverable={false}>
+        <Flex gap={6} className="flex-col sm:flex-row" items="center">
+          <IconBox icon={<LuMessageCircle />} variant="primary" size="lg" className="text-theme-accent" />
+          <Stack gap={2} className="flex-1 text-center sm:text-left">
+            <h3>Got feedback?</h3>
+            <Subtle>
+              Found a bug, have a feature request, or just want to share your thoughts? Join the discussion on GitHub.
+            </Subtle>
+          </Stack>
+          <Button
+            variant="secondary"
+            onClick={() => window.open('https://github.com/wahdanz1/feathertype/discussions', '_blank')}
+          >
+            <LuMessageCircle size={16} />
+            Open Discussions
+          </Button>
+        </Flex>
+      </GlassCard>
+    </Section>
   );
 }

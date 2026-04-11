@@ -10,13 +10,15 @@ import { IconBox } from '../components/ui/IconBox';
 import { StatusIndicator } from '../components/ui/StatusIndicator';
 import { BulletList } from '../components/ui/BulletList';
 import { AccordionItem, AccordionTrigger, AccordionContent } from '../components/ui/Accordion';
+import { useLatestRelease, formatFileSize } from '../hooks/useLatestRelease';
 import { RELEASES } from '../data/releases';
 import {
   LuDownload,
   LuMonitor,
   LuHistory,
   LuChevronDown,
-  LuChevronUp
+  LuChevronUp,
+  LuLoader
 } from 'react-icons/lu';
 
 
@@ -31,6 +33,9 @@ export default function Download() {
 }
 
 function HeroSection() {
+  const { release, loading } = useLatestRelease();
+  const hasRelease = !!release?.asset;
+
   return (
     <Section size="lg" animate="slide-up">
       <Flex gap={12} items="start" className="flex-col md:flex-row">
@@ -49,23 +54,43 @@ function HeroSection() {
               <IconBox icon={<LuMonitor />} variant="primary" className="text-theme-accent" />
               <Stack gap={1}>
                 <h3>Latest Stable</h3>
-                <Badge label="v1.0.0 • Windows" variant="outline" />
+                <Badge
+                  label={release ? `v${release.version} • Windows` : 'Coming soon'}
+                  variant="outline"
+                />
               </Stack>
             </Flex>
 
             <Stack gap={3} align="stretch">
-              <Button
-                size="lg"
-                variant="primary"
-                fullWidth
-                animateIcon="vertical"
-                disabled
-              >
-                Download
-                <LuDownload size={20} />
-              </Button>
+              {hasRelease ? (
+                <a href={release!.asset!.downloadUrl}>
+                  <Button
+                    size="lg"
+                    variant="primary"
+                    fullWidth
+                    animateIcon="vertical"
+                  >
+                    Download
+                    <LuDownload size={20} />
+                  </Button>
+                </a>
+              ) : (
+                <Button
+                  size="lg"
+                  variant="primary"
+                  fullWidth
+                  disabled
+                  title={loading ? 'Checking for releases...' : 'No releases available yet'}
+                >
+                  {loading ? <LuLoader size={20} className="animate-spin" /> : 'Download'}
+                  {!loading && <LuDownload size={20} />}
+                </Button>
+              )}
               <Subtle className="text-center">
-                Universal .exe (8.4MB)
+                {hasRelease
+                  ? `${release!.asset!.name} (${formatFileSize(release!.asset!.size)})`
+                  : loading ? 'Checking...' : 'No releases yet'
+                }
               </Subtle>
             </Stack>
           </Stack>

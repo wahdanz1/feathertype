@@ -132,7 +132,7 @@
 
   /* === Dialog === */
   .dialog-overlay {
-    @apply fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200;
+    @apply fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm;
   }
   .panel h3 {
     @apply text-lg;
@@ -146,12 +146,15 @@
     @apply overflow-auto h-full bg-editor-bg;
   }
   .status-bar {
-    @apply flex items-center justify-between px-4 py-1 text-xs border-t editor-chrome text-muted;
+    @apply flex items-center justify-between px-4 py-1 text-xs border-t border-border bg-editor-surface text-theme-text-muted;
+  }
+  .light-theme .status-bar {
+    @apply border-border-light bg-editor-surface-light text-text-muted-light;
   }
 
   /* === Tab styling === */
   .tab {
-    @apply px-3.5 h-full min-w-[120px] max-w-[200px] flex items-center justify-between gap-3 cursor-pointer relative transition-all duration-150 group mx-[2px];
+    @apply px-3.5 h-full min-w-[120px] max-w-[200px] flex items-center justify-between gap-3 cursor-pointer relative transition-all duration-150 mx-[2px];
   }
   .tab-active {
     @apply bg-editor-bg text-white border-x border-t border-border z-10 -mb-[1px] rounded-t-lg shadow-sm font-medium;

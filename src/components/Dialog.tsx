@@ -57,10 +57,10 @@ export function Dialog({
   const headerFooterClass = 'panel-header';
 
   return (
-    <div className="dialog-overlay">
+    <div className="dialog-overlay animate-in fade-in duration-200">
       <div
         className={cn(
-          "w-full overflow-hidden rounded-xl animate-in zoom-in duration-200",
+          "w-full overflow-hidden rounded-xl",
           maxWidthClasses[maxWidth],
           panelClass
         )}

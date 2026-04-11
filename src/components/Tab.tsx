@@ -43,7 +43,7 @@ export function Tab({ tab, isActive, index, onSelect, onClose }: TabProps) {
   };
 
   return (
-    <div onClick={onSelect} className={`tab ${isActive ? 'tab-active' : 'tab-inactive'}`}>
+    <div onClick={onSelect} className={`tab group ${isActive ? 'tab-active' : 'tab-inactive'}`}>
       {!isActive && index > 0 && (
         <div className="absolute -left-[2px] w-[1px] h-4 top-1/2 -translate-y-1/2 bg-white/10" />
       )}

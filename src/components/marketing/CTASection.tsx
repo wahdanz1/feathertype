@@ -26,7 +26,7 @@ export function CTASection() {
             </Button>
             <Button to="/editor" variant="secondary" size="lg" animateIcon>
               Online Editor
-              <LuArrowRight className="ml-2" size={18} />
+              <LuArrowRight size={18} />
             </Button>
           </Flex>
         </Stack>

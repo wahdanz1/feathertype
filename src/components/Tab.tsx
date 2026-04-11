@@ -104,7 +104,7 @@ export function Tab({ tab, isActive, index, onSelect, onClose }: TabProps) {
           e.stopPropagation();
           onClose();
         }}
-        className={`flex items-center justify-center w-5 h-5 text-theme-text-muted ${styles.closeHover} transition-colors rounded hover:bg-white/10 dark:hover:bg-white/5 opacity-0 group-hover:opacity-100 ${isActive ? 'opacity-100' : ''}`}
+        className={`flex items-center justify-center w-5 h-5 text-theme-text-muted ${styles.closeHover} transition-colors rounded hover:bg-white/10 opacity-0 group-hover:opacity-100 ${isActive ? 'opacity-100' : ''}`}
         title="Close"
       >
         <span className="text-lg" style={{ marginTop: '-2px' }}>×</span>

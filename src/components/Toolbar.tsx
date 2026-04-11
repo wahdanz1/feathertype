@@ -65,7 +65,7 @@ export function Toolbar() {
   };
 
   const dividerColor = theme === 'dark' ? 'bg-border' : 'bg-border-light';
-  const getButtonClass = (isActive: boolean) => isActive ? 'border border-theme-primary bg-white/10 dark:bg-white/5 shadow-sm scale-[0.98]' : '';
+  const getButtonClass = (isActive: boolean) => isActive ? 'border border-theme-primary bg-white/5 shadow-sm scale-[0.98]' : '';
 
   return (
     <div

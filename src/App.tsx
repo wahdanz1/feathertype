@@ -2,6 +2,7 @@ import { useEffect, Suspense, lazy } from 'react';
 import {
   createBrowserRouter,
   RouterProvider,
+  MemoryRouter,
   Navigate,
   useLocation,
   Outlet
@@ -107,9 +108,11 @@ function TauriApp() {
   }, [theme]);
 
   return (
-    <div className="h-screen overflow-hidden">
-      <AppShell />
-    </div>
+    <MemoryRouter>
+      <div className="h-screen overflow-hidden">
+        <AppShell />
+      </div>
+    </MemoryRouter>
   );
 }
 

@@ -29,7 +29,7 @@ export function Button({
   ...props
 }: ButtonProps) {
   const theme = useEditorStore((s) => s.theme);
-  const isEditor = window.location.pathname === '/editor' || window.location.pathname === '/';
+  const isEditor = window.location.pathname === '/editor' || !!(window as any).__TAURI_INTERNALS__;
   const isDark = theme === 'dark';
 
   const baseStyles = cn(
@@ -74,11 +74,14 @@ export function Button({
     )
   };
 
+  const disabledStyles = props.disabled ? 'opacity-50 cursor-not-allowed pointer-events-none' : '';
+
   const finalClasses = cn(
-    baseStyles, 
-    sizeStyles[size], 
-    variantStyles[variant], 
+    baseStyles,
+    sizeStyles[size],
+    variantStyles[variant],
     animationClass,
+    disabledStyles,
     className
   );
 

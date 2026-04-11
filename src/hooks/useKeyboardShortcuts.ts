@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useEditorStore } from '../store/useEditorStore';
-import { openFileDialog, saveFileDialog, openAndReadFile, writeFile, getFileName } from '../utils/fileOperations';
+import { openFileDialog, openAndReadFile, getFileName, handleSaveFile, handleSaveAsFile } from '../utils/fileOperations';
 import { formats } from '../utils/markdownFormatting';
 
 export function useKeyboardShortcuts() {
@@ -45,47 +45,14 @@ export function useKeyboardShortcuts() {
       if (isMod && e.key === 's' && !e.shiftKey) {
         e.preventDefault();
         const activeTab = getActiveTab();
-        if (!activeTab) return;
-
-        try {
-          if (activeTab.filePath) {
-            // Save to existing path
-            await writeFile(activeTab.filePath, activeTab.content);
-            markTabClean(activeTab.id);
-          } else {
-            // Save As for untitled files
-            const path = await saveFileDialog();
-            if (path) {
-              await writeFile(path, activeTab.content);
-              const title = getFileName(path);
-              updateTabPath(activeTab.id, path, title);
-              markTabClean(activeTab.id);
-            }
-          }
-        } catch (error) {
-          console.error('Failed to save file:', error);
-          alert('Failed to save file: ' + error);
-        }
+        if (activeTab) await handleSaveFile(activeTab, markTabClean, updateTabPath);
       }
 
       // Ctrl+Shift+S - Save As
       if (isMod && e.shiftKey && e.key === 'S') {
         e.preventDefault();
         const activeTab = getActiveTab();
-        if (!activeTab) return;
-
-        try {
-          const path = await saveFileDialog(activeTab.filePath || undefined);
-          if (path) {
-            await writeFile(path, activeTab.content);
-            const title = getFileName(path);
-            updateTabPath(activeTab.id, path, title);
-            markTabClean(activeTab.id);
-          }
-        } catch (error) {
-          console.error('Failed to save file:', error);
-          alert('Failed to save file: ' + error);
-        }
+        if (activeTab) await handleSaveAsFile(activeTab, markTabClean, updateTabPath);
       }
 
       // Ctrl+\ - Toggle preview

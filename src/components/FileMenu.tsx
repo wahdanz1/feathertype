@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { LuMenu } from 'react-icons/lu';
 import { useEditorStore } from '../store/useEditorStore';
-import { openFileDialog, saveFileDialog, openAndReadFile, writeFile, getFileName, handleSaveFile, exportAsDocx, isTauri } from '../utils/fileOperations';
+import { openFileDialog, openAndReadFile, getFileName, handleSaveFile, handleSaveAsFile, exportAsDocx, isTauri } from '../utils/fileOperations';
 import { Button } from './Button';
 
 
@@ -64,18 +64,7 @@ export function FileMenu() {
     const activeTab = getActiveTab();
     if (!activeTab) return;
 
-    try {
-      const path = await saveFileDialog(activeTab.filePath || undefined) as string | File | null;
-      if (path) {
-        await writeFile(path, activeTab.content);
-        const title = getFileName(path);
-        updateTabPath(activeTab.id, path, title);
-        markTabClean(activeTab.id);
-      }
-    } catch (error) {
-      console.error('Failed to save file:', error);
-      alert('Failed to save file: ' + error);
-    }
+    await handleSaveAsFile(activeTab, markTabClean, updateTabPath);
     setIsOpen(false);
   };
 
@@ -110,7 +99,7 @@ export function FileMenu() {
             }`}
           >
             <span>New</span>
-            <span className="text-xs text-gray-400">Ctrl+N</span>
+            {isTauri() && <span className="text-xs text-gray-400">Ctrl+N</span>}
           </button>
           <button
             onClick={handleOpen}
@@ -119,7 +108,7 @@ export function FileMenu() {
             }`}
           >
             <span>Open</span>
-            <span className="text-xs text-gray-400">Ctrl+O</span>
+            {isTauri() && <span className="text-xs text-gray-400">Ctrl+O</span>}
           </button>
           <div className={`border-t my-1 ${theme === 'dark' ? 'border-[#3e3e42]' : 'border-gray-300'}`}></div>
           <button
@@ -129,7 +118,7 @@ export function FileMenu() {
             }`}
           >
             <span>Save</span>
-            <span className="text-xs text-gray-400">Ctrl+S</span>
+            {isTauri() && <span className="text-xs text-gray-400">Ctrl+S</span>}
           </button>
           <button
             onClick={handleSaveAs}
@@ -138,7 +127,7 @@ export function FileMenu() {
             }`}
           >
             <span>Save As</span>
-            <span className="text-xs text-gray-400">Ctrl+Shift+S</span>
+            {isTauri() && <span className="text-xs text-gray-400">Ctrl+Shift+S</span>}
           </button>
           <div className={`border-t my-1 ${theme === 'dark' ? 'border-[#3e3e42]' : 'border-gray-300'}`}></div>
           <button

@@ -89,13 +89,15 @@ export async function readFileBinary(path: string | File): Promise<ArrayBuffer> 
   return new Uint8Array(bytes).buffer;
 }
 
-export async function writeFile(path: string | File, content: string): Promise<void> {
+export async function writeFile(path: string | File, content: string, downloadName?: string): Promise<void> {
   if (!isTauri()) {
     // Browser download fallback
     const blob = new Blob([content], { type: 'text/markdown' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    const fileName = path instanceof File ? path.name : (path === 'browser-save' ? 'document.md' : path);
+    const baseName = downloadName || (path instanceof File ? path.name : 'document');
+    // Ensure .md extension
+    const fileName = baseName.endsWith('.md') ? baseName : `${baseName}.md`;
     a.href = url;
     a.download = fileName;
     a.click();
@@ -140,17 +142,25 @@ export async function handleSaveFile(
   updateTabPath: (tabId: string, path: string | File, title: string) => void
 ): Promise<void> {
   try {
-    if (tab.filePath) {
+    if (tab.filePath && tab.filePath !== 'browser-save') {
+      // Has a real file path (Tauri) — save directly
       await writeFile(tab.filePath, tab.content);
       markTabClean(tab.id);
+    } else if (!isTauri()) {
+      // Browser mode: download with tab title, prompt if still "Untitled"
+      const name = tab.title === 'Untitled'
+        ? promptFileName(tab.title)
+        : tab.title;
+      if (!name) return; // User cancelled prompt
+      await writeFile('browser-save', tab.content, name);
+      updateTabPath(tab.id, 'browser-save', name);
+      markTabClean(tab.id);
     } else {
-      // Save As
+      // Tauri: no file path yet — open native Save As dialog
       const path = await saveFileDialog(tab.filePath || undefined);
       if (path) {
         await writeFile(path, tab.content);
-        // In browser mode, keep the current tab title instead of "browser-save"
-        const title = path === 'browser-save' ? tab.title : getFileName(path);
-        updateTabPath(tab.id, path, title);
+        updateTabPath(tab.id, path, getFileName(path));
         markTabClean(tab.id);
       }
     }
@@ -159,6 +169,40 @@ export async function handleSaveFile(
     alert('Failed to save file: ' + error);
     throw error;
   }
+}
+
+export async function handleSaveAsFile(
+  tab: Tab,
+  markTabClean: (tabId: string) => void,
+  updateTabPath: (tabId: string, path: string | File, title: string) => void
+): Promise<void> {
+  try {
+    if (!isTauri()) {
+      // Browser: always prompt for name
+      const name = promptFileName(tab.title);
+      if (!name) return;
+      await writeFile('browser-save', tab.content, name);
+      updateTabPath(tab.id, 'browser-save', name);
+      markTabClean(tab.id);
+    } else {
+      // Tauri: native Save As dialog
+      const path = await saveFileDialog(tab.filePath || undefined);
+      if (path) {
+        await writeFile(path, tab.content);
+        updateTabPath(tab.id, path, getFileName(path));
+        markTabClean(tab.id);
+      }
+    }
+  } catch (error) {
+    console.error('Failed to save file:', error);
+    alert('Failed to save file: ' + error);
+    throw error;
+  }
+}
+
+function promptFileName(defaultName: string): string | null {
+  const name = window.prompt('File name:', defaultName === 'Untitled' ? '' : defaultName);
+  return name?.trim() || null;
 }
 
 export async function writeFileBinary(path: string, data: ArrayBuffer): Promise<void> {

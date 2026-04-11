@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 import { useEditorStore } from '../store/useEditorStore';
-import { useLocation, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { cn } from '../lib/utils';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -29,8 +29,7 @@ export function Button({
   ...props
 }: ButtonProps) {
   const theme = useEditorStore((s) => s.theme);
-  const location = useLocation();
-  const isEditor = location.pathname === '/editor';
+  const isEditor = window.location.pathname === '/editor' || window.location.pathname === '/';
   const isDark = theme === 'dark';
 
   const baseStyles = cn(

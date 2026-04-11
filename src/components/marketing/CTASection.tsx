@@ -1,6 +1,6 @@
-import { Button } from '../../components/Button';
-import { GlassCard } from '../../components/GlassCard';
-import { Section, Stack, Flex } from '../../components/ui/Layout';
+import { Button } from '../Button';
+import { GlassCard } from '../GlassCard';
+import { Section, Stack, Flex } from '../ui/Layout';
 import { LuArrowRight } from 'react-icons/lu';
 
 export function CTASection() {

@@ -4,6 +4,7 @@ import { markdown } from '@codemirror/lang-markdown';
 import { EditorView } from '@codemirror/view';
 import { search, searchKeymap } from '@codemirror/search';
 import { keymap } from '@codemirror/view';
+import { foldGutter } from '@codemirror/language';
 import { indentUnit, HighlightStyle, syntaxHighlighting } from '@codemirror/language';
 import { tags } from '@lezer/highlight';
 import { useEditorStore } from '../store/useEditorStore';
@@ -39,14 +40,14 @@ const darkTheme = EditorView.theme({
   '.cm-foldGutter': {
     width: '16px',
   },
-  '.cm-foldGutter .cm-gutterElement': {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    cursor: 'pointer',
-    height: '100%',
-  },
 });
+
+function makeFoldMarker(content: string) {
+  const span = document.createElement('span');
+  span.textContent = content;
+  span.style.cssText = 'display:inline-flex;align-items:center;justify-content:center;width:100%;height:100%;cursor:pointer;font-size:18px;';
+  return span;
+}
 
 const lightTheme = EditorView.theme({
   '&': {
@@ -77,11 +78,15 @@ const lightTheme = EditorView.theme({
     width: '16px',
   },
   '.cm-foldGutter .cm-gutterElement': {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
+    position: 'relative',
     cursor: 'pointer',
-    height: '100%',
+  },
+  '.cm-foldGutter .cm-gutterElement span': {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    lineHeight: '1',
   },
 });
 
@@ -155,6 +160,11 @@ export function Editor() {
     tableExtension, // Smart Enter key for tables
     theme === 'dark' ? darkTheme : lightTheme,
     indentUnit.of('    '), // 4 spaces for Tab key
+    foldGutter({
+      openText: '▸',
+      closedText: '▾',
+      markerDOM: (open) => makeFoldMarker(open ? '▾' : '▸'),
+    }),
   ];
 
   if (lineWrap) {
@@ -175,7 +185,7 @@ export function Editor() {
           lineNumbers: true,
           highlightActiveLineGutter: true,
           highlightActiveLine: true,
-          foldGutter: true,
+          foldGutter: false,
         }}
       />
     </div>

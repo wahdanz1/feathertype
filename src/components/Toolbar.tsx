@@ -81,19 +81,26 @@ export function Toolbar() {
         value={activeFormats.headingLevel > 0 ? `h${activeFormats.headingLevel}` : ''}
         onChange={(value) => {
           if (!editorView) return;
-          const currentLevel = activeFormats.headingLevel;
-          if (value === '') { if (currentLevel > 0) { if (currentLevel === 1) formats.heading1(editorView); else if (currentLevel === 2) formats.heading2(editorView); else if (currentLevel === 3) formats.heading3(editorView); } }
-          else if ((value === 'h1' && currentLevel === 1) || (value === 'h2' && currentLevel === 2) || (value === 'h3' && currentLevel === 3)) { if (value === 'h1') formats.heading1(editorView); else if (value === 'h2') formats.heading2(editorView); else if (value === 'h3') formats.heading3(editorView); }
-          else { if (value === 'h1') formats.heading1(editorView); else if (value === 'h2') formats.heading2(editorView); else if (value === 'h3') formats.heading3(editorView); }
+          if (value === 'h1') formats.heading1(editorView);
+          else if (value === 'h2') formats.heading2(editorView);
+          else if (value === 'h3') formats.heading3(editorView);
+          else if (value === '' && activeFormats.headingLevel > 0) {
+            // Remove current heading
+            const level = activeFormats.headingLevel;
+            if (level === 1) formats.heading1(editorView);
+            else if (level === 2) formats.heading2(editorView);
+            else if (level === 3) formats.heading3(editorView);
+          }
         }}
+        options={[
+          { value: '', label: 'No Heading' },
+          { value: 'h1', label: 'H1' },
+          { value: 'h2', label: 'H2' },
+          { value: 'h3', label: 'H3' },
+        ]}
         isActive={activeFormats.heading}
         title="Heading"
-      >
-        <option value="">No Heading</option>
-        <option value="h1">H1</option>
-        <option value="h2">H2</option>
-        <option value="h3">H3</option>
-      </Dropdown>
+      />
 
       <div className={`w-px h-6 ${dividerColor} mx-1`} />
 

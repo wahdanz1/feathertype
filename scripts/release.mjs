@@ -55,7 +55,15 @@ console.log('  - src/config.ts');
 const run = (cmd) => execSync(cmd, { stdio: 'inherit' });
 
 run('git add -A');
-run(`git commit -m "release: v${version}"`);
+
+// Only commit if there are staged changes (version may already match)
+try {
+  execSync('git diff --cached --quiet', { stdio: 'pipe' });
+  console.log('Version already up to date, skipping commit.');
+} catch {
+  run(`git commit -m "release: v${version}"`);
+}
+
 run(`git tag -a "v${version}" -m "v${version}"`);
 run('git push');
 run('git push --tags');

@@ -19,6 +19,7 @@ import './App.css';
 const Home = lazy(() => import('./pages/Home.tsx'));
 const Download = lazy(() => import('./pages/Download.tsx'));
 const Contact = lazy(() => import('./pages/Contact.tsx'));
+const Privacy = lazy(() => import('./pages/Privacy.tsx'));
 
 // Tauri detection (Mode-specific for builds, runtime-specific for development)
 const isTauri = import.meta.env.MODE === 'tauri' || (import.meta.env.MODE === 'development' && typeof window !== 'undefined' && (window as any).__TAURI_INTERNALS__ !== undefined);
@@ -78,6 +79,7 @@ const router = createBrowserRouter([
         { path: "editor", element: <AppShell /> },
         { path: "download", element: <Download /> },
         { path: "contact", element: <Contact /> },
+        { path: "privacy", element: <Privacy /> },
         { path: "*", element: <Navigate to="/" replace /> },
       ]
   }

@@ -126,7 +126,7 @@ function HistorySection() {
               <ReleaseItem key={rel.version} rel={rel} />
             ))
           ) : (
-            <Subtle className="text-center py-12">No releases yet. Check back soon!</Subtle>
+            <Subtle className="py-12">No releases yet. Check back soon!</Subtle>
           )}
         </Stack>
       </Stack>
@@ -188,7 +188,7 @@ function FeedbackSection() {
       <GlassCard variant="muted" border="subtle" hoverable={false}>
         <Flex gap={6} className="flex-col sm:flex-row" items="center">
           <IconBox icon={<LuMessageCircle />} variant="primary" size="lg" className="text-theme-accent" />
-          <Stack gap={2} className="flex-1 text-center sm:text-left">
+          <Stack gap={2} className="flex-1 text-center sm:text-left items-center sm:items-start">
             <h3>Got feedback?</h3>
             <Subtle>
               Found a bug, have a feature request, or just want to share your thoughts? Join the discussion on GitHub.

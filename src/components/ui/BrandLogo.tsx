@@ -17,14 +17,14 @@ export function BrandLogo({ size = 'md', className, hideText = false }: BrandLog
   const current = sizes[size];
 
   return (
-    <Link to="/" className={cn("flex items-center gap-2 transition-opacity hover:opacity-80 group shrink-0", className)}>
+    <Link to="/" className={cn("flex items-center gap-2 group shrink-0", className)}>
       <img
         src="/feathertype-logo.svg"
         alt="FeatherType"
         className={cn("transition-transform group-hover:scale-110", current.img)}
       />
       {!hideText && (
-        <span className={cn("font-bold tracking-tight text-white", current.text)}>
+        <span className={cn("font-bold tracking-tight text-white/70 transition-colors group-hover:text-white", current.text)}>
           FeatherType
         </span>
       )}

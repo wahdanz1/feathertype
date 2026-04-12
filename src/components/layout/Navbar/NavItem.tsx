@@ -6,14 +6,15 @@ interface NavItemProps {
   to: string;
   children: React.ReactNode;
   className?: string;
+  onClick?: () => void;
 }
 
-export function NavItem({ to, children, className }: NavItemProps) {
+export function NavItem({ to, children, className, onClick }: NavItemProps) {
   const location = useLocation();
   const isActive = location.pathname === to;
 
   return (
-    <Link to={to} className={cn("relative group py-1 block", className)}>
+    <Link to={to} onClick={onClick} className={cn("relative group py-1 block", className)}>
       <span className={cn(
         "text-sm font-medium transition-colors group-hover:text-white",
         isActive ? "text-white" : "text-theme-text-muted"

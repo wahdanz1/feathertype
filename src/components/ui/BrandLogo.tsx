@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom';
-import { LuFeather } from 'react-icons/lu';
 import { cn } from '../../lib/utils';
 
 interface BrandLogoProps {
@@ -9,22 +8,21 @@ interface BrandLogoProps {
 }
 
 export function BrandLogo({ size = 'md', className, hideText = false }: BrandLogoProps) {
-  const iconSizes = {
-    sm: { box: 'h-7 w-7', icon: 18, text: 'text-md' },
-    md: { box: 'h-8 w-8', icon: 20, text: 'text-lg' },
-    lg: { box: 'h-10 w-10', icon: 24, text: 'text-xl' },
+  const sizes = {
+    sm: { img: 'h-7 w-7', text: 'text-md' },
+    md: { img: 'h-8 w-8', text: 'text-lg' },
+    lg: { img: 'h-10 w-10', text: 'text-xl' },
   };
 
-  const current = iconSizes[size];
+  const current = sizes[size];
 
   return (
     <Link to="/" className={cn("flex items-center gap-2 transition-opacity hover:opacity-80 group shrink-0", className)}>
-      <div className={cn(
-        "flex items-center justify-center rounded-lg bg-theme-primary text-white transition-transform group-hover:scale-110",
-        current.box
-      )}>
-        <LuFeather size={current.icon} />
-      </div>
+      <img
+        src="/feathertype-logo.svg"
+        alt="FeatherType"
+        className={cn("transition-transform group-hover:scale-110", current.img)}
+      />
       {!hideText && (
         <span className={cn("font-bold tracking-tight text-white", current.text)}>
           FeatherType

@@ -11,7 +11,7 @@ import { StatusIndicator } from '../components/ui/StatusIndicator';
 import { BulletList } from '../components/ui/BulletList';
 import { AccordionItem, AccordionTrigger, AccordionContent } from '../components/ui/Accordion';
 import { useLatestRelease, formatFileSize } from '../hooks/useLatestRelease';
-import { RELEASES } from '../data/releases';
+import { useReleases, type ReleaseEntry } from '../hooks/useReleases';
 import {
   LuDownload,
   LuMonitor,
@@ -104,6 +104,8 @@ function HeroSection() {
 
 
 function HistorySection() {
+  const { releases, loading } = useReleases();
+
   return (
     <Section id="releases" size="lg" className="pb-24">
       <Stack gap={8} align="stretch">
@@ -115,16 +117,24 @@ function HistorySection() {
         />
 
         <Stack gap={4} align="stretch">
-          {RELEASES.map((rel) => (
-            <ReleaseItem key={rel.version} rel={rel} />
-          ))}
+          {loading ? (
+            <Flex justify="center" className="py-12">
+              <LuLoader size={24} className="animate-spin text-theme-muted" />
+            </Flex>
+          ) : releases.length > 0 ? (
+            releases.map((rel) => (
+              <ReleaseItem key={rel.version} rel={rel} />
+            ))
+          ) : (
+            <Subtle className="text-center py-12">No releases yet. Check back soon!</Subtle>
+          )}
         </Stack>
       </Stack>
     </Section>
   );
 }
 
-function ReleaseItem({ rel }: { rel: (typeof RELEASES)[0] }) {
+function ReleaseItem({ rel }: { rel: ReleaseEntry }) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (

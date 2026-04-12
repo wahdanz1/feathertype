@@ -14,7 +14,8 @@
     "build": "tsc && vite build",
     "build:tauri": "tsc && vite build --mode tauri",
     "preview": "vite preview",
-    "tauri": "tauri"
+    "tauri": "tauri",
+    "release": "bash scripts/release.sh"
   },
   "dependencies": {
     "@codemirror/commands": "^6.10.2",

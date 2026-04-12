@@ -1,9 +1,8 @@
 import { useEditorStore } from '../store/useEditorStore';
-import { LuFeather, LuExternalLink, LuDownload, LuMessageSquare } from 'react-icons/lu';
+import { LuExternalLink, LuDownload, LuMessageSquare } from 'react-icons/lu';
 import { Dialog } from './Dialog';
 import { Button } from './Button';
 import { Stack } from './ui/Layout';
-import { IconBox } from './ui/IconBox';
 import { Caption, Subtle } from './ui/Typography';
 import { isTauri } from '../utils/fileOperations';
 import { APP_NAME, APP_VERSION, LINKS } from '../config';
@@ -28,7 +27,7 @@ export function AboutDialog() {
       }
     >
       <Stack align="center" gap={4} className="text-center">
-        <IconBox icon={<LuFeather />} variant="solid" size="xl" />
+        <img src="/feathertype-logo.svg" alt="FeatherType" className="h-16 w-16" />
 
         <Stack align="center" gap={1}>
           <h2>{APP_NAME}</h2>

@@ -54,4 +54,4 @@ This bumps the version everywhere, tags, pushes, and triggers a GitHub Actions b
 
 ## License
 
-MIT
+[PolyForm Noncommercial 1.0.0](LICENSE) — free for personal and non-commercial use. Commercial use requires permission from the author. See the full license for details.

@@ -52,7 +52,6 @@ export function Dialog({
     xl: 'max-w-xl',
   };
 
-  // These classes auto-switch via .light-theme in globals.css
   const panelClass = 'panel';
   const headerFooterClass = 'panel-header';
 
@@ -65,7 +64,6 @@ export function Dialog({
           panelClass
         )}
       >
-        {/* Header */}
         <Flex
           justify="between"
           className={cn("px-6 py-4 border-b", headerFooterClass)}
@@ -86,7 +84,6 @@ export function Dialog({
           </Button>
         </Flex>
 
-        {/* Body */}
         <div className="p-8">
           {description && (
             <p className="text-sm mb-6 text-muted">
@@ -96,7 +93,6 @@ export function Dialog({
           {children}
         </div>
 
-        {/* Footer: actions or custom */}
         {actions && (
           <Flex
             justify="end"

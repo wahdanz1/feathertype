@@ -91,12 +91,10 @@ export async function readFileBinary(path: string | File): Promise<ArrayBuffer> 
 
 export async function writeFile(path: string | File, content: string, downloadName?: string): Promise<void> {
   if (!isTauri()) {
-    // Browser download fallback
     const blob = new Blob([content], { type: 'text/markdown' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     const baseName = downloadName || (path instanceof File ? path.name : 'document');
-    // Ensure .md extension
     const fileName = baseName.endsWith('.md') ? baseName : `${baseName}.md`;
     a.href = url;
     a.download = fileName;
@@ -113,7 +111,6 @@ export function getFileName(path: string | File): string {
 }
 
 function cleanMammothMarkdown(markdown: string): string {
-  // Remove unnecessary escapes that mammoth adds
   return markdown
     .replace(/\\([().\-])/g, '$1')  // Unescape parentheses, periods, and dashes
     .replace(/\\\\/g, '\\');         // Fix double-escaped backslashes
@@ -124,14 +121,12 @@ export async function openAndReadFile(path: string | File): Promise<string> {
   const ext = fileName.toLowerCase().split('.').pop();
 
   if (ext === 'docx') {
-    // Read .docx file as binary and convert to markdown
     const arrayBuffer = await readFileBinary(path);
-    // mammoth's TS types omit convertToMarkdown — cast to any to bypass
+    // mammoth's TS types omit convertToMarkdown
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const result = await (mammoth as any).convertToMarkdown({ arrayBuffer });
     return cleanMammothMarkdown(result.value);
   } else {
-    // Read as text file (.md, .markdown, .txt)
     return readFile(path);
   }
 }
@@ -143,20 +138,17 @@ export async function handleSaveFile(
 ): Promise<void> {
   try {
     if (tab.filePath && tab.filePath !== 'browser-save') {
-      // Has a real file path (Tauri) — save directly
       await writeFile(tab.filePath, tab.content);
       markTabClean(tab.id);
     } else if (!isTauri()) {
-      // Browser mode: download with tab title, prompt if still "Untitled"
       const name = tab.title === 'Untitled'
         ? promptFileName(tab.title)
         : tab.title;
-      if (!name) return; // User cancelled prompt
+      if (!name) return;
       await writeFile('browser-save', tab.content, name);
       updateTabPath(tab.id, 'browser-save', name);
       markTabClean(tab.id);
     } else {
-      // Tauri: no file path yet — open native Save As dialog
       const path = await saveFileDialog(tab.filePath || undefined);
       if (path) {
         await writeFile(path, tab.content);
@@ -178,14 +170,12 @@ export async function handleSaveAsFile(
 ): Promise<void> {
   try {
     if (!isTauri()) {
-      // Browser: always prompt for name
       const name = promptFileName(tab.title);
       if (!name) return;
       await writeFile('browser-save', tab.content, name);
       updateTabPath(tab.id, 'browser-save', name);
       markTabClean(tab.id);
     } else {
-      // Tauri: native Save As dialog
       const path = await saveFileDialog(tab.filePath || undefined);
       if (path) {
         await writeFile(path, tab.content);
@@ -206,8 +196,8 @@ function promptFileName(defaultName: string): string | null {
 }
 
 export async function writeFileBinary(path: string, data: ArrayBuffer): Promise<void> {
-  if (!isTauri()) return; // Not supported for now
-  // Tauri expects Vec<u8> — convert ArrayBuffer to a plain number array
+  if (!isTauri()) return;
+  // Tauri expects Vec<u8>
   const bytes = Array.from(new Uint8Array(data));
   await invoke('write_file_binary', { path, data: bytes });
 }
@@ -235,7 +225,7 @@ export async function exportAsDocx(content: string, currentFilePath?: string | F
       filters: [{ name: 'Word Document', extensions: ['docx'] }],
     });
 
-    if (!path) return; // user cancelled
+    if (!path) return;
 
     const arrayBuffer = await markdownToDocxBuffer(content);
     await writeFileBinary(path, arrayBuffer);

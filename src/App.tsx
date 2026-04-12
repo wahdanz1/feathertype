@@ -15,13 +15,11 @@ import { Footer } from './components/layout/Footer';
 import { cn } from './lib/utils';
 import './App.css';
 
-// Lazy load website components to keep Tauri app lean
 const Home = lazy(() => import('./pages/Home.tsx'));
 const Download = lazy(() => import('./pages/Download.tsx'));
 const Contact = lazy(() => import('./pages/Contact.tsx'));
 const Privacy = lazy(() => import('./pages/Privacy.tsx'));
 
-// Tauri detection (Mode-specific for builds, runtime-specific for development)
 const isTauri = import.meta.env.MODE === 'tauri' || (import.meta.env.MODE === 'development' && typeof window !== 'undefined' && (window as any).__TAURI_INTERNALS__ !== undefined);
 
 console.log(`[FeatherType] Environment: ${isTauri ? 'Tauri' : 'Web'} (Mode: ${import.meta.env.MODE})`);
@@ -32,7 +30,6 @@ function RootLayout() {
 
   const isEditor = location.pathname === '/editor' || isTauri;
 
-  // Apply theme class and layout behavior to body and root
   useEffect(() => {
     const bodyClasses = [];
     if (theme === 'light') bodyClasses.push('light-theme');
@@ -86,18 +83,13 @@ const router = createBrowserRouter([
 ]);
 
 function App() {
-  // Tauri: render AppShell directly (no router overhead, matches original working layout)
-  if (isTauri) {
-    return <TauriApp />;
-  }
-  // Web: use router for landing page + editor
+  if (isTauri) return <TauriApp />;
   return <RouterProvider router={router} />;
 }
 
 function TauriApp() {
   const theme = useEditorStore((s) => s.theme);
 
-  // Apply theme class and layout behavior to body and root (Always editor mode in Tauri)
   useEffect(() => {
     const bodyClasses = ['is-editor-body'];
     if (theme === 'light') bodyClasses.push('light-theme');

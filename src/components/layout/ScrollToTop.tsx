@@ -5,11 +5,10 @@ export function ScrollToTop() {
   const { pathname, hash } = useLocation();
 
   useEffect(() => {
-    // If we have a hash, find the element and scroll to it
     if (hash) {
       const id = hash.replace('#', '');
       const element = document.getElementById(id);
-      
+
       if (element) {
         const headerOffset = 80;
         const elementPosition = element.getBoundingClientRect().top;
@@ -21,10 +20,9 @@ export function ScrollToTop() {
         });
       }
     } else {
-      // If no hash, scroll to top of page
       window.scrollTo({
         top: 0,
-        behavior: 'instant' as ScrollBehavior // Use instant for page transitions to avoid sliding from previous page
+        behavior: 'instant' as ScrollBehavior
       });
     }
   }, [pathname, hash]);

@@ -97,7 +97,6 @@ export const useEditorStore = create<EditorStore>()(
         const state = get();
         const tab = state.tabs.find((t) => t.id === tabId);
 
-        // Show dialog if tab has unsaved changes
         if (tab?.isDirty) {
           set({
             unsavedChangesDialog: {
@@ -108,12 +107,10 @@ export const useEditorStore = create<EditorStore>()(
           return;
         }
 
-        // Close tab immediately if no unsaved changes
         set((state) => {
           const newTabs = state.tabs.filter((t) => t.id !== tabId);
           let newActiveId = state.activeTabId;
 
-          // If closing active tab, switch to another
           if (state.activeTabId === tabId) {
             newActiveId = newTabs.length > 0 ? newTabs[newTabs.length - 1].id : null;
           }
@@ -135,7 +132,6 @@ export const useEditorStore = create<EditorStore>()(
           const newTabs = state.tabs.filter((t) => t.id !== tabId);
           let newActiveId = state.activeTabId;
 
-          // If closing active tab, switch to another
           if (state.activeTabId === tabId) {
             newActiveId = newTabs.length > 0 ? newTabs[newTabs.length - 1].id : null;
           }
@@ -169,15 +165,12 @@ export const useEditorStore = create<EditorStore>()(
         const tab = state.tabs.find((t) => t.id === tabId);
         if (!tab) return;
 
-        // Save the file
         await handleSaveFile(tab, get().markTabClean, get().updateTabPath);
 
-        // Then close the tab
         set((state) => {
           const newTabs = state.tabs.filter((t) => t.id !== tabId);
           let newActiveId = state.activeTabId;
 
-          // If closing active tab, switch to another
           if (state.activeTabId === tabId) {
             newActiveId = newTabs.length > 0 ? newTabs[newTabs.length - 1].id : null;
           }

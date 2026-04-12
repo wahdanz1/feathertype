@@ -195,16 +195,13 @@ const lightTheme = EditorView.theme({
   },
 });
 
-// Custom markdown syntax highlighting - only color the markers, not the content
-// Dark mode: lighter cyan/teal for good contrast on dark background
 const darkSyntaxHighlight = HighlightStyle.define([
-  { tag: tags.processingInstruction, color: '#4EC9B0' }, // Formatting markers like ** ~~ _
+  { tag: tags.processingInstruction, color: '#4EC9B0' },
   { tag: tags.meta, color: '#4EC9B0' },
 ]);
 
-// Light mode: darker teal/blue for good contrast on light background
 const lightSyntaxHighlight = HighlightStyle.define([
-  { tag: tags.processingInstruction, color: '#0070C0' }, // Formatting markers like ** ~~ _
+  { tag: tags.processingInstruction, color: '#0070C0' },
   { tag: tags.meta, color: '#0070C0' },
 ]);
 
@@ -219,19 +216,16 @@ export function Editor() {
 
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Cleanup editor view reference on unmount
   useEffect(() => {
     return () => setEditorView(null);
   }, [setEditorView]);
 
-  // Apply zoom via font-size — avoids the clipping/scrollbar issues of CSS transform scale
   useEffect(() => {
     if (containerRef.current) {
       containerRef.current.style.setProperty('--editor-font-size', `${(zoom / 100) * 14}px`);
     }
   }, [zoom]);
 
-  // Ctrl+wheel zoom — reads zoom directly from store so the handler never needs to re-register
   useEffect(() => {
     const handleWheel = (e: WheelEvent) => {
       if (e.ctrlKey) {
@@ -246,7 +240,7 @@ export function Editor() {
       container.addEventListener('wheel', handleWheel, { passive: false });
       return () => container.removeEventListener('wheel', handleWheel);
     }
-  }, []); // stable — reads live state via getState()
+  }, []);
 
   if (!activeTab) {
     return (
@@ -256,11 +250,11 @@ export function Editor() {
 
   const extensions: Extension[] = [
     markdown(),
-    syntaxHighlighting(theme === 'dark' ? darkSyntaxHighlight : lightSyntaxHighlight), // Custom syntax colors
+    syntaxHighlighting(theme === 'dark' ? darkSyntaxHighlight : lightSyntaxHighlight),
     search({ top: false }),
     keymap.of(searchKeymap),
-    listExtension, // Smart Enter key for lists
-    tableExtension, // Smart Enter key for tables
+    listExtension,
+    tableExtension,
     theme === 'dark' ? darkTheme : lightTheme,
     indentUnit.of('    '), // 4 spaces for Tab key
     foldGutter({

@@ -57,7 +57,6 @@ export function Toolbar() {
     };
   }, [editorView]);
 
-  /** Apply a format and refresh active state indicators */
   const applyFormat = (formatFn: (view: EditorView) => void) => {
     if (!editorView) return;
     formatFn(editorView);

@@ -1,100 +1,57 @@
 # FeatherType
 
-A lightweight local Markdown editor built with Tauri and React.
+A feather-light Markdown editor that runs as a native desktop app (Tauri) and an online editor.
+
+**[Try it in your browser](https://feathertype.vercel.app/editor)** | **[Download for desktop](https://feathertype.vercel.app/download)**
 
 ## Features
 
-- **Multi-tab editing** with unsaved change tracking
-- **Live markdown preview** with GitHub Flavored Markdown support
-- **Split-pane layout** (editor | preview) with toggle
-- **Dark/light theme** support
-- **Native file operations** via Tauri (New, Open, Save, Save As)
-- **Rich formatting toolbar** (bold, italic, headings, lists, links, code)
-- **Zoom / font-size control** with keyboard and Ctrl+scroll
-- **Word count** and cursor position in the status bar
-- **DOCX import** — open a Word document and it converts to Markdown automatically
-- **Full keyboard shortcut** support
+- Live split-pane Markdown preview
+- Multi-tab editing with unsaved changes tracking
+- DOCX import (Word to Markdown conversion)
+- Dark and light themes
+- Rich formatting toolbar and keyboard shortcuts
+- Zoom control (Ctrl+scroll, Ctrl+/-)
+- Word count and cursor position in status bar
+- Offline-first — your documents never leave your device
 
 ## Tech Stack
 
-**Frontend:**
-- React 19 + TypeScript
-- CodeMirror 6 (editor with syntax highlighting)
-- react-markdown + remark-gfm (preview)
-- Zustand (state management)
-- Tailwind CSS v4
+- **Frontend:** React 19, TypeScript, CodeMirror 6, Zustand, Tailwind CSS v4
+- **Desktop:** Tauri v2 (Rust)
+- **Web:** Vite, hosted on Vercel
 
-**Backend:**
-- Tauri v2
-- Rust
-- Native fs and dialog plugins
-
-## Quick Start
+## Development
 
 ### Prerequisites
 
-- [Node.js](https://nodejs.org/) (v18+)
+- [Node.js](https://nodejs.org/) 18+
 - [pnpm](https://pnpm.io/)
 - [Rust](https://rustup.rs/)
 
-### Install & Run
+### Run locally
 
 ```bash
-# Install dependencies
 pnpm install
-
-# Run development server
 pnpm tauri dev
+```
 
-# Build for production (creates installer in src-tauri/target/release/bundle/)
+### Build
+
+```bash
 pnpm tauri build
 ```
 
-## Keyboard Shortcuts
+### Release
 
-### File Operations
+Write release notes in `RELEASE_NOTES.md`, then:
 
-| Shortcut | Action |
-|----------|--------|
-| `Ctrl+N` | New tab |
-| `Ctrl+O` | Open file |
-| `Ctrl+S` | Save |
-| `Ctrl+Shift+S` | Save As |
+```bash
+pnpm release <version>
+```
 
-### Editor
+This bumps the version everywhere, tags, pushes, and triggers a GitHub Actions build for Windows, macOS, and Linux.
 
-| Shortcut | Action |
-|----------|--------|
-| `Ctrl+F` | Find in file |
-| `Ctrl+H` | Find & replace |
-| `Alt+Z` | Toggle word wrap |
-| `Ctrl+\` | Toggle preview pane |
+## License
 
-### Formatting
-
-| Shortcut | Action |
-|----------|--------|
-| `Ctrl+B` | Bold |
-| `Ctrl+I` | Italic |
-| `Ctrl+K` | Insert link |
-| `` Ctrl+` `` | Inline code |
-| `Ctrl+1` | Heading 1 |
-| `Ctrl+2` | Heading 2 |
-| `Ctrl+3` | Heading 3 |
-
-### Zoom
-
-| Shortcut | Action |
-|----------|--------|
-| `Ctrl++` | Zoom in |
-| `Ctrl+-` | Zoom out |
-| `Ctrl+0` | Reset zoom |
-| `Ctrl+Scroll` | Zoom in/out |
-
-## Supported File Types
-
-| Extension | Open | Save |
-|-----------|------|------|
-| `.md`, `.markdown` | Yes | Yes |
-| `.txt` | Yes | Yes |
-| `.docx` | Yes (converts to Markdown) | — |
+MIT

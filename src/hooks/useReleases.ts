@@ -16,10 +16,18 @@ interface UseReleasesResult {
   error: boolean;
 }
 
+function stripInlineMarkdown(text: string): string {
+  return text
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+    .replace(/(\*\*|__)(.*?)\1/g, '$2')
+    .replace(/([*_])(.*?)\1/g, '$2')
+    .replace(/`([^`]+)`/g, '$1');
+}
+
 function parseChanges(body: string): string[] {
   return body
     .split('\n')
-    .map((line) => line.replace(/^[-*]\s+/, '').trim())
+    .map((line) => stripInlineMarkdown(line.replace(/^[-*]\s+/, '').trim()))
     .filter((line) => line.length > 0 && !line.startsWith('#'));
 }
 

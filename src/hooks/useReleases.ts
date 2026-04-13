@@ -8,6 +8,7 @@ export interface ReleaseEntry {
   date: string;
   type: 'Stable' | 'Beta';
   changes: string[];
+  downloadUrl: string | null;
 }
 
 interface UseReleasesResult {
@@ -62,12 +63,16 @@ export function useReleases(): UseReleasesResult {
         if (cancelled) return;
 
         const entries: ReleaseEntry[] = data.map(
-          (rel: { tag_name: string; published_at: string; prerelease: boolean; body: string }) => ({
-            version: rel.tag_name.replace(/^v/, ''),
-            date: formatDate(rel.published_at),
-            type: rel.prerelease ? 'Beta' : 'Stable',
-            changes: parseChanges(rel.body || ''),
-          })
+          (rel: { tag_name: string; published_at: string; prerelease: boolean; body: string; assets: { name: string; browser_download_url: string }[] }) => {
+            const exe = rel.assets?.find((a) => a.name.endsWith('.exe'));
+            return {
+              version: rel.tag_name.replace(/^v/, ''),
+              date: formatDate(rel.published_at),
+              type: rel.prerelease ? 'Beta' : 'Stable',
+              changes: parseChanges(rel.body || ''),
+              downloadUrl: exe?.browser_download_url ?? null,
+            };
+          }
         );
 
         setReleases(entries);

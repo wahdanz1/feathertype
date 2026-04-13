@@ -162,9 +162,17 @@ function ReleaseItem({ rel }: { rel: ReleaseEntry }) {
               {isOpen ? 'Close' : 'View Changes'}
             </ActionLink>
 
-            <Button size="sm" variant="secondary" className="hidden sm:flex px-4" disabled>
-              Download
-            </Button>
+            {rel.downloadUrl ? (
+              <a href={rel.downloadUrl} className="hidden sm:flex">
+                <Button size="sm" variant="secondary" className="px-4">
+                  Download
+                </Button>
+              </a>
+            ) : (
+              <Button size="sm" variant="secondary" className="hidden sm:flex px-4" disabled>
+                Download
+              </Button>
+            )}
           </Flex>
         </Flex>
       </AccordionTrigger>
@@ -172,11 +180,15 @@ function ReleaseItem({ rel }: { rel: ReleaseEntry }) {
       <AccordionContent>
         <BulletList items={rel.changes} cols={2} />
 
-        <Stack divider className="mt-8 pt-8 sm:hidden">
-          <Button size="lg" variant="secondary" fullWidth disabled>
-            Download Version
-          </Button>
-        </Stack>
+        {rel.downloadUrl && (
+          <Stack divider className="mt-8 pt-8 sm:hidden">
+            <a href={rel.downloadUrl}>
+              <Button size="lg" variant="secondary" fullWidth>
+                Download Version
+              </Button>
+            </a>
+          </Stack>
+        )}
       </AccordionContent>
     </AccordionItem>
   );

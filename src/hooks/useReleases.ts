@@ -3,10 +3,12 @@ import { useState, useEffect } from 'react';
 const GITHUB_REPO = 'wahdanz1/feathertype';
 const API_URL = `https://api.github.com/repos/${GITHUB_REPO}/releases`;
 
+export type ReleaseTag = 'Stable' | 'Beta' | 'Feature' | 'Bug Fix' | 'Improvement';
+
 export interface ReleaseEntry {
   version: string;
   date: string;
-  type: 'Stable' | 'Beta';
+  tags: ReleaseTag[];
   changes: string[];
   downloadUrl: string | null;
 }
@@ -25,11 +27,34 @@ function stripInlineMarkdown(text: string): string {
     .replace(/`([^`]+)`/g, '$1');
 }
 
+const VALID_TAGS: Record<string, ReleaseTag> = {
+  'stable': 'Stable',
+  'beta': 'Beta',
+  'feature': 'Feature',
+  'bug fix': 'Bug Fix',
+  'improvement': 'Improvement',
+};
+
+function parseTags(body: string, prerelease: boolean): { tags: ReleaseTag[]; cleanBody: string } {
+  const tagsMatch = body.match(/^tags:\s*(.+)$/m);
+
+  if (tagsMatch) {
+    const tags = tagsMatch[1]
+      .split(',')
+      .map((t) => VALID_TAGS[t.trim().toLowerCase()])
+      .filter(Boolean);
+    const cleanBody = body.replace(/^tags:\s*.+\n?/m, '');
+    return { tags: tags.length > 0 ? tags : [prerelease ? 'Beta' : 'Stable'], cleanBody };
+  }
+
+  return { tags: [prerelease ? 'Beta' : 'Stable'], cleanBody: body };
+}
+
 function parseChanges(body: string): string[] {
   return body
     .split('\n')
     .map((line) => stripInlineMarkdown(line.replace(/^[-*]\s+/, '').trim()))
-    .filter((line) => line.length > 0 && !line.startsWith('#'));
+    .filter((line) => line.length > 0 && !line.startsWith('#') && !line.startsWith('tags:'));
 }
 
 function formatDate(iso: string): string {
@@ -65,11 +90,12 @@ export function useReleases(): UseReleasesResult {
         const entries: ReleaseEntry[] = data.map(
           (rel: { tag_name: string; published_at: string; prerelease: boolean; body: string; assets: { name: string; browser_download_url: string }[] }) => {
             const exe = rel.assets?.find((a) => a.name.endsWith('.exe'));
+            const { tags, cleanBody } = parseTags(rel.body || '', rel.prerelease);
             return {
               version: rel.tag_name.replace(/^v/, ''),
               date: formatDate(rel.published_at),
-              type: rel.prerelease ? 'Beta' : 'Stable',
-              changes: parseChanges(rel.body || ''),
+              tags,
+              changes: parseChanges(cleanBody),
               downloadUrl: exe?.browser_download_url ?? null,
             };
           }

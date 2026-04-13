@@ -11,7 +11,7 @@ import { StatusIndicator } from '../components/ui/StatusIndicator';
 import { BulletList } from '../components/ui/BulletList';
 import { AccordionItem, AccordionTrigger, AccordionContent } from '../components/ui/Accordion';
 import { useLatestRelease, formatFileSize } from '../hooks/useLatestRelease';
-import { useReleases, type ReleaseEntry } from '../hooks/useReleases';
+import { useReleases, type ReleaseEntry, type ReleaseTag } from '../hooks/useReleases';
 import {
   LuDownload,
   LuMonitor,
@@ -23,6 +23,18 @@ import {
 } from 'react-icons/lu';
 
 
+
+const TAG_VARIANTS: Record<ReleaseTag, 'success' | 'info' | 'warning' | 'default'> = {
+  'Stable': 'success',
+  'Feature': 'info',
+  'Bug Fix': 'warning',
+  'Improvement': 'default',
+  'Beta': 'default',
+};
+
+function tagVariant(tag: ReleaseTag) {
+  return TAG_VARIANTS[tag] ?? 'default';
+}
 
 export default function Download() {
   return (
@@ -148,7 +160,9 @@ function ReleaseItem({ rel, isLatest }: { rel: ReleaseEntry; isLatest: boolean }
           <Stack gap={1}>
             <Flex gap={3}>
               <h4 className="text-xl font-bold">v{rel.version}</h4>
-              <Badge label={rel.type} variant="success" />
+              {rel.tags.map((tag) => (
+                <Badge key={tag} label={tag} variant={tagVariant(tag)} />
+              ))}
             </Flex>
             <Subtle>{rel.date}</Subtle>
           </Stack>

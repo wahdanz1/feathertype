@@ -56,7 +56,7 @@
   html {
     scrollbar-gutter: stable;
   }
-  body.is-editor-body {
+  html.is-editor {
     scrollbar-gutter: auto;
   }
   h1 {

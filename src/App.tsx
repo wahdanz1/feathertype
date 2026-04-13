@@ -36,6 +36,8 @@ function RootLayout() {
     if (isEditor) bodyClasses.push('is-editor-body');
     document.body.className = bodyClasses.join(' ');
 
+    document.documentElement.classList.toggle('is-editor', isEditor);
+
     const rootElement = document.getElementById('root');
     if (rootElement) {
       if (isEditor) {
@@ -94,6 +96,8 @@ function TauriApp() {
     const bodyClasses = ['is-editor-body'];
     if (theme === 'light') bodyClasses.push('light-theme');
     document.body.className = bodyClasses.join(' ');
+
+    document.documentElement.classList.add('is-editor');
 
     const rootElement = document.getElementById('root');
     if (rootElement) {

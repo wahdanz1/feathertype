@@ -275,6 +275,10 @@ export function hasLineFormat(view: EditorView | null, linePrefix: string): bool
   return textAfterWhitespace.startsWith(linePrefix);
 }
 
+export function hasBlockquote(view: EditorView | null): boolean {
+  return hasLineFormat(view, '> ');
+}
+
 export function hasBulletList(view: EditorView | null): boolean {
   return hasLineFormat(view, '- ');
 }
@@ -327,6 +331,9 @@ export const formats = {
 
   link: (view: EditorView | null) =>
     applyMarkdownFormat(view, { prefix: '[', suffix: '](url)', placeholder: 'link text' }),
+
+  blockquote: (view: EditorView | null) =>
+    applyMarkdownFormat(view, { linePrefix: '> ' }),
 
   bulletList: (view: EditorView | null) =>
     applyMarkdownFormat(view, { linePrefix: '- ' }),

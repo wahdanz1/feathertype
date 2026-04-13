@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import type { EditorView } from '@codemirror/view';
-import { LuSun, LuMoon, LuBold, LuItalic, LuStrikethrough, LuList, LuListOrdered, LuLink2, LuCode, LuFileCode, LuWrapText } from 'react-icons/lu';
+import { LuSun, LuMoon, LuBold, LuItalic, LuStrikethrough, LuList, LuListOrdered, LuLink2, LuCode, LuWrapText, LuTextQuote } from 'react-icons/lu';
 import { FileMenu } from './FileMenu';
 import { Button } from './Button';
 import { Dropdown } from './Dropdown';
 import { TableGridSelector } from './TableGridSelector';
 import { useEditorStore } from '../store/useEditorStore';
-import { formats, hasFormat, hasBulletList, hasNumberedList, hasHeading, getHeadingLevel } from '../utils/markdownFormatting';
+import { formats, hasFormat, hasBlockquote, hasBulletList, hasNumberedList, hasHeading, getHeadingLevel } from '../utils/markdownFormatting';
 
 export function Toolbar() {
   const toggleTheme = useEditorStore((s) => s.toggleTheme);
@@ -22,6 +22,7 @@ export function Toolbar() {
     italic: false,
     strikethrough: false,
     code: false,
+    blockquote: false,
     bulletList: false,
     numberedList: false,
     heading: false,
@@ -36,6 +37,7 @@ export function Toolbar() {
         italic: hasFormat(editorView, '_', '_'),
         strikethrough: hasFormat(editorView, '~~', '~~'),
         code: hasFormat(editorView, '`', '`'),
+        blockquote: hasBlockquote(editorView),
         bulletList: hasBulletList(editorView),
         numberedList: hasNumberedList(editorView),
         heading: hasHeading(editorView),
@@ -127,6 +129,9 @@ export function Toolbar() {
       <Button variant="secondary" iconOnly onClick={() => applyFormat(formats.numberedList)} title="Numbered List (Ctrl+Shift+N)" className={getButtonClass(activeFormats.numberedList)}>
         <LuListOrdered  />
       </Button>
+      <Button variant="secondary" iconOnly onClick={() => applyFormat(formats.blockquote)} title="Blockquote" className={getButtonClass(activeFormats.blockquote)}>
+        <LuTextQuote  />
+      </Button>
 
       <TableGridSelector onInsert={(rows, cols) => { if (editorView) formats.table(editorView, rows, cols); refreshActiveFormats(); }} />
 
@@ -138,10 +143,6 @@ export function Toolbar() {
       <Button variant="secondary" iconOnly onClick={() => applyFormat(formats.inlineCode)} title="Inline Code (Ctrl+`)" className={getButtonClass(activeFormats.code)}>
         <LuCode  />
       </Button>
-      <Button variant="secondary" iconOnly onClick={() => applyFormat(formats.comment)} title="Comment (Ctrl+Shift+/)">
-        <LuFileCode  />
-      </Button>
-
       <div className={`w-px h-6 ${dividerColor} mx-1`} />
 
       <Button variant="secondary" iconOnly onClick={toggleLineWrap} title="Word Wrap (Alt+Z)" className={getButtonClass(lineWrap)}>

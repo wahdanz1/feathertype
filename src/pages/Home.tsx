@@ -26,8 +26,8 @@ export default function Home() {
           </h1>
 
           <p className="lead max-w-2xl">
-            FeatherType is a feather-light Markdown editor built for writers who crave speed,
-            minimalism, and local-first control. No distractions, just your words.
+            A lightweight Markdown editor for notes, docs, and everyday writing.
+            Fast to open, simple to use, and everything stays on your device.
           </p>
 
           <Flex gap={6} className="flex-col sm:flex-row mt-4">
@@ -50,39 +50,39 @@ export default function Home() {
       <Section size="xl" className="py-24">
         <SectionHeader
           title={<>Everything you need, <br /> nothing you don't.</>}
-          description="Designed for maximum focus and zero friction. We didn't reinvent the wheel, we just made it lighter."
+          description="No account, no cloud, no bloat. Just a clean editor that opens instantly and gets out of your way."
         />
 
         <Grid cols={3} gap={8} className="mt-16">
           <MarketingCard
             icon={<LuZap />}
-            title="Instant Launch"
-            description="Start writing in milliseconds. No splash screens, no heavy loading — just you and your words."
+            title="Opens Instantly"
+            description="No splash screens, no loading bars. Click and start typing — it's ready before you are."
           />
           <MarketingCard
             icon={<LuShield />}
-            title="Privacy First"
-            description="Your documents never leave your device unless you want them to. Complete local encryption."
+            title="Your Files, Your Device"
+            description="Nothing is uploaded or synced. Your documents stay on your machine, always."
           />
           <MarketingCard
             icon={<LuCpu />}
-            title="Extreme Performance"
-            description="Powered by a high-efficiency Rust core for a lag-free experience even with massive files."
+            title="Native Speed"
+            description="Built on Rust and Tauri, so it stays snappy even with large documents."
           />
           <MarketingCard
             icon={<LuCloudOff />}
-            title="Offline Power"
-            description="Work anywhere, anytime. All features are available without an internet connection."
+            title="Works Offline"
+            description="No internet needed. Everything works the same whether you're online or not."
           />
           <MarketingCard
             icon={<LuFileText />}
-            title="Markdown Focused"
-            description="Real-time preview and system-native DOCX export support for a modern writing workflow."
+            title="Markdown + Live Preview"
+            description="Write in Markdown with a side-by-side preview. Import Word documents, export when you need to."
           />
           <MarketingCard
             icon={<LuLayoutGrid />}
-            title="Minimalist UI"
-            description="A clean, distraction-free environment that lets you focus on what matters: your content."
+            title="Clean Interface"
+            description="Multi-tab editing, dark and light themes, keyboard shortcuts — nothing extra, nothing missing."
           />
         </Grid>
       </Section>

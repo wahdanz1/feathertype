@@ -45,7 +45,7 @@ export function Dropdown({
         onClick={() => setIsOpen(!isOpen)}
         title={title}
         className={cn(
-          "dropdown-trigger text-secondary",
+          "dropdown-trigger text-secondary min-w-[7.5rem] justify-between",
           isActive && "border-theme-primary ring-1 ring-theme-primary/20",
           className
         )}

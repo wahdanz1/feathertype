@@ -15,6 +15,8 @@ export function Toolbar() {
   const lineWrap = useEditorStore((s) => s.lineWrap);
   const toggleLineWrap = useEditorStore((s) => s.toggleLineWrap);
 
+  const activeTabId = useEditorStore((s) => s.activeTabId);
+
   const [activeFormats, setActiveFormats] = useState({
     bold: false,
     italic: false,
@@ -56,6 +58,10 @@ export function Toolbar() {
       editorView.dom.removeEventListener('focus', refreshActiveFormats);
     };
   }, [editorView]);
+
+  useEffect(() => {
+    refreshActiveFormats();
+  }, [activeTabId]);
 
   const applyFormat = (formatFn: (view: EditorView) => void) => {
     if (!editorView) return;

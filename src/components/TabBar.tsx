@@ -16,10 +16,10 @@ export function TabBar() {
   };
 
   return (
-    <div className="flex items-center group/tabbar editor-chrome text-muted h-9 border-b border-border">
-      <div 
+    <div className="flex items-center group/tabbar editor-chrome text-muted h-9 border-b border-border px-3">
+      <div
         ref={scrollRef}
-        className="flex h-full overflow-x-auto overflow-y-hidden no-scrollbar flex-1"
+        className="flex h-full overflow-x-auto overflow-y-hidden no-scrollbar flex-1 gap-1"
       >
         {tabs.map((tab) => (
           <Tab

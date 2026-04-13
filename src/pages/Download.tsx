@@ -122,8 +122,8 @@ function HistorySection() {
               <LuLoader size={24} className="animate-spin text-theme-muted" />
             </Flex>
           ) : releases.length > 0 ? (
-            releases.map((rel) => (
-              <ReleaseItem key={rel.version} rel={rel} />
+            releases.map((rel, i) => (
+              <ReleaseItem key={rel.version} rel={rel} isLatest={i === 0} />
             ))
           ) : (
             <Subtle className="py-12">No releases yet. Check back soon!</Subtle>
@@ -134,7 +134,7 @@ function HistorySection() {
   );
 }
 
-function ReleaseItem({ rel }: { rel: ReleaseEntry }) {
+function ReleaseItem({ rel, isLatest }: { rel: ReleaseEntry; isLatest: boolean }) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -164,7 +164,7 @@ function ReleaseItem({ rel }: { rel: ReleaseEntry }) {
 
             {rel.downloadUrl ? (
               <a href={rel.downloadUrl} className="hidden sm:flex">
-                <Button size="sm" variant="secondary" className="px-4">
+                <Button size="sm" variant={isLatest ? 'primary' : 'secondary'} className="px-4">
                   Download
                 </Button>
               </a>
@@ -183,7 +183,7 @@ function ReleaseItem({ rel }: { rel: ReleaseEntry }) {
         {rel.downloadUrl && (
           <Stack divider className="mt-8 pt-8 sm:hidden">
             <a href={rel.downloadUrl}>
-              <Button size="lg" variant="secondary" fullWidth>
+              <Button size="lg" variant={isLatest ? 'primary' : 'secondary'} fullWidth>
                 Download Version
               </Button>
             </a>

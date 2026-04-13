@@ -55,3 +55,6 @@ Thumbs.db
 
 # Additional
 .vscode/
+
+# Own
+RELEASING.md

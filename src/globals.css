@@ -53,6 +53,9 @@
 }
 
 @layer base {
+  html {
+    scrollbar-gutter: stable;
+  }
   h1 {
     @apply text-4xl font-extrabold tracking-tight text-white sm:text-5xl md:text-6xl;
   }

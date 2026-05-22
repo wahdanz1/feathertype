@@ -19,19 +19,24 @@ import type { ConverterContext } from './types';
  */
 export function convertInlineNodes(
   nodes: PhrasingContent[],
-  ctx: ConverterContext
+  ctx: ConverterContext,
+  formatting: InlineFormatting = {}
 ): (TextRun | ExternalHyperlink)[] {
   const result: (TextRun | ExternalHyperlink)[] = [];
 
   for (const node of nodes) {
-    result.push(...convertInlineNode(node, ctx));
+    result.push(...convertInlineNode(node, ctx, formatting));
   }
 
   return result;
 }
 
 /**
- * Convert a single inline node
+ * Convert a single inline node.
+ *
+ * Formatting (bold/italic/strike) accumulates as we recurse into nested marks
+ * and is applied when we reach the leaf text — building a fresh TextRun from a
+ * parent TextRun *instance* drops its text content.
  */
 function convertInlineNode(
   node: PhrasingContent,
@@ -43,36 +48,21 @@ function convertInlineNode(
       return [createTextRun((node as Text).value, parentFormatting, ctx)];
 
     case 'strong':
-      return convertInlineNodes(
-        (node as Strong).children,
-        ctx
-      ).map(item => {
-        if (item instanceof TextRun) {
-          return new TextRun({ ...item, bold: true });
-        }
-        return item;
+      return convertInlineNodes((node as Strong).children, ctx, {
+        ...parentFormatting,
+        bold: true,
       });
 
     case 'emphasis':
-      return convertInlineNodes(
-        (node as Emphasis).children,
-        ctx
-      ).map(item => {
-        if (item instanceof TextRun) {
-          return new TextRun({ ...item, italics: true });
-        }
-        return item;
+      return convertInlineNodes((node as Emphasis).children, ctx, {
+        ...parentFormatting,
+        italics: true,
       });
 
     case 'delete':
-      return convertInlineNodes(
-        (node as Delete).children,
-        ctx
-      ).map(item => {
-        if (item instanceof TextRun) {
-          return new TextRun({ ...item, strike: true });
-        }
-        return item;
+      return convertInlineNodes((node as Delete).children, ctx, {
+        ...parentFormatting,
+        strike: true,
       });
 
     case 'inlineCode':
@@ -85,12 +75,13 @@ function convertInlineNode(
             type: 'solid',
             color: 'F0F0F0',
           },
+          ...parentFormatting,
         }),
       ];
 
     case 'link': {
       const linkNode = node as Link;
-      const children = convertInlineNodes(linkNode.children, ctx);
+      const children = convertInlineNodes(linkNode.children, ctx, parentFormatting);
 
       // Combine all text runs into a single hyperlink
       return [
@@ -107,7 +98,7 @@ function convertInlineNode(
     default:
       // Fallback for unhandled inline types
       if ('children' in node && Array.isArray(node.children)) {
-        return convertInlineNodes(node.children as PhrasingContent[], ctx);
+        return convertInlineNodes(node.children as PhrasingContent[], ctx, parentFormatting);
       }
       return [];
   }

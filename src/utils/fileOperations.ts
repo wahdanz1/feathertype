@@ -6,6 +6,21 @@ import { markdownToDocxBuffer } from './docxExport';
 
 export const isTauri = () => !!(window as any).__TAURI_INTERNALS__;
 
+const DOCX_MIME = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+
+const isDocxPath = (path: string | File): boolean =>
+  (typeof path === 'string' ? path : path.name).toLowerCase().endsWith('.docx');
+
+function downloadBlob(data: BlobPart, fileName: string, mime: string): void {
+  const blob = new Blob([data], { type: mime });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = fileName;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 export async function openFileDialog(): Promise<string | File | null> {
   if (!isTauri()) {
     return new Promise((resolve) => {
@@ -105,6 +120,22 @@ export async function writeFile(path: string | File, content: string, downloadNa
   await invoke('write_file', { path, content });
 }
 
+// Writes editor content to a target path, converting markdown to a real DOCX
+// package when the path is a .docx — otherwise the markdown source would be
+// written verbatim and Word would reject the file as unreadable.
+async function writeContent(path: string | File, content: string): Promise<void> {
+  if (isDocxPath(path)) {
+    const buffer = await markdownToDocxBuffer(content);
+    if (isTauri() && typeof path === 'string') {
+      await writeFileBinary(path, buffer);
+    } else {
+      downloadBlob(buffer, getFileName(path), DOCX_MIME);
+    }
+    return;
+  }
+  await writeFile(path, content);
+}
+
 export function getFileName(path: string | File): string {
   if (typeof path !== 'string') return path.name;
   return path.split(/[\\/]/).pop() || 'Untitled';
@@ -138,7 +169,7 @@ export async function handleSaveFile(
 ): Promise<void> {
   try {
     if (tab.filePath && tab.filePath !== 'browser-save') {
-      await writeFile(tab.filePath, tab.content);
+      await writeContent(tab.filePath, tab.content);
       markTabClean(tab.id);
     } else if (!isTauri()) {
       const name = tab.title === 'Untitled'
@@ -151,7 +182,7 @@ export async function handleSaveFile(
     } else {
       const path = await saveFileDialog(tab.filePath || undefined);
       if (path) {
-        await writeFile(path, tab.content);
+        await writeContent(path, tab.content);
         updateTabPath(tab.id, path, getFileName(path));
         markTabClean(tab.id);
       }
@@ -178,7 +209,7 @@ export async function handleSaveAsFile(
     } else {
       const path = await saveFileDialog(tab.filePath || undefined);
       if (path) {
-        await writeFile(path, tab.content);
+        await writeContent(path, tab.content);
         updateTabPath(tab.id, path, getFileName(path));
         markTabClean(tab.id);
       }
@@ -210,13 +241,7 @@ export async function exportAsDocx(content: string, currentFilePath?: string | F
 
     if (!isTauri()) {
       const arrayBuffer = await markdownToDocxBuffer(content);
-      const blob = new Blob([arrayBuffer], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = defaultName;
-      a.click();
-      URL.revokeObjectURL(url);
+      downloadBlob(arrayBuffer, defaultName, DOCX_MIME);
       return;
     }
 

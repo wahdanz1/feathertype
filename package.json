@@ -1,7 +1,7 @@
 {
   "name": "feathertype",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.1.0",
   "type": "module",
   "author": "Daniel Wahlgren",
   "homepage": "https://wahdanz.vercel.app/",

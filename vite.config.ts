@@ -44,11 +44,31 @@ function prePaintTheme(): Plugin {
   };
 }
 
+// The Vite manifest names chunks but not the modules inside them, which scripts/check-bundle.mjs needs.
+function chunkGraph(): Plugin {
+  return {
+    name: "feathertype-chunk-graph",
+    apply: "build",
+    generateBundle(_options, bundle) {
+      const root = process.cwd().replaceAll("\\", "/");
+      const chunks: Record<string, { imports: string[]; modules: string[] }> = {};
+      for (const output of Object.values(bundle)) {
+        if (output.type !== "chunk") continue;
+        chunks[output.fileName] = {
+          imports: output.imports,
+          modules: output.moduleIds.map((id) => id.replaceAll("\\", "/").replace(root, "")),
+        };
+      }
+      this.emitFile({ type: "asset", fileName: ".vite/chunk-graph.json", source: JSON.stringify(chunks) });
+    },
+  };
+}
+
 const host = process.env.TAURI_DEV_HOST;
 
 // https://vite.dev/config/
 export default defineConfig(async () => ({
-  plugins: [react(), tailwindcss(), prePaintTheme()],
+  plugins: [react(), tailwindcss(), prePaintTheme(), chunkGraph()],
 
   // Vite options tailored for Tauri development and only applied in `tauri dev` or `tauri build`
   //
@@ -69,22 +89,6 @@ export default defineConfig(async () => ({
     watch: {
       // 3. tell Vite to ignore watching `src-tauri`
       ignored: ["**/src-tauri/**"],
-    },
-  },
-  build: {
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          'vendor-docx': ['docx'],
-          'vendor-codemirror': [
-            '@codemirror/view',
-            '@codemirror/state',
-            '@codemirror/language',
-            '@codemirror/commands',
-            '@codemirror/search',
-          ],
-        },
-      },
     },
   },
   test: {

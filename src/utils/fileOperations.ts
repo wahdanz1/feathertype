@@ -1,8 +1,10 @@
 import { invoke } from '@tauri-apps/api/core';
 import { open, save } from '@tauri-apps/plugin-dialog';
-import mammoth from 'mammoth';
 import type { Tab } from '../types';
-import { markdownToDocxBuffer } from './docxExport';
+
+// Loaded on demand: both converters are large and only a .docx open or save needs them.
+const markdownToDocxBuffer = async (content: string): Promise<ArrayBuffer> =>
+  (await import('./docxExport')).markdownToDocxBuffer(content);
 
 export const isTauri = () => !!window.__TAURI_INTERNALS__;
 
@@ -183,7 +185,7 @@ export async function openAndReadFile(path: string | File): Promise<string> {
   const ext = fileName.toLowerCase().split('.').pop();
 
   if (ext === 'docx') {
-    const arrayBuffer = await readFileBinary(path);
+    const [arrayBuffer, { default: mammoth }] = await Promise.all([readFileBinary(path), import('mammoth')]);
     // mammoth's TS types omit convertToMarkdown
     const result = await (mammoth as typeof mammoth & { convertToMarkdown: typeof mammoth.convertToHtml }).convertToMarkdown({ arrayBuffer });
     return cleanMammothMarkdown(result.value);

@@ -44,6 +44,9 @@ jobs:
       - name: Build (web)
         run: pnpm exec vite build
 
+      - name: Check bundle
+        run: pnpm check:bundle
+
       - name: Build (tauri)
         run: pnpm exec vite build --mode tauri
 

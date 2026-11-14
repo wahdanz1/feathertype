@@ -1,7 +1,7 @@
-import { ReactNode } from 'react';
-import { useEditorStore } from '../store/useEditorStore';
+import { ReactNode, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { cn } from '../lib/utils';
+import { EditorThemeContext } from '../lib/editorThemeContext';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'ghost' | 'destructive';
@@ -28,9 +28,9 @@ export function Button({
   children,
   ...props
 }: ButtonProps) {
-  const theme = useEditorStore((s) => s.theme);
-  const isEditor = window.location.pathname === '/editor' || !!window.__TAURI_INTERNALS__;
-  const isDark = theme === 'dark';
+  const editorTheme = useContext(EditorThemeContext);
+  const isEditor = editorTheme !== null;
+  const isDark = editorTheme !== 'light';
 
   const baseStyles = cn(
     'rounded-md text-sm font-medium leading-none flex items-center flex-shrink-0 transition-all group',

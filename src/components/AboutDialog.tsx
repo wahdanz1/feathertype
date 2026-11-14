@@ -5,6 +5,7 @@ import { Button } from './Button';
 import { Stack } from './ui/Layout';
 import { Caption, Subtle } from './ui/Typography';
 import { isTauri } from '../utils/fileOperations';
+import { openExternal } from '../lib/externalLinks';
 import { APP_NAME, APP_VERSION, LINKS } from '../config';
 
 export function AboutDialog() {
@@ -40,15 +41,15 @@ export function AboutDialog() {
         </Subtle>
 
         <Stack gap={3} align="stretch" className="w-full mt-4">
-          <Button variant="secondary" onClick={() => window.open(LINKS.website, '_blank')}>
+          <Button variant="secondary" onClick={() => openExternal(LINKS.website)}>
             <LuExternalLink size={16} />
             Visit Website
           </Button>
-          <Button variant="secondary" onClick={() => window.open(LINKS.download, '_blank')}>
+          <Button variant="secondary" onClick={() => openExternal(LINKS.download)}>
             <LuDownload size={16} />
             Check for Updates
           </Button>
-          <Button variant="primary" onClick={() => window.open(LINKS.feedback, '_blank')}>
+          <Button variant="primary" onClick={() => openExternal(LINKS.feedback)}>
             <LuMessageSquare size={16} />
             Send Feedback
           </Button>

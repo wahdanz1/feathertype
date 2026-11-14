@@ -3,6 +3,7 @@ import { Editor } from './Editor';
 import { Preview } from './Preview';
 import { Button } from './Button';
 import { useEditorStore } from '../store/useEditorStore';
+import { withHint } from '../utils/shortcuts';
 
 export function SplitPane() {
   const showPreview = useEditorStore((s) => s.showPreview);
@@ -15,7 +16,7 @@ export function SplitPane() {
           variant={showPreview ? 'primary' : 'secondary'}
           iconOnly
           onClick={togglePreview}
-          title="Toggle Preview (Ctrl+\)"
+          title={withHint('Toggle Preview', 'togglePreview')}
         >
           {showPreview ? <LuEye className="w-6 h-6" /> : <LuEyeOff className="w-6 h-6" />}
         </Button>

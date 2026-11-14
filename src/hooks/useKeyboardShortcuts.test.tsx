@@ -111,4 +111,12 @@ describe('app shortcuts', () => {
     expect(store().showPreview).toBe(false);
     expect(event.defaultPrevented).toBe(false);
   });
+
+  it('Ctrl+Shift+P and Ctrl+\\ both toggle preview', async () => {
+    await mount('');
+    press(document.body, { key: 'P', code: 'KeyP', ctrlKey: true, shiftKey: true });
+    expect(store().showPreview).toBe(true);
+    press(document.body, { key: '\\', code: 'Backslash', ctrlKey: true });
+    expect(store().showPreview).toBe(false);
+  });
 });

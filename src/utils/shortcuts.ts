@@ -60,7 +60,7 @@ const SHORTCUTS: Record<ShortcutId, string> = {
   open: 'Mod-o',
   save: 'Mod-s',
   saveAs: 'Mod-Shift-s',
-  togglePreview: 'Mod-\\',
+  togglePreview: 'Mod-Shift-p',
   lineWrap: 'Alt-z',
   zoomIn: 'Mod-=',
   zoomOut: 'Mod--',
@@ -97,7 +97,8 @@ function bindings<T extends ShortcutId>(ids: T[], extra: [string, T][] = []): [C
   return [...ids.map((id) => [SHORTCUTS[id], id] as [string, T]), ...extra].map(([spec, id]) => [parse(spec), id]);
 }
 
-const APP_BINDINGS = bindings(Object.keys(appCommands) as AppCommand[], [['Mod-+', 'zoomIn']]);
+// Mod-\ stays as an alternate; Nordic layouts need AltGr for \, so the shown binding is Mod-Shift-p.
+const APP_BINDINGS = bindings(Object.keys(appCommands) as AppCommand[], [['Mod-+', 'zoomIn'], ['Mod-\\', 'togglePreview']]);
 const FORMAT_BINDINGS = bindings(Object.keys(formatCommands) as FormatCommand[]);
 
 const ALNUM = /^[a-z0-9]$/;

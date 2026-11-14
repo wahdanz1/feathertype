@@ -1,4 +1,5 @@
-import { useEffect, useRef } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import CodeMirror from '@uiw/react-codemirror';
 import { markdown } from '@codemirror/lang-markdown';
 import { EditorView } from '@codemirror/view';
@@ -205,20 +206,71 @@ const lightSyntaxHighlight = HighlightStyle.define([
   { tag: tags.meta, color: '#0070C0' },
 ]);
 
-export function Editor() {
-  const activeTab = useEditorStore((s) => s.getActiveTab());
+const basicSetup = {
+  lineNumbers: true,
+  highlightActiveLineGutter: true,
+  highlightActiveLine: true,
+  foldGutter: false,
+  searchKeymap: false,
+};
+
+interface TabEditorProps {
+  tabId: string;
+  active: boolean;
+  theme: 'dark' | 'light';
+  extensions: Extension[];
+}
+
+// One CodeMirror view per tab: a shared view would carry undo history, selection
+// and @uiw's deferred value sync from one tab into the next.
+function TabEditor({ tabId, active, theme, extensions }: TabEditorProps) {
+  const content = useEditorStore((s) => s.tabs.find((t) => t.id === tabId)?.content ?? '');
   const updateContent = useEditorStore((s) => s.updateTabContent);
+  const setEditorView = useEditorStore((s) => s.setEditorView);
+  const [view, setView] = useState<EditorView | null>(null);
+
+  const onChange = useCallback((value: string) => updateContent(tabId, value), [tabId, updateContent]);
+
+  useLayoutEffect(() => {
+    if (!active || !view) return;
+    setEditorView(view);
+    view.focus();
+    return () => {
+      if (useEditorStore.getState().editorView === view) setEditorView(null);
+    };
+  }, [active, view, setEditorView]);
+
+  return (
+    <div className="editor-viewport" hidden={!active}>
+      <CodeMirror
+        value={content}
+        height="auto"
+        minHeight="100%"
+        theme={theme}
+        extensions={extensions}
+        onChange={onChange}
+        onCreateEditor={setView}
+        basicSetup={basicSetup}
+      />
+    </div>
+  );
+}
+
+export function Editor() {
+  const tabIds = useEditorStore(useShallow((s) => s.tabs.map((t) => t.id)));
+  const activeTabId = useEditorStore((s) => s.activeTabId);
   const theme = useEditorStore((s) => s.theme);
   const lineWrap = useEditorStore((s) => s.lineWrap);
   const zoom = useEditorStore((s) => s.zoom);
-  const setEditorView = useEditorStore((s) => s.setEditorView);
   const setZoom = useEditorStore((s) => s.setZoom);
 
-  const containerRef = useRef<HTMLDivElement>(null);
+  // Tabs get a view the first time they are shown, so restoring many tabs stays cheap.
+  const [shownTabIds, setShownTabIds] = useState<string[]>([]);
+  if (activeTabId && !shownTabIds.includes(activeTabId)) {
+    setShownTabIds([...shownTabIds.filter((id) => tabIds.includes(id)), activeTabId]);
+  }
 
-  useEffect(() => {
-    return () => setEditorView(null);
-  }, [setEditorView]);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (containerRef.current) {
@@ -240,52 +292,39 @@ export function Editor() {
       container.addEventListener('wheel', handleWheel, { passive: false });
       return () => container.removeEventListener('wheel', handleWheel);
     }
-  }, []);
+  }, [setZoom]);
 
-  if (!activeTab) {
+  const extensions = useMemo(() => {
+    const list: Extension[] = [
+      markdown(),
+      syntaxHighlighting(theme === 'dark' ? darkSyntaxHighlight : lightSyntaxHighlight),
+      search({ top: false }),
+      keymap.of(searchKeymap),
+      listExtension,
+      tableExtension,
+      theme === 'dark' ? darkTheme : lightTheme,
+      indentUnit.of('    '), // 4 spaces for Tab key
+      foldGutter({
+        openText: '▸',
+        closedText: '▾',
+        markerDOM: (open) => makeFoldMarker(open ? '▾' : '▸'),
+      }),
+    ];
+    if (lineWrap) list.push(EditorView.lineWrapping);
+    return list;
+  }, [theme, lineWrap]);
+
+  if (!activeTabId) {
     return (
       <div className="empty-state">No file open</div>
     );
   }
 
-  const extensions: Extension[] = [
-    markdown(),
-    syntaxHighlighting(theme === 'dark' ? darkSyntaxHighlight : lightSyntaxHighlight),
-    search({ top: false }),
-    keymap.of(searchKeymap),
-    listExtension,
-    tableExtension,
-    theme === 'dark' ? darkTheme : lightTheme,
-    indentUnit.of('    '), // 4 spaces for Tab key
-    foldGutter({
-      openText: '▸',
-      closedText: '▾',
-      markerDOM: (open) => makeFoldMarker(open ? '▾' : '▸'),
-    }),
-  ];
-
-  if (lineWrap) {
-    extensions.push(EditorView.lineWrapping);
-  }
-
   return (
-    <div ref={containerRef} className="editor-viewport editor-zoom-container">
-      <CodeMirror
-        value={activeTab.content}
-        height="auto"
-        minHeight="100%"
-        theme={theme}
-        extensions={extensions}
-        onChange={(value) => updateContent(activeTab.id, value)}
-        onCreateEditor={(view) => setEditorView(view)}
-        basicSetup={{
-          lineNumbers: true,
-          highlightActiveLineGutter: true,
-          highlightActiveLine: true,
-          foldGutter: false,
-          searchKeymap: false,
-        }}
-      />
+    <div ref={containerRef} className="editor-zoom-container">
+      {tabIds.filter((id) => shownTabIds.includes(id)).map((id) => (
+        <TabEditor key={id} tabId={id} active={id === activeTabId} theme={theme} extensions={extensions} />
+      ))}
     </div>
   );
 }

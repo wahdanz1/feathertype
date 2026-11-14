@@ -28,6 +28,7 @@ body.is-editor-body {
 
 .editor-zoom-container {
   --editor-font-size: 14px;
+  height: 100%;
 }
 
 .cm-editor {
@@ -336,4 +337,4 @@ body.light-theme ::-webkit-scrollbar-corner {
 
 body.light-theme * {
   scrollbar-color: #c0c0c0 #ffffff;
-}
+}

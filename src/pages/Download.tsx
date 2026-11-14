@@ -10,8 +10,8 @@ import { IconBox } from '../components/ui/IconBox';
 import { StatusIndicator } from '../components/ui/StatusIndicator';
 import { BulletList } from '../components/ui/BulletList';
 import { AccordionItem, AccordionTrigger, AccordionContent } from '../components/ui/Accordion';
-import { useLatestRelease, formatFileSize } from '../hooks/useLatestRelease';
-import { useReleases, type ReleaseEntry, type ReleaseTag } from '../hooks/useReleases';
+import { useReleases, type ReleasesStatus } from '../hooks/useReleases';
+import { formatFileSize, RELEASES_PAGE_URL, type ReleaseEntry, type ReleaseTag } from '../lib/releases';
 import {
   LuDownload,
   LuMonitor,
@@ -19,10 +19,9 @@ import {
   LuChevronDown,
   LuChevronUp,
   LuLoader,
-  LuMessageCircle
+  LuMessageCircle,
+  LuExternalLink
 } from 'react-icons/lu';
-
-
 
 const TAG_VARIANTS: Record<ReleaseTag, 'success' | 'info' | 'warning' | 'default'> = {
   'Stable': 'success',
@@ -36,20 +35,24 @@ function tagVariant(tag: ReleaseTag) {
   return TAG_VARIANTS[tag] ?? 'default';
 }
 
+interface ReleasesProps {
+  status: ReleasesStatus;
+  latest: ReleaseEntry | null;
+}
+
 export default function Download() {
+  const { releases, latest, status } = useReleases();
+
   return (
     <Page>
-      <HeroSection />
-      <HistorySection />
+      <HeroSection status={status} latest={latest} />
+      <HistorySection status={status} releases={releases} latest={latest} />
       <FeedbackSection />
     </Page>
   );
 }
 
-function HeroSection() {
-  const { release, loading } = useLatestRelease();
-  const hasRelease = !!release?.asset;
-
+function HeroSection({ status, latest }: ReleasesProps) {
   return (
     <Section size="lg" animate="slide-up">
       <Flex gap={12} items="start" className="flex-col md:flex-row">
@@ -68,45 +71,11 @@ function HeroSection() {
               <IconBox icon={<LuMonitor />} variant="primary" className="text-theme-accent" />
               <Stack gap={1}>
                 <h3>Latest Stable</h3>
-                <Badge
-                  label={release ? `v${release.version} • Windows` : 'Coming soon'}
-                  variant="outline"
-                />
+                <Badge label={badgeLabel(status, latest)} variant="outline" />
               </Stack>
             </Flex>
 
-            <Stack gap={3} align="stretch">
-              {hasRelease ? (
-                <a href={release!.asset!.downloadUrl}>
-                  <Button
-                    size="lg"
-                    variant="primary"
-                    fullWidth
-                    animateIcon="vertical"
-                  >
-                    Download
-                    <LuDownload size={20} />
-                  </Button>
-                </a>
-              ) : (
-                <Button
-                  size="lg"
-                  variant="primary"
-                  fullWidth
-                  disabled
-                  title={loading ? 'Checking for releases...' : 'No releases available yet'}
-                >
-                  {loading ? <LuLoader size={20} className="animate-spin" /> : 'Download'}
-                  {!loading && <LuDownload size={20} />}
-                </Button>
-              )}
-              <Subtle className="text-center">
-                {hasRelease
-                  ? `${release!.asset!.name} (${formatFileSize(release!.asset!.size)})`
-                  : loading ? 'Checking...' : 'No releases yet'
-                }
-              </Subtle>
-            </Stack>
+            <HeroDownload status={status} latest={latest} />
           </Stack>
         </GlassCard>
       </Flex>
@@ -114,9 +83,64 @@ function HeroSection() {
   );
 }
 
+function badgeLabel(status: ReleasesStatus, latest: ReleaseEntry | null) {
+  if (latest) return `v${latest.version} • Windows`;
+  return status === 'ready' ? 'Coming soon' : 'Windows';
+}
 
-function HistorySection() {
-  const { releases, loading } = useReleases();
+function HeroDownload({ status, latest }: ReleasesProps) {
+  if (status === 'loading') {
+    return (
+      <Stack gap={3} align="stretch">
+        <Button size="lg" variant="primary" fullWidth disabled title="Checking for releases...">
+          <LuLoader size={20} className="animate-spin" />
+        </Button>
+        <Subtle className="text-center">Checking...</Subtle>
+      </Stack>
+    );
+  }
+
+  if (latest?.asset) {
+    return (
+      <Stack gap={3} align="stretch">
+        <Button to={latest.asset.downloadUrl} size="lg" variant="primary" fullWidth animateIcon="vertical">
+          Download
+          <LuDownload size={20} />
+        </Button>
+        <Subtle className="text-center">
+          {`${latest.asset.name} (${formatFileSize(latest.asset.size)})`}
+        </Subtle>
+      </Stack>
+    );
+  }
+
+  if (status === 'error' || latest) {
+    return (
+      <Stack gap={3} align="stretch">
+        <Button to={RELEASES_PAGE_URL} size="lg" variant="primary" fullWidth>
+          Releases
+          <LuExternalLink size={20} />
+        </Button>
+        <Subtle className="text-center">
+          {status === 'error' ? "Couldn't load release info. Get the installer on GitHub." : 'Installer not attached yet. Check GitHub.'}
+        </Subtle>
+      </Stack>
+    );
+  }
+
+  return (
+    <Stack gap={3} align="stretch">
+      <Button size="lg" variant="primary" fullWidth disabled title="No releases available yet">
+        Download
+        <LuDownload size={20} />
+      </Button>
+      <Subtle className="text-center">No releases yet</Subtle>
+    </Stack>
+  );
+}
+
+
+function HistorySection({ status, releases, latest }: ReleasesProps & { releases: ReleaseEntry[] }) {
 
   return (
     <Section id="releases" size="lg" className="pb-24">
@@ -129,13 +153,18 @@ function HistorySection() {
         />
 
         <Stack gap={4} align="stretch">
-          {loading ? (
+          {status === 'loading' ? (
             <Flex justify="center" className="py-12">
               <LuLoader size={24} className="animate-spin text-theme-muted" />
             </Flex>
+          ) : status === 'error' ? (
+            <Subtle className="py-12">
+              Release history couldn't be loaded right now.{' '}
+              <ActionLink to={RELEASES_PAGE_URL}>See all releases on GitHub</ActionLink>
+            </Subtle>
           ) : releases.length > 0 ? (
-            releases.map((rel, i) => (
-              <ReleaseItem key={rel.version} rel={rel} isLatest={i === 0} />
+            releases.map((rel) => (
+              <ReleaseItem key={rel.version} rel={rel} isLatest={rel === latest} />
             ))
           ) : (
             <Subtle className="py-12">No releases yet. Check back soon!</Subtle>
@@ -176,12 +205,15 @@ function ReleaseItem({ rel, isLatest }: { rel: ReleaseEntry; isLatest: boolean }
               {isOpen ? 'Close' : 'View Changes'}
             </ActionLink>
 
-            {rel.downloadUrl ? (
-              <a href={rel.downloadUrl} className="hidden sm:flex">
-                <Button size="sm" variant={isLatest ? 'primary' : 'secondary'} className="px-4">
-                  Download
-                </Button>
-              </a>
+            {rel.asset ? (
+              <Button
+                to={rel.asset.downloadUrl}
+                size="sm"
+                variant={isLatest ? 'primary' : 'secondary'}
+                className="hidden sm:flex px-4"
+              >
+                Download
+              </Button>
             ) : (
               <Button size="sm" variant="secondary" className="hidden sm:flex px-4" disabled>
                 Download
@@ -194,13 +226,11 @@ function ReleaseItem({ rel, isLatest }: { rel: ReleaseEntry; isLatest: boolean }
       <AccordionContent>
         <BulletList items={rel.changes} cols={2} />
 
-        {rel.downloadUrl && (
+        {rel.asset && (
           <Stack divider className="mt-8 pt-8 sm:hidden">
-            <a href={rel.downloadUrl}>
-              <Button size="lg" variant={isLatest ? 'primary' : 'secondary'} fullWidth>
-                Download Version
-              </Button>
-            </a>
+            <Button to={rel.asset.downloadUrl} size="lg" variant={isLatest ? 'primary' : 'secondary'} fullWidth>
+              Download Version
+            </Button>
           </Stack>
         )}
       </AccordionContent>

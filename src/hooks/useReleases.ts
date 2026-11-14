@@ -1,119 +1,46 @@
 import { useState, useEffect } from 'react';
+import { loadReleases, pickLatest, type ReleaseEntry } from '../lib/releases';
 
-const GITHUB_REPO = 'wahdanz1/feathertype';
-const API_URL = `https://api.github.com/repos/${GITHUB_REPO}/releases`;
-
-export type ReleaseTag = 'Stable' | 'Beta' | 'Feature' | 'Bug Fix' | 'Improvement';
-
-export interface ReleaseEntry {
-  version: string;
-  date: string;
-  tags: ReleaseTag[];
-  changes: string[];
-  downloadUrl: string | null;
-}
+export type ReleasesStatus = 'loading' | 'ready' | 'error';
 
 interface UseReleasesResult {
   releases: ReleaseEntry[];
-  loading: boolean;
-  error: boolean;
+  latest: ReleaseEntry | null;
+  status: ReleasesStatus;
 }
 
-function stripInlineMarkdown(text: string): string {
-  return text
-    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
-    .replace(/(\*\*|__)(.*?)\1/g, '$2')
-    .replace(/([*_])(.*?)\1/g, '$2')
-    .replace(/`([^`]+)`/g, '$1');
-}
+// StrictMode runs effects twice in dev; sharing the pending promise keeps that to one request.
+let pending: Promise<ReleaseEntry[]> | null = null;
 
-const VALID_TAGS: Record<string, ReleaseTag> = {
-  'stable': 'Stable',
-  'beta': 'Beta',
-  'feature': 'Feature',
-  'bug fix': 'Bug Fix',
-  'improvement': 'Improvement',
-};
-
-function parseTags(body: string, prerelease: boolean): { tags: ReleaseTag[]; cleanBody: string } {
-  const tagsMatch = body.match(/^tags:\s*(.+)$/m);
-
-  if (tagsMatch) {
-    const tags = tagsMatch[1]
-      .split(',')
-      .map((t) => VALID_TAGS[t.trim().toLowerCase()])
-      .filter(Boolean);
-    const cleanBody = body.replace(/^tags:\s*.+\n?/m, '');
-    return { tags: tags.length > 0 ? tags : [prerelease ? 'Beta' : 'Stable'], cleanBody };
-  }
-
-  return { tags: [prerelease ? 'Beta' : 'Stable'], cleanBody: body };
-}
-
-function parseChanges(body: string): string[] {
-  return body
-    .split('\n')
-    .map((line) => stripInlineMarkdown(line.replace(/^[-*]\s+/, '').trim()))
-    .filter((line) => line.length > 0 && !line.startsWith('#') && !line.startsWith('tags:'));
-}
-
-function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
+function loadOnce(): Promise<ReleaseEntry[]> {
+  pending ??= loadReleases().finally(() => {
+    pending = null;
   });
+  return pending;
 }
 
 export function useReleases(): UseReleasesResult {
   const [releases, setReleases] = useState<ReleaseEntry[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
+  const [status, setStatus] = useState<ReleasesStatus>('loading');
 
   useEffect(() => {
     let cancelled = false;
 
-    async function fetchReleases() {
-      try {
-        const res = await fetch(API_URL);
-        if (!res.ok) {
-          if (res.status === 404) {
-            setReleases([]);
-            return;
-          }
-          throw new Error(`GitHub API returned ${res.status}`);
-        }
-
-        const data = await res.json();
+    loadOnce().then(
+      (entries) => {
         if (cancelled) return;
-
-        const entries: ReleaseEntry[] = data.map(
-          (rel: { tag_name: string; published_at: string; prerelease: boolean; body: string; assets: { name: string; browser_download_url: string }[] }) => {
-            const exe = rel.assets?.find((a) => a.name.endsWith('.exe'));
-            const { tags, cleanBody } = parseTags(rel.body || '', rel.prerelease);
-            return {
-              version: rel.tag_name.replace(/^v/, ''),
-              date: formatDate(rel.published_at),
-              tags,
-              changes: parseChanges(cleanBody),
-              downloadUrl: exe?.browser_download_url ?? null,
-            };
-          }
-        );
-
         setReleases(entries);
-      } catch {
-        if (!cancelled) setError(true);
-      } finally {
-        if (!cancelled) setLoading(false);
+        setStatus('ready');
+      },
+      () => {
+        if (!cancelled) setStatus('error');
       }
-    }
+    );
 
-    fetchReleases();
     return () => {
       cancelled = true;
     };
   }, []);
 
-  return { releases, loading, error };
+  return { releases, latest: pickLatest(releases), status };
 }

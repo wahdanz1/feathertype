@@ -87,6 +87,5 @@ export async function markdownToDocxBuffer(
   config?: Partial<DocxConfig>
 ): Promise<ArrayBuffer> {
   const doc = await markdownToDocx(markdown, config);
-  const buffer = await Packer.toBuffer(doc);
-  return buffer.buffer;
+  return Packer.toArrayBuffer(doc);
 }

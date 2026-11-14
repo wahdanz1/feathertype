@@ -7,6 +7,7 @@ import { Dropdown } from './Dropdown';
 import { TableGridSelector } from './TableGridSelector';
 import { useEditorStore } from '../store/useEditorStore';
 import { subscribeEditorUpdates } from '../lib/editorUpdates';
+import { shortcutHint, withHint } from '../utils/shortcuts';
 import { formats, hasFormat, hasBlockquote, hasBulletList, hasNumberedList, hasHeading, getHeadingLevel } from '../utils/markdownFormatting';
 
 interface ActiveFormats {
@@ -81,10 +82,10 @@ export function Toolbar() {
       
       <div className={`w-px h-6 ${dividerColor} mx-1`} />
 
-      <Button variant="secondary" iconOnly onClick={() => applyFormat(formats.bold)} title="Bold (Ctrl+B)" aria-label="Bold" aria-pressed={activeFormats.bold} className={getButtonClass(activeFormats.bold)}>
+      <Button variant="secondary" iconOnly onClick={() => applyFormat(formats.bold)} title={withHint('Bold', 'bold')} aria-label="Bold" aria-pressed={activeFormats.bold} className={getButtonClass(activeFormats.bold)}>
         <LuBold  />
       </Button>
-      <Button variant="secondary" iconOnly onClick={() => applyFormat(formats.italic)} title="Italic (Ctrl+I)" aria-label="Italic" aria-pressed={activeFormats.italic} className={getButtonClass(activeFormats.italic)}>
+      <Button variant="secondary" iconOnly onClick={() => applyFormat(formats.italic)} title={withHint('Italic', 'italic')} aria-label="Italic" aria-pressed={activeFormats.italic} className={getButtonClass(activeFormats.italic)}>
         <LuItalic  />
       </Button>
       <Button variant="secondary" iconOnly onClick={() => applyFormat(formats.strikethrough)} title="Strikethrough" aria-label="Strikethrough" aria-pressed={activeFormats.strikethrough} className={getButtonClass(activeFormats.strikethrough)}>
@@ -111,15 +112,15 @@ export function Toolbar() {
           { value: 'h3', label: 'H3' },
         ]}
         isActive={activeFormats.heading}
-        title="Heading (Ctrl+1/2/3)"
+        title={`Heading (${shortcutHint('heading1')}/2/3)`}
       />
 
       <div className={`w-px h-6 ${dividerColor} mx-1`} />
 
-      <Button variant="secondary" iconOnly onClick={() => applyFormat(formats.bulletList)} title="Bullet List (Ctrl+Shift+B)" aria-label="Bullet list" aria-pressed={activeFormats.bulletList} className={getButtonClass(activeFormats.bulletList)}>
+      <Button variant="secondary" iconOnly onClick={() => applyFormat(formats.bulletList)} title={withHint('Bullet List', 'bulletList')} aria-label="Bullet list" aria-pressed={activeFormats.bulletList} className={getButtonClass(activeFormats.bulletList)}>
         <LuList  />
       </Button>
-      <Button variant="secondary" iconOnly onClick={() => applyFormat(formats.numberedList)} title="Numbered List (Ctrl+Shift+N)" aria-label="Numbered list" aria-pressed={activeFormats.numberedList} className={getButtonClass(activeFormats.numberedList)}>
+      <Button variant="secondary" iconOnly onClick={() => applyFormat(formats.numberedList)} title={withHint('Numbered List', 'numberedList')} aria-label="Numbered list" aria-pressed={activeFormats.numberedList} className={getButtonClass(activeFormats.numberedList)}>
         <LuListOrdered  />
       </Button>
       <Button variant="secondary" iconOnly onClick={() => applyFormat(formats.blockquote)} title="Blockquote" aria-label="Blockquote" aria-pressed={activeFormats.blockquote} className={getButtonClass(activeFormats.blockquote)}>
@@ -130,15 +131,15 @@ export function Toolbar() {
 
       <div className={`w-px h-6 ${dividerColor} mx-1`} />
 
-      <Button variant="secondary" iconOnly onClick={() => applyFormat(formats.link)} title="Link (Ctrl+K)" aria-label="Link">
+      <Button variant="secondary" iconOnly onClick={() => applyFormat(formats.link)} title={withHint('Link', 'link')} aria-label="Link">
         <LuLink2  />
       </Button>
-      <Button variant="secondary" iconOnly onClick={() => applyFormat(formats.inlineCode)} title="Inline Code (Ctrl+`)" aria-label="Inline code" aria-pressed={activeFormats.code} className={getButtonClass(activeFormats.code)}>
+      <Button variant="secondary" iconOnly onClick={() => applyFormat(formats.inlineCode)} title={withHint('Inline Code', 'inlineCode')} aria-label="Inline code" aria-pressed={activeFormats.code} className={getButtonClass(activeFormats.code)}>
         <LuCode  />
       </Button>
       <div className={`w-px h-6 ${dividerColor} mx-1`} />
 
-      <Button variant="secondary" iconOnly onClick={toggleLineWrap} title="Word Wrap (Alt+Z)" aria-label="Word wrap" aria-pressed={lineWrap} className={getButtonClass(lineWrap)}>
+      <Button variant="secondary" iconOnly onClick={toggleLineWrap} title={withHint('Word Wrap', 'lineWrap')} aria-label="Word wrap" aria-pressed={lineWrap} className={getButtonClass(lineWrap)}>
         <LuWrapText  />
       </Button>
 

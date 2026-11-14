@@ -11,6 +11,7 @@ import { useEditorStore } from '../store/useEditorStore';
 import { tableExtension } from '../utils/tableExtension';
 import { listExtension } from '../utils/listExtension';
 import { markdownSupport } from '../utils/markdownSyntax';
+import { formattingShortcuts } from '../utils/shortcuts';
 import { editorUpdates } from '../lib/editorUpdates';
 import type { Extension } from '@codemirror/state';
 
@@ -298,6 +299,7 @@ export function Editor() {
   const extensions = useMemo(() => {
     const list: Extension[] = [
       markdownSupport,
+      formattingShortcuts,
       syntaxHighlighting(theme === 'dark' ? darkSyntaxHighlight : lightSyntaxHighlight),
       search({ top: false }),
       keymap.of(searchKeymap),

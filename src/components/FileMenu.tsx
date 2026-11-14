@@ -1,19 +1,27 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useId } from 'react';
 import { LuMenu } from 'react-icons/lu';
 import { useEditorStore } from '../store/useEditorStore';
-import { openFile, handleSaveFile, handleSaveAsFile, exportAsDocx, isTauri } from '../utils/fileOperations';
+import { exportAsDocx, isTauri } from '../utils/fileOperations';
+import { appCommands, shortcutHint } from '../utils/shortcuts';
+import { useMenu } from '../hooks/usePopup';
 import { Button } from './Button';
 import { APP_NAME } from '../config';
+
+const exportActiveTab = async () => {
+  const activeTab = useEditorStore.getState().getActiveTab();
+  if (activeTab) await exportAsDocx(activeTab);
+};
+
+const showAbout = () => useEditorStore.getState().setShowAboutDialog(true);
 
 export function FileMenu() {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
-
-  const addTab = useEditorStore((s) => s.addTab);
-  const getActiveTab = useEditorStore((s) => s.getActiveTab);
-  const updateTabPath = useEditorStore((s) => s.updateTabPath);
-  const markTabClean = useEditorStore((s) => s.markTabClean);
+  const menuId = useId();
   useEditorStore((s) => s.theme); // subscribe for light-theme CSS reactivity
+
+  const close = () => setIsOpen(false);
+  useMenu(menuRef, isOpen, close);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -26,68 +34,44 @@ export function FileMenu() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isOpen]);
 
-  const close = () => setIsOpen(false);
-
-  const handleNew = () => { addTab(); close(); };
-
-  const handleOpen = async () => {
-    try {
-      const opened = await openFile();
-      if (opened) addTab({ ...opened, isDirty: false });
-    } catch (error) {
-      console.error('Failed to open file:', error);
-      alert('Failed to open file: ' + error);
-    }
+  const run = (command: () => unknown) => () => {
     close();
+    void command();
   };
-
-  const handleSave = async () => {
-    const activeTab = getActiveTab();
-    if (!activeTab) return;
-    await handleSaveFile(activeTab, markTabClean, updateTabPath);
-    close();
-  };
-
-  const handleSaveAs = async () => {
-    const activeTab = getActiveTab();
-    if (!activeTab) return;
-    await handleSaveAsFile(activeTab, markTabClean, updateTabPath);
-    close();
-  };
-
-  const handleExportDocx = async () => {
-    const activeTab = getActiveTab();
-    if (!activeTab) return;
-    await exportAsDocx(activeTab);
-    close();
-  };
-
-  const itemClass = "menu-item";
-  const dividerClass = "menu-divider";
 
   return (
     <div className="relative" ref={menuRef}>
-      <Button variant="primary" iconOnly onClick={() => setIsOpen(!isOpen)} title="File menu">
+      <Button
+        variant="primary"
+        iconOnly
+        onClick={() => setIsOpen(!isOpen)}
+        onKeyDown={(e) => {
+          if (!isOpen && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) {
+            e.preventDefault();
+            setIsOpen(true);
+          }
+        }}
+        title="File menu"
+        aria-haspopup="menu"
+        aria-expanded={isOpen}
+        aria-controls={isOpen ? menuId : undefined}
+      >
         <LuMenu />
       </Button>
 
       {isOpen && (
-        <div className="panel absolute top-full left-0 mt-1 min-w-[200px] z-50 py-1">
-          <MenuItem label="New" shortcut="Ctrl+N" onClick={handleNew} className={itemClass} />
-          <MenuItem label="Open" shortcut="Ctrl+O" onClick={handleOpen} className={itemClass} />
-          <div className={dividerClass} />
-          <MenuItem label="Save" shortcut="Ctrl+S" onClick={handleSave} className={itemClass} />
-          <MenuItem label="Save As" shortcut="Ctrl+Shift+S" onClick={handleSaveAs} className={itemClass} />
-          <div className={dividerClass} />
-          <MenuItem label="Export as DOCX" onClick={handleExportDocx} className={itemClass} />
+        <div id={menuId} role="menu" aria-label="File" className="panel absolute top-full left-0 mt-1 min-w-[200px] z-50 py-1">
+          <MenuItem label="New" shortcut={shortcutHint('new')} onClick={run(appCommands.new)} />
+          <MenuItem label="Open" shortcut={shortcutHint('open')} onClick={run(appCommands.open)} />
+          <div role="separator" className="menu-divider" />
+          <MenuItem label="Save" shortcut={shortcutHint('save')} onClick={run(appCommands.save)} />
+          <MenuItem label="Save As" shortcut={shortcutHint('saveAs')} onClick={run(appCommands.saveAs)} />
+          <div role="separator" className="menu-divider" />
+          <MenuItem label="Export as DOCX" onClick={run(exportActiveTab)} />
           {isTauri() && (
             <>
-              <div className={dividerClass} />
-              <MenuItem
-                label={`About ${APP_NAME}`}
-                onClick={() => { useEditorStore.getState().setShowAboutDialog(true); close(); }}
-                className={itemClass}
-              />
+              <div role="separator" className="menu-divider" />
+              <MenuItem label={`About ${APP_NAME}`} onClick={run(showAbout)} />
             </>
           )}
         </div>
@@ -96,14 +80,13 @@ export function FileMenu() {
   );
 }
 
-function MenuItem({ label, shortcut, onClick, className }: {
+function MenuItem({ label, shortcut, onClick }: {
   label: string;
   shortcut?: string;
   onClick: () => void;
-  className: string;
 }) {
   return (
-    <button onClick={onClick} className={className}>
+    <button role="menuitem" tabIndex={-1} onClick={onClick} className="menu-item">
       <span>{label}</span>
       {shortcut && <span className="text-xs text-theme-text-muted ml-6">{shortcut}</span>}
     </button>

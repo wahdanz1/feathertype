@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { LuMenu, LuX } from 'react-icons/lu';
 import { Button } from '../Button';
@@ -10,6 +10,7 @@ export function Navbar() {
   const location = useLocation();
   const isEditor = location.pathname === '/editor';
   const [menuOpen, setMenuOpen] = useState(false);
+  const menuId = useId();
 
   return (
     <nav className="sticky top-0 left-0 right-0 z-50 border-b border-border/40 bg-editor-bg backdrop-blur-md">
@@ -36,8 +37,11 @@ export function Navbar() {
                   iconOnly
                   className="md:hidden"
                   onClick={() => setMenuOpen(!menuOpen)}
+                  aria-label={menuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+                  aria-expanded={menuOpen}
+                  aria-controls={menuOpen ? menuId : undefined}
                 >
-                  {menuOpen ? <LuX size={20} /> : <LuMenu size={20} />}
+                  {menuOpen ? <LuX size={20} aria-hidden /> : <LuMenu size={20} aria-hidden />}
                 </Button>
               </>
             ) : null}
@@ -46,7 +50,7 @@ export function Navbar() {
       </div>
 
       {menuOpen && !isEditor && (
-        <div className="md:hidden border-t border-border/40 bg-editor-bg px-4">
+        <div id={menuId} className="md:hidden border-t border-border/40 bg-editor-bg px-4">
           <Stack gap={1} className="py-3">
             <NavItem to="/download" className="py-2" onClick={() => setMenuOpen(false)}>Download</NavItem>
             <NavItem to="/contact" className="py-2" onClick={() => setMenuOpen(false)}>Contact</NavItem>

@@ -46,6 +46,7 @@ All tokens are defined in `src/globals.css` under `@theme`. Use them via Tailwin
 | `theme-accent` | (25% lighter) | Accent color — links, highlights |
 | `theme-primary-hover` | `#1177bb` | Hover state for primary buttons |
 | `theme-primary-border` | `#248ad2` | Border for primary buttons |
+| `theme-primary-outline` | dark `#248ad2`, light `#0e639c` | Active-state borders and focus rings (3:1 on either theme's surfaces) |
 
 ### Semantic Text (Marketing / Dark-only pages)
 | Token | Value | Replaces |
@@ -85,7 +86,7 @@ All tokens are defined in `src/globals.css` under `@theme`. Use them via Tailwin
 | `border-light` | `#d0d0d0` | All light mode borders |
 | `text-light` | `#1e1e1e` | Primary text in light mode |
 | `text-secondary-light` | `#374151` | Secondary text in light mode |
-| `text-muted-light` | `#6b7280` | Muted text in light mode |
+| `text-muted-light` | `#626873` | Muted text in light mode (4.5:1 on all light surfaces) |
 | `button-inactive-light` | `#f0f0f0` | Secondary button bg |
 | `button-hover-light` | `#e5e7eb` | Secondary button hover |
 
@@ -116,6 +117,7 @@ Cursor colors (`#ffffff`/`#000000`) and syntax highlight colors (`#4EC9B0`/`#007
 - **`Dialog`** — Universal dialog. Supports `title`, `description`, `icon`, `children`, `actions`, `footer`
 - **`actions` prop**: Array of `{ label, icon?, variant?, onClick }` for declarative button footers
 - **Do not** build one-off modal markup. Always use `<Dialog>`
+- Renders a native modal `<dialog>`: focus starts on the primary action, Tab wraps inside, Escape calls `onClose`, focus returns to the opener
 
 ### Buttons (`Button.tsx`)
 - Variants: `primary`, `secondary`, `ghost`, `destructive`
@@ -137,6 +139,7 @@ Cursor colors (`#ffffff`/`#000000`) and syntax highlight colors (`#4EC9B0`/`#007
 
 ### Dropdown (`Dropdown.tsx`)
 - Custom styled select replacement. Props: `value`, `onChange`, `options[]`, `isActive`
+- Keyboard comes from `useMenu` (`hooks/usePopup.ts`): give any toolbar popup the trigger's `aria-expanded` and `role="menu"`/`menuitem` children and call `useMenu(containerRef, isOpen, close)`
 - Active item uses solid `bg-theme-primary`
 
 ### Accordion (`Accordion.tsx`)

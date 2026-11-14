@@ -304,6 +304,7 @@ export function Editor() {
       listExtension,
       tableExtension,
       editorUpdates,
+      EditorView.contentAttributes.of({ 'aria-label': 'Markdown editor' }),
       theme === 'dark' ? darkTheme : lightTheme,
       indentUnit.of('    '), // 4 spaces for Tab key
       foldGutter({

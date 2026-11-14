@@ -7,6 +7,8 @@
   --color-theme-accent: color-mix(in srgb, var(--color-theme-primary), white 25%);
   --color-theme-primary-hover: #1177bb;
   --color-theme-primary-border: #248ad2;
+  /* Active borders and focus rings: keeps 3:1 against the surface of the current theme */
+  --color-theme-primary-outline: var(--color-theme-primary-border);
 
   /* === Button Colors - Dark Theme === */
   --color-button-inactive-dark: #2d2d2d;        /* Darker than before for better contrast */
@@ -49,7 +51,11 @@
   --color-border-light: #d0d0d0;
   --color-text-light: #1e1e1e;
   --color-text-secondary-light: #374151;
-  --color-text-muted-light: #6b7280;
+  --color-text-muted-light: #626873;
+}
+
+html.light-theme {
+  --color-theme-primary-outline: var(--color-theme-primary);
 }
 
 @layer base {
@@ -137,11 +143,17 @@
   }
 
   /* === Dialog === */
-  .dialog-overlay {
-    @apply fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm;
+  .dialog {
+    @apply m-auto p-0 w-[calc(100%-2rem)] overflow-hidden rounded-xl text-inherit;
   }
-  .panel h3 {
-    @apply text-lg;
+  .dialog::backdrop {
+    @apply bg-black/60 backdrop-blur-sm;
+  }
+  .dialog-title {
+    @apply text-lg font-bold text-white;
+  }
+  .light-theme .dialog-title {
+    @apply text-text-light;
   }
 
   /* === Editor viewport === */
@@ -177,6 +189,12 @@
   .tab-close {
     @apply flex items-center justify-center w-5 h-5 text-theme-text-muted hover:text-red-500 transition-colors rounded hover:bg-white/10 opacity-0 group-hover:opacity-100;
   }
+  .tab-label {
+    @apply flex items-center gap-1.5 overflow-hidden flex-1 min-w-0 h-full outline-none;
+  }
+  .tab:has(.tab-label:focus-visible) {
+    @apply ring-2 ring-inset ring-theme-primary-outline;
+  }
   .dirty-dot {
     @apply w-1.5 h-1.5 bg-theme-primary rounded-full;
   }
@@ -198,6 +216,13 @@
     @apply bg-white/5 backdrop-blur-sm;
   }
 
+  .table-cell {
+    @apply w-4 h-4 border cursor-pointer transition-colors bg-editor-bg border-border hover:bg-button-hover-dark focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-theme-primary-outline;
+  }
+  .table-cell-selected {
+    @apply bg-theme-primary border-theme-primary/80 hover:bg-theme-primary;
+  }
+
   .animate-icons:hover svg {
     @apply translate-x-1;
   }
@@ -206,5 +231,17 @@
   }
   .animate-icons svg, .animate-icons-vertical svg {
     @apply transition-transform duration-200;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after,
+  *::backdrop {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

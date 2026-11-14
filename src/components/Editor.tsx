@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import CodeMirror from '@uiw/react-codemirror';
-import { markdown } from '@codemirror/lang-markdown';
 import { EditorView } from '@codemirror/view';
 import { search, searchKeymap } from '@codemirror/search';
 import { keymap } from '@codemirror/view';
@@ -11,6 +10,7 @@ import { tags } from '@lezer/highlight';
 import { useEditorStore } from '../store/useEditorStore';
 import { tableExtension } from '../utils/tableExtension';
 import { listExtension } from '../utils/listExtension';
+import { markdownSupport } from '../utils/markdownSyntax';
 import { editorUpdates } from '../lib/editorUpdates';
 import type { Extension } from '@codemirror/state';
 
@@ -297,7 +297,7 @@ export function Editor() {
 
   const extensions = useMemo(() => {
     const list: Extension[] = [
-      markdown(),
+      markdownSupport,
       syntaxHighlighting(theme === 'dark' ? darkSyntaxHighlight : lightSyntaxHighlight),
       search({ top: false }),
       keymap.of(searchKeymap),

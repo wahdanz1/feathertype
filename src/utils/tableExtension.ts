@@ -1,11 +1,14 @@
 import { keymap } from '@codemirror/view';
 import { Prec } from '@codemirror/state';
 import type { EditorView } from '@codemirror/view';
+import { isInCodeBlock } from './markdownSyntax';
+
+function isSeparatorRow(lineText: string): boolean {
+  return /^\s*\|[\s\-:|]+\|\s*$/.test(lineText);
+}
 
 function isTableRow(lineText: string): boolean {
-  const hasPipes = lineText.includes('|');
-  const isSeparator = /^\s*\|[\s\-:|]+\|\s*$/.test(lineText);
-  return hasPipes && !isSeparator;
+  return lineText.includes('|') && !isSeparatorRow(lineText);
 }
 
 function getColumnCount(lineText: string): number {
@@ -29,7 +32,7 @@ function handleEnterInTable(view: EditorView): boolean {
   const line = state.doc.lineAt(from);
   const lineText = line.text;
 
-  if (!isTableRow(lineText)) return false;
+  if (!isTableRow(lineText) || isInCodeBlock(state, line.from)) return false;
 
   // Only handle Enter at end of row (whitespace/pipes after cursor)
   const cursorPosInLine = from - line.from;
@@ -39,16 +42,20 @@ function handleEnterInTable(view: EditorView): boolean {
   const columnCount = getColumnCount(lineText);
   if (columnCount === 0) return false;
 
+  // A row under the header must go below the separator, or the table stops parsing.
+  const next = line.number < state.doc.lines ? state.doc.line(line.number + 1) : null;
+  const after = next && isSeparatorRow(next.text) ? next : line;
+
   const newRow = '\n' + generateEmptyRow(columnCount);
   view.dispatch({
     changes: {
-      from: line.to,
-      to: line.to,
+      from: after.to,
+      to: after.to,
       insert: newRow
     },
     selection: {
-      anchor: line.to + 3,
-      head: line.to + 3
+      anchor: after.to + 3,
+      head: after.to + 3
     }
   });
 

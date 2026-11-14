@@ -25,10 +25,10 @@ interface ActiveFormats {
 function readFormats(view: EditorView | null): ActiveFormats {
   return {
     view,
-    bold: hasFormat(view, '**', '**'),
-    italic: hasFormat(view, '_', '_'),
-    strikethrough: hasFormat(view, '~~', '~~'),
-    code: hasFormat(view, '`', '`'),
+    bold: hasFormat(view, '**'),
+    italic: hasFormat(view, '_'),
+    strikethrough: hasFormat(view, '~~'),
+    code: hasFormat(view, '`'),
     blockquote: hasBlockquote(view),
     bulletList: hasBulletList(view),
     numberedList: hasNumberedList(view),

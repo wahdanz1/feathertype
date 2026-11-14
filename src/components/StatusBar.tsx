@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import type { EditorState } from '@codemirror/state';
 import type { EditorView } from '@codemirror/view';
 import { useEditorStore } from '../store/useEditorStore';
+import { Badge } from './ui/Badge';
 import { subscribeEditorUpdates } from '../lib/editorUpdates';
 import { countPlainTextCharacters, stripMarkdown } from '../utils/markdownStrip';
 
@@ -40,6 +41,8 @@ function measure(view: EditorView | null): Stats {
 export function StatusBar() {
   const editorView = useEditorStore((s) => s.editorView);
   const zoom = useEditorStore((s) => s.zoom);
+  const notice = useEditorStore((s) => s.notices[0]);
+  const dismissNotice = useEditorStore((s) => s.dismissNotice);
 
   const [stats, setStats] = useState(() => measure(editorView));
   if (stats.view !== editorView) setStats(measure(editorView));
@@ -78,6 +81,12 @@ export function StatusBar() {
           <span>{selected} selected</span>
         )}
       </div>
+
+      {notice && (
+        <button type="button" onClick={dismissNotice} title="Dismiss">
+          <Badge variant="warning" role="status" label={notice} className="normal-case tracking-normal" />
+        </button>
+      )}
 
       <div className="flex items-center gap-4">
         <span>{stats.total} characters</span>

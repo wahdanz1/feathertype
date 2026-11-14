@@ -16,7 +16,7 @@ vi.mock('@tauri-apps/api/window', () => ({
 vi.mock('@tauri-apps/plugin-dialog', () => ({ ask: desktop.ask, open: vi.fn(), save: vi.fn() }));
 
 import { useUnsavedChangesGuard } from './useUnsavedChangesGuard';
-import { useEditorStore } from '../store/useEditorStore';
+import { flushPersistedState, useEditorStore } from '../store/useEditorStore';
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
 
@@ -79,6 +79,17 @@ describe('desktop close guard', () => {
     expect(await requestClose()).toBe(true);
     desktop.ask.mockResolvedValueOnce(true);
     expect(await requestClose()).toBe(false);
+  });
+
+  it('writes the queued session before the window closes', async () => {
+    flushPersistedState();
+    localStorage.clear();
+    await mount(true);
+    setDirty(false);
+    expect(localStorage.getItem('feathertype-storage')).toBeNull();
+
+    await requestClose();
+    expect(JSON.parse(localStorage.getItem('feathertype-storage')!).state.tabs[0].content).toBe('x');
   });
 
   it('stops listening on unmount', async () => {

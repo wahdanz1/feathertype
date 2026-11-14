@@ -26,6 +26,9 @@ const isTauri = detectTauri(import.meta.env.MODE, window);
 
 console.log(`[FeatherType] Environment: ${isTauri ? 'Tauri' : 'Web'} (Mode: ${import.meta.env.MODE})`);
 
+// Once per launch, outside React: StrictMode would run an effect twice and repeat the notices.
+if (isTauri) void useEditorStore.getState().syncTabsWithDisk();
+
 function RootLayout() {
   const theme = useEditorStore((s) => s.theme);
   const location = useLocation();

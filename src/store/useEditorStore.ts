@@ -3,7 +3,18 @@ import { persist } from 'zustand/middleware';
 import { Tab } from '../types';
 import { v4 as uuidv4 } from 'uuid';
 import type { EditorView } from '@codemirror/view';
-import { BROWSER_SAVE, getFileName, handleSaveFile, isDocxPath, toMarkdownPath } from '../utils/fileOperations';
+import {
+  BROWSER_SAVE,
+  canReloadFromDisk,
+  getFileName,
+  handleSaveFile,
+  hashContent,
+  isDocxPath,
+  isTauri,
+  readFile,
+  toMarkdownPath,
+} from '../utils/fileOperations';
+import { createSafeStorage } from './persistStorage';
 
 interface EditorState {
   tabs: Tab[];
@@ -18,7 +29,10 @@ interface EditorState {
     tabId: string | null;
   };
   showAboutDialog: boolean;
+  notices: string[];
 }
+
+type PersistedState = Pick<EditorState, 'tabs' | 'activeTabId' | 'theme' | 'showPreview' | 'lineWrap' | 'zoom'>;
 
 interface EditorStore extends EditorState {
   // Tab management
@@ -32,6 +46,7 @@ interface EditorStore extends EditorState {
   updateTabPath: (tabId: string, path: string, title: string) => void;
   renameTab: (tabId: string, title: string) => void;
   markTabClean: (tabId: string, savedContent: string) => void;
+  syncTabsWithDisk: () => Promise<void>;
 
   // UI state
   togglePreview: () => void;
@@ -44,6 +59,8 @@ interface EditorStore extends EditorState {
   zoomOut: () => void;
   resetZoom: () => void;
   setShowAboutDialog: (show: boolean) => void;
+  addNotice: (message: string) => void;
+  dismissNotice: () => void;
 
   // Getters
   getActiveTab: () => Tab | null;
@@ -51,6 +68,15 @@ interface EditorStore extends EditorState {
 }
 
 const initialTabId = uuidv4();
+
+export const STORAGE_FULL_NOTICE =
+  "This session is too large to keep in full, so some tabs won't come back after a restart. Save your work to keep it.";
+
+const listNames = (tabs: Tab[]) => tabs.map((t) => `"${t.title}"`).join(', ');
+
+const storage = createSafeStorage<PersistedState>(() => useEditorStore.getState().addNotice(STORAGE_FULL_NOTICE));
+
+export const flushPersistedState = () => storage.flush();
 
 export const useEditorStore = create<EditorStore>()(
   persist(
@@ -73,6 +99,7 @@ export const useEditorStore = create<EditorStore>()(
         tabId: null,
       },
       showAboutDialog: false,
+      notices: [],
 
       addTab: (partialTab = {}) => {
         const newId = uuidv4();
@@ -222,12 +249,62 @@ export const useEditorStore = create<EditorStore>()(
 
       markTabClean: (tabId: string, savedContent: string) => {
         set((state) => ({
-          tabs: state.tabs.map((tab) =>
-            tab.id === tabId && tab.content === savedContent
-              ? { ...tab, isDirty: false }
-              : tab
-          ),
+          tabs: state.tabs.map((tab) => {
+            if (tab.id !== tabId) return tab;
+            const diskHash = canReloadFromDisk(tab) ? hashContent(savedContent) : tab.diskHash;
+            return { ...tab, diskHash, isDirty: tab.content === savedContent ? false : tab.isDirty };
+          }),
         }));
+      },
+
+      syncTabsWithDisk: async () => {
+        if (!isTauri()) return;
+        const changed: Tab[] = [];
+        const unreadable: Tab[] = [];
+        const lost: Tab[] = [];
+
+        await Promise.all(get().tabs.filter(canReloadFromDisk).map(async (before) => {
+          const disk = await readFile(before.filePath!).catch(() => null);
+          const tab = get().tabs.find((t) => t.id === before.id);
+          // Leave tabs alone that were edited or saved while the read was in flight.
+          if (tab !== before) return;
+
+          let patch: Partial<Tab> | null = null;
+          if (disk === null) {
+            if (tab.unloaded) {
+              // Nothing to keep and nothing to show: saving an empty buffer here would wipe the file.
+              patch = { filePath: null, suggestedPath: tab.filePath!, unloaded: undefined };
+              lost.push(tab);
+            } else {
+              patch = { isDirty: true };
+              unreadable.push(tab);
+            }
+          } else if (!tab.isDirty) {
+            if (tab.unloaded || disk !== tab.content || !tab.diskHash) {
+              patch = { content: disk, diskHash: hashContent(disk), unloaded: undefined };
+            }
+          } else if (tab.diskHash) {
+            if (hashContent(disk) !== tab.diskHash) changed.push(tab);
+          } else if (disk === tab.content) {
+            patch = { isDirty: false, diskHash: hashContent(disk) };
+          }
+
+          if (patch) {
+            const update = patch;
+            set((state) => ({ tabs: state.tabs.map((t) => (t.id === tab.id ? { ...t, ...update } : t)) }));
+          }
+        }));
+
+        const { addNotice } = get();
+        if (changed.length) {
+          addNotice(`${listNames(changed)} changed on disk since your last save. Your unsaved edits are kept: save to overwrite the file, or close the tab without saving and reopen the file to load the disk version.`);
+        }
+        if (unreadable.length) {
+          addNotice(`Couldn't read ${listNames(unreadable)} from disk. Your copy is kept as unsaved; save to write it back.`);
+        }
+        if (lost.length) {
+          addNotice(`Couldn't read ${listNames(lost)} from disk. Reopen the file once it's available.`);
+        }
       },
 
       togglePreview: () => {
@@ -275,6 +352,14 @@ export const useEditorStore = create<EditorStore>()(
         set({ showAboutDialog: show });
       },
 
+      addNotice: (message: string) => {
+        set((state) => ({ notices: [...state.notices, message] }));
+      },
+
+      dismissNotice: () => {
+        set((state) => ({ notices: state.notices.slice(1) }));
+      },
+
       getActiveTab: () => {
         const state = get();
         return state.tabs.find((t) => t.id === state.activeTabId) || null;
@@ -290,6 +375,7 @@ export const useEditorStore = create<EditorStore>()(
     {
       name: 'feathertype-storage',
       version: 2,
+      storage,
       migrate: (persisted, version) => {
         const state = persisted as Partial<EditorState>;
         // v0 could hold a web File, which JSON turns into {}.
@@ -312,7 +398,7 @@ export const useEditorStore = create<EditorStore>()(
         return state as EditorStore;
       },
       // Only persist specific keys to avoid bloat or singleton view refs
-      partialize: (state) => ({
+      partialize: (state): PersistedState => ({
         tabs: state.tabs,
         activeTabId: state.activeTabId,
         theme: state.theme,

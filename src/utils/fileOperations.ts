@@ -17,6 +17,24 @@ export const isDocxPath = (path: string): boolean => path.toLowerCase().endsWith
 
 export const toMarkdownPath = (path: string): string => path.replace(/\.docx$/i, '.md');
 
+// Word files are converted on open, so their text can't be compared with or restored from disk.
+export const canReloadFromDisk = (tab: Pick<Tab, 'filePath'>): boolean =>
+  !!tab.filePath && tab.filePath !== BROWSER_SAVE && !isDocxPath(tab.filePath);
+
+// cyrb53: fast and well spread; it only has to tell edited text apart, not resist attackers.
+export function hashContent(text: string): string {
+  let h1 = 0xdeadbeef;
+  let h2 = 0x41c6ce57;
+  for (let i = 0; i < text.length; i++) {
+    const ch = text.charCodeAt(i);
+    h1 = Math.imul(h1 ^ ch, 2654435761);
+    h2 = Math.imul(h2 ^ ch, 1597334677);
+  }
+  h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+  h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+  return `${text.length.toString(36)}-${(4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(36)}`;
+}
+
 function downloadBlob(data: BlobPart, fileName: string, mime: string): void {
   const blob = new Blob([data], { type: mime });
   const url = URL.createObjectURL(blob);
@@ -174,7 +192,7 @@ export async function openAndReadFile(path: string | File): Promise<string> {
   }
 }
 
-export async function openFile(): Promise<Pick<Tab, 'filePath' | 'title' | 'content' | 'suggestedPath'> | null> {
+export async function openFile(): Promise<Pick<Tab, 'filePath' | 'title' | 'content' | 'suggestedPath' | 'diskHash'> | null> {
   const path = await openFileDialog();
   if (path === null) return null;
   const content = await openAndReadFile(path);
@@ -185,7 +203,8 @@ export async function openFile(): Promise<Pick<Tab, 'filePath' | 'title' | 'cont
     return { filePath: null, title: getFileName(suggestedPath), content, suggestedPath };
   }
   // A File can't be persisted, so a web tab keeps only its name and saves as a download of it.
-  return { filePath: typeof path === 'string' ? path : BROWSER_SAVE, title, content };
+  if (typeof path !== 'string') return { filePath: BROWSER_SAVE, title, content };
+  return { filePath: path, title, content, diskHash: hashContent(content) };
 }
 
 // Resolves true only once the content was written; failures are reported here and never thrown.

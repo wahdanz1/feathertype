@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { getCurrentWindow } from '@tauri-apps/api/window';
 import { ask } from '@tauri-apps/plugin-dialog';
-import { useEditorStore } from '../store/useEditorStore';
+import { flushPersistedState, useEditorStore } from '../store/useEditorStore';
 
 export const hasDirtyTabs = () => useEditorStore.getState().tabs.some((tab) => tab.isDirty);
 
@@ -27,6 +27,8 @@ export function useUnsavedChangesGuard(isDesktop: boolean) {
       let disposed = false;
       getCurrentWindow()
         .onCloseRequested(async (event) => {
+          // Throttled writes may still be queued, and the webview gets no pagehide on close.
+          flushPersistedState();
           if (hasDirtyTabs() && !(await confirmDesktopClose())) event.preventDefault();
         })
         .then((stop) => {

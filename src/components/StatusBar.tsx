@@ -1,51 +1,72 @@
 import { useEffect, useState } from 'react';
+import type { EditorState } from '@codemirror/state';
+import type { EditorView } from '@codemirror/view';
 import { useEditorStore } from '../store/useEditorStore';
+import { subscribeEditorUpdates } from '../lib/editorUpdates';
 import { countPlainTextCharacters, stripMarkdown } from '../utils/markdownStrip';
+
+// The whole-document count waits for a typing pause; cursor stats update immediately.
+const COUNT_DELAY_MS = 150;
+
+interface Cursor {
+  line: number;
+  col: number;
+  selected: number;
+}
+
+interface Stats {
+  view: EditorView | null;
+  cursor: Cursor;
+  total: number;
+}
+
+function readCursor(state: EditorState): Cursor {
+  const { head, from, to } = state.selection.main;
+  const line = state.doc.lineAt(head);
+  return {
+    line: line.number,
+    col: head - line.from + 1,
+    selected: from === to ? 0 : stripMarkdown(state.sliceDoc(from, to)).length,
+  };
+}
+
+const sameCursor = (a: Cursor, b: Cursor) => a.line === b.line && a.col === b.col && a.selected === b.selected;
+
+function measure(view: EditorView | null): Stats {
+  if (!view) return { view, cursor: { line: 1, col: 1, selected: 0 }, total: 0 };
+  return { view, cursor: readCursor(view.state), total: countPlainTextCharacters(view.state.doc.toString()) };
+}
 
 export function StatusBar() {
   const editorView = useEditorStore((s) => s.editorView);
-  const activeTab = useEditorStore((s) => s.getActiveTab());
   const zoom = useEditorStore((s) => s.zoom);
 
-
-  const [line, setLine] = useState(1);
-  const [col, setCol] = useState(1);
-  const [selectedCount, setSelectedCount] = useState(0);
+  const [stats, setStats] = useState(() => measure(editorView));
+  if (stats.view !== editorView) setStats(measure(editorView));
 
   useEffect(() => {
     if (!editorView) return;
+    let countTimer: ReturnType<typeof setTimeout> | undefined;
 
-    const updateStats = () => {
-      const state = editorView.state;
-      const selection = state.selection.main;
-
-      // Get line and column position
-      const currentLine = state.doc.lineAt(selection.head);
-      const lineNumber = currentLine.number;
-      const colNumber = selection.head - currentLine.from + 1;
-
-      setLine(lineNumber);
-      setCol(colNumber);
-
-      // Get selected text count (strip markdown syntax)
-      const selectedText = state.sliceDoc(selection.from, selection.to);
-      const strippedText = stripMarkdown(selectedText);
-      setSelectedCount(strippedText.length);
-    };
-
-    // Update on mount
-    updateStats();
-
-    // Create an interval to periodically update stats
-    // This ensures we catch all selection changes
-    const interval = setInterval(updateStats, 100);
+    const unsubscribe = subscribeEditorUpdates((update) => {
+      if (update.view !== editorView) return;
+      const cursor = readCursor(update.state);
+      setStats((s) => (sameCursor(s.cursor, cursor) ? s : { ...s, cursor }));
+      if (!update.docChanged) return;
+      clearTimeout(countTimer);
+      countTimer = setTimeout(() => {
+        const total = countPlainTextCharacters(editorView.state.doc.toString());
+        setStats((s) => (s.total === total ? s : { ...s, total }));
+      }, COUNT_DELAY_MS);
+    });
 
     return () => {
-      clearInterval(interval);
+      unsubscribe();
+      clearTimeout(countTimer);
     };
   }, [editorView]);
 
-  const totalChars = activeTab ? countPlainTextCharacters(activeTab.content) : 0;
+  const { line, col, selected } = stats.cursor;
 
   return (
     <div
@@ -53,13 +74,13 @@ export function StatusBar() {
     >
       <div className="flex items-center gap-4">
         <span>Ln {line}, Col {col}</span>
-        {selectedCount > 0 && (
-          <span>{selectedCount} selected</span>
+        {selected > 0 && (
+          <span>{selected} selected</span>
         )}
       </div>
 
       <div className="flex items-center gap-4">
-        <span>{totalChars} characters</span>
+        <span>{stats.total} characters</span>
         <span>{zoom}%</span>
       </div>
     </div>

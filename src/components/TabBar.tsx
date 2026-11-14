@@ -1,13 +1,12 @@
 import { useRef } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import { useEditorStore } from '../store/useEditorStore';
 import { Tab } from './Tab';
 import { LuPlus } from 'react-icons/lu';
 
 export function TabBar() {
-  const tabs = useEditorStore((s) => s.tabs);
+  const tabIds = useEditorStore(useShallow((s) => s.tabs.map((t) => t.id)));
   const activeTabId = useEditorStore((s) => s.activeTabId);
-  const setActiveTab = useEditorStore((s) => s.setActiveTab);
-  const closeTab = useEditorStore((s) => s.closeTab);
   const addTab = useEditorStore((s) => s.addTab);
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -21,14 +20,8 @@ export function TabBar() {
         ref={scrollRef}
         className="flex h-full overflow-x-auto overflow-y-hidden no-scrollbar flex-1 gap-1"
       >
-        {tabs.map((tab) => (
-          <Tab
-            key={tab.id}
-            tab={tab}
-            isActive={tab.id === activeTabId}
-            onSelect={() => setActiveTab(tab.id)}
-            onClose={() => closeTab(tab.id)}
-          />
+        {tabIds.map((id) => (
+          <Tab key={id} tabId={id} isActive={id === activeTabId} />
         ))}
       </div>
 

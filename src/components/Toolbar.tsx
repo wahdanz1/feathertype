@@ -65,7 +65,7 @@ export function Toolbar() {
   };
 
   const dividerColor = theme === 'dark' ? 'bg-border' : 'bg-border-light';
-  const getButtonClass = (isActive: boolean) => isActive ? 'border border-theme-primary bg-white/5 shadow-sm scale-[0.98]' : '';
+  const getButtonClass = (isActive: boolean) => isActive ? 'border border-theme-primary-outline bg-white/5 shadow-sm scale-[0.98]' : '';
 
   return (
     <div
@@ -81,13 +81,13 @@ export function Toolbar() {
       
       <div className={`w-px h-6 ${dividerColor} mx-1`} />
 
-      <Button variant="secondary" iconOnly onClick={() => applyFormat(formats.bold)} title="Bold (Ctrl+B)" className={getButtonClass(activeFormats.bold)}>
+      <Button variant="secondary" iconOnly onClick={() => applyFormat(formats.bold)} title="Bold (Ctrl+B)" aria-label="Bold" aria-pressed={activeFormats.bold} className={getButtonClass(activeFormats.bold)}>
         <LuBold  />
       </Button>
-      <Button variant="secondary" iconOnly onClick={() => applyFormat(formats.italic)} title="Italic (Ctrl+I)" className={getButtonClass(activeFormats.italic)}>
+      <Button variant="secondary" iconOnly onClick={() => applyFormat(formats.italic)} title="Italic (Ctrl+I)" aria-label="Italic" aria-pressed={activeFormats.italic} className={getButtonClass(activeFormats.italic)}>
         <LuItalic  />
       </Button>
-      <Button variant="secondary" iconOnly onClick={() => applyFormat(formats.strikethrough)} title="Strikethrough" className={getButtonClass(activeFormats.strikethrough)}>
+      <Button variant="secondary" iconOnly onClick={() => applyFormat(formats.strikethrough)} title="Strikethrough" aria-label="Strikethrough" aria-pressed={activeFormats.strikethrough} className={getButtonClass(activeFormats.strikethrough)}>
         <LuStrikethrough  />
       </Button>
 
@@ -116,13 +116,13 @@ export function Toolbar() {
 
       <div className={`w-px h-6 ${dividerColor} mx-1`} />
 
-      <Button variant="secondary" iconOnly onClick={() => applyFormat(formats.bulletList)} title="Bullet List (Ctrl+Shift+B)" className={getButtonClass(activeFormats.bulletList)}>
+      <Button variant="secondary" iconOnly onClick={() => applyFormat(formats.bulletList)} title="Bullet List (Ctrl+Shift+B)" aria-label="Bullet list" aria-pressed={activeFormats.bulletList} className={getButtonClass(activeFormats.bulletList)}>
         <LuList  />
       </Button>
-      <Button variant="secondary" iconOnly onClick={() => applyFormat(formats.numberedList)} title="Numbered List (Ctrl+Shift+N)" className={getButtonClass(activeFormats.numberedList)}>
+      <Button variant="secondary" iconOnly onClick={() => applyFormat(formats.numberedList)} title="Numbered List (Ctrl+Shift+N)" aria-label="Numbered list" aria-pressed={activeFormats.numberedList} className={getButtonClass(activeFormats.numberedList)}>
         <LuListOrdered  />
       </Button>
-      <Button variant="secondary" iconOnly onClick={() => applyFormat(formats.blockquote)} title="Blockquote" className={getButtonClass(activeFormats.blockquote)}>
+      <Button variant="secondary" iconOnly onClick={() => applyFormat(formats.blockquote)} title="Blockquote" aria-label="Blockquote" aria-pressed={activeFormats.blockquote} className={getButtonClass(activeFormats.blockquote)}>
         <LuTextQuote  />
       </Button>
 
@@ -130,21 +130,21 @@ export function Toolbar() {
 
       <div className={`w-px h-6 ${dividerColor} mx-1`} />
 
-      <Button variant="secondary" iconOnly onClick={() => applyFormat(formats.link)} title="Link (Ctrl+K)">
+      <Button variant="secondary" iconOnly onClick={() => applyFormat(formats.link)} title="Link (Ctrl+K)" aria-label="Link">
         <LuLink2  />
       </Button>
-      <Button variant="secondary" iconOnly onClick={() => applyFormat(formats.inlineCode)} title="Inline Code (Ctrl+`)" className={getButtonClass(activeFormats.code)}>
+      <Button variant="secondary" iconOnly onClick={() => applyFormat(formats.inlineCode)} title="Inline Code (Ctrl+`)" aria-label="Inline code" aria-pressed={activeFormats.code} className={getButtonClass(activeFormats.code)}>
         <LuCode  />
       </Button>
       <div className={`w-px h-6 ${dividerColor} mx-1`} />
 
-      <Button variant="secondary" iconOnly onClick={toggleLineWrap} title="Word Wrap (Alt+Z)" className={getButtonClass(lineWrap)}>
+      <Button variant="secondary" iconOnly onClick={toggleLineWrap} title="Word Wrap (Alt+Z)" aria-label="Word wrap" aria-pressed={lineWrap} className={getButtonClass(lineWrap)}>
         <LuWrapText  />
       </Button>
 
       <div className="flex-1" />
       
-      <Button variant="secondary" iconOnly onClick={toggleTheme} title="Toggle Theme">
+      <Button variant="secondary" iconOnly onClick={toggleTheme} title="Toggle Theme" aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}>
         {theme === 'dark' ? <LuSun  /> : <LuMoon  />}
       </Button>
     </div>

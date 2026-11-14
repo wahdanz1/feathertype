@@ -4,7 +4,7 @@ import mammoth from 'mammoth';
 import type { Tab } from '../types';
 import { markdownToDocxBuffer } from './docxExport';
 
-export const isTauri = () => !!(window as any).__TAURI_INTERNALS__;
+export const isTauri = () => !!window.__TAURI_INTERNALS__;
 
 const DOCX_MIME = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
 
@@ -143,7 +143,7 @@ export function getFileName(path: string | File): string {
 
 function cleanMammothMarkdown(markdown: string): string {
   return markdown
-    .replace(/\\([().\-])/g, '$1')  // Unescape parentheses, periods, and dashes
+    .replace(/\\([().-])/g, '$1')  // Unescape parentheses, periods, and dashes
     .replace(/\\\\/g, '\\');         // Fix double-escaped backslashes
 }
 
@@ -154,8 +154,7 @@ export async function openAndReadFile(path: string | File): Promise<string> {
   if (ext === 'docx') {
     const arrayBuffer = await readFileBinary(path);
     // mammoth's TS types omit convertToMarkdown
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const result = await (mammoth as any).convertToMarkdown({ arrayBuffer });
+    const result = await (mammoth as typeof mammoth & { convertToMarkdown: typeof mammoth.convertToHtml }).convertToMarkdown({ arrayBuffer });
     return cleanMammothMarkdown(result.value);
   } else {
     return readFile(path);

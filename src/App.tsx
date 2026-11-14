@@ -20,7 +20,7 @@ const Download = lazy(() => import('./pages/Download.tsx'));
 const Contact = lazy(() => import('./pages/Contact.tsx'));
 const Privacy = lazy(() => import('./pages/Privacy.tsx'));
 
-const isTauri = import.meta.env.MODE === 'tauri' || (import.meta.env.MODE === 'development' && typeof window !== 'undefined' && (window as any).__TAURI_INTERNALS__ !== undefined);
+const isTauri = import.meta.env.MODE === 'tauri' || (import.meta.env.MODE === 'development' && typeof window !== 'undefined' && window.__TAURI_INTERNALS__ !== undefined);
 
 console.log(`[FeatherType] Environment: ${isTauri ? 'Tauri' : 'Web'} (Mode: ${import.meta.env.MODE})`);
 

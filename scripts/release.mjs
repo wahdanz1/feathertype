@@ -14,11 +14,11 @@ if (!/^\d+\.\d+\.\d+$/.test(version)) {
   process.exit(1);
 }
 
-// Check for clean working tree
-try {
-  execSync('git diff --quiet && git diff --cached --quiet', { stdio: 'pipe' });
-} catch {
-  console.error('Error: Working tree is not clean. Commit or stash changes first.');
+// Untracked files count too: the release commit must match what CI builds from the tag.
+const status = execSync('git status --porcelain', { encoding: 'utf-8' });
+if (status.trim()) {
+  console.error('Error: Working tree is not clean. Commit, stash or remove changes first.');
+  console.error(status);
   process.exit(1);
 }
 
@@ -33,28 +33,32 @@ try {
 
 console.log(`Releasing v${version}...`);
 
-// Bump version in all four places
 function replaceInFile(path, search, replacement) {
   const content = readFileSync(path, 'utf-8');
-  const updated = content.replace(search, replacement);
-  writeFileSync(path, updated);
+  if (!search.test(content)) {
+    console.error(`Error: version pattern not found in ${path}`);
+    process.exit(1);
+  }
+  writeFileSync(path, content.replace(search, replacement));
 }
 
-replaceInFile('package.json', /"version": "[^"]*"/, `"version": "${version}"`);
-replaceInFile('src-tauri/tauri.conf.json', /"version": "[^"]*"/, `"version": "${version}"`);
-replaceInFile('src-tauri/Cargo.toml', /^version = "[^"]*"/m, `version = "${version}"`);
-replaceInFile('src/config.ts', /APP_VERSION = '[^']*'/, `APP_VERSION = '${version}'`);
+const bumps = [
+  ['package.json', /"version": "[^"]*"/, `"version": "${version}"`],
+  ['src-tauri/tauri.conf.json', /"version": "[^"]*"/, `"version": "${version}"`],
+  ['src-tauri/Cargo.toml', /^version = "[^"]*"/m, `version = "${version}"`],
+  ['src-tauri/Cargo.lock', /(name = "feathertype"\r?\nversion = )"[^"]*"/, `$1"${version}"`],
+  ['src/config.ts', /APP_VERSION = '[^']*'/, `APP_VERSION = '${version}'`],
+];
+
+for (const [path, search, replacement] of bumps) replaceInFile(path, search, replacement);
 
 console.log(`Version bumped to ${version} in:`);
-console.log('  - package.json');
-console.log('  - src-tauri/tauri.conf.json');
-console.log('  - src-tauri/Cargo.toml');
-console.log('  - src/config.ts');
+for (const [path] of bumps) console.log(`  - ${path}`);
 
 // Commit, tag, push
 const run = (cmd) => execSync(cmd, { stdio: 'inherit' });
 
-run('git add -A');
+run(`git add -- ${bumps.map(([path]) => path).join(' ')}`);
 
 // Only commit if there are staged changes (version may already match)
 try {

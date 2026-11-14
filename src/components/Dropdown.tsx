@@ -3,7 +3,7 @@ import { LuChevronDown } from 'react-icons/lu';
 import { cn } from '../lib/utils';
 import { useMenu } from '../hooks/usePopup';
 
-export interface DropdownOption {
+interface DropdownOption {
   value: string;
   label: string;
 }
@@ -86,7 +86,7 @@ export function Dropdown({
               className={cn(
                 "w-full px-4 py-1.5 text-sm text-left transition-colors",
                 option.value === value
-                  ? "bg-theme-primary text-white"
+                  ? "bg-theme-primary text-on-primary"
                   : "text-secondary menu-item !px-4 !py-1.5"
               )}
             >

@@ -9,7 +9,7 @@ interface PersistedTabs {
   activeTabId: string | null;
 }
 
-export interface SafeStorage<S> extends PersistStorage<S, void> {
+interface SafeStorage<S> extends PersistStorage<S, void> {
   flush: () => void;
 }
 

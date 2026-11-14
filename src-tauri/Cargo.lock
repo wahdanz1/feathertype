@@ -945,12 +945,9 @@ dependencies = [
 name = "feathertype"
 version = "1.1.0"
 dependencies = [
- "serde",
- "serde_json",
  "tauri",
  "tauri-build",
  "tauri-plugin-dialog",
- "tauri-plugin-fs",
  "tauri-plugin-opener",
 ]
 

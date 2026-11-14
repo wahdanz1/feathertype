@@ -1,12 +1,11 @@
 import { invoke } from '@tauri-apps/api/core';
 import { open, save } from '@tauri-apps/plugin-dialog';
 import type { Tab } from '../types';
+import { isTauri } from '../lib/platform';
 
 // Loaded on demand: both converters are large and only a .docx open or save needs them.
 const markdownToDocxBuffer = async (content: string): Promise<ArrayBuffer> =>
-  (await import('./docxExport')).markdownToDocxBuffer(content);
-
-export const isTauri = () => !!window.__TAURI_INTERNALS__;
+  (await import('./docx')).markdownToDocxBuffer(content);
 
 export const BROWSER_SAVE = 'browser-save';
 
@@ -47,7 +46,7 @@ function downloadBlob(data: BlobPart, fileName: string, mime: string): void {
   URL.revokeObjectURL(url);
 }
 
-export async function openFileDialog(): Promise<string | File | null> {
+async function openFileDialog(): Promise<string | File | null> {
   if (!isTauri()) {
     return new Promise((resolve) => {
       const input = document.createElement('input');
@@ -85,7 +84,7 @@ export async function openFileDialog(): Promise<string | File | null> {
   return null;
 }
 
-export async function saveFileDialog(defaultPath?: string | null): Promise<string | null> {
+async function saveFileDialog(defaultPath?: string | null): Promise<string | null> {
   if (!isTauri()) return BROWSER_SAVE;
 
   const initialPath = defaultPath && defaultPath !== BROWSER_SAVE ? defaultPath : undefined;
@@ -122,7 +121,7 @@ export async function readFile(path: string | File): Promise<string> {
   return invoke<string>('read_file', { path });
 }
 
-export async function readFileBinary(path: string | File): Promise<ArrayBuffer> {
+async function readFileBinary(path: string | File): Promise<ArrayBuffer> {
   if (!isTauri() && path instanceof File) {
     return new Promise((resolve) => {
       const reader = new FileReader();
@@ -134,7 +133,7 @@ export async function readFileBinary(path: string | File): Promise<ArrayBuffer> 
   return new Uint8Array(bytes).buffer;
 }
 
-export async function writeFile(path: string, content: string, downloadName?: string): Promise<void> {
+async function writeFile(path: string, content: string, downloadName?: string): Promise<void> {
   if (!isTauri()) {
     const blob = new Blob([content], { type: 'text/markdown' });
     const url = URL.createObjectURL(blob);
@@ -180,7 +179,7 @@ function cleanMammothMarkdown(markdown: string): string {
     .replace(/\\\\/g, '\\');         // Fix double-escaped backslashes
 }
 
-export async function openAndReadFile(path: string | File): Promise<string> {
+async function openAndReadFile(path: string | File): Promise<string> {
   const fileName = typeof path === 'string' ? path : path.name;
   const ext = fileName.toLowerCase().split('.').pop();
 
@@ -276,7 +275,7 @@ function promptFileName(defaultName: string): string | null {
   return name?.trim() || null;
 }
 
-export async function writeFileBinary(path: string, data: ArrayBuffer): Promise<void> {
+async function writeFileBinary(path: string, data: ArrayBuffer): Promise<void> {
   if (!isTauri()) return;
   // Tauri expects Vec<u8>
   const bytes = Array.from(new Uint8Array(data));

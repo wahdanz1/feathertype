@@ -13,7 +13,7 @@ import { listExtension } from '../utils/listExtension';
 import { markdownSupport } from '../utils/markdownSyntax';
 import { formattingShortcuts } from '../utils/shortcuts';
 import { editorUpdates } from '../lib/editorUpdates';
-import type { Extension } from '@codemirror/state';
+import { Prec, type Extension } from '@codemirror/state';
 
 const v = (token: string) => `var(--color-${token})`;
 
@@ -198,14 +198,14 @@ const lightTheme = EditorView.theme({
   },
 });
 
+// Layered over the oneDark style that @uiw adds for theme="dark"; its heading coral falls short of 4.5:1.
 const darkSyntaxHighlight = HighlightStyle.define([
-  { tag: tags.processingInstruction, color: '#4EC9B0' },
-  { tag: tags.meta, color: '#4EC9B0' },
+  { tag: tags.heading, color: v('syntax-heading') },
 ]);
 
 const lightSyntaxHighlight = HighlightStyle.define([
-  { tag: tags.processingInstruction, color: '#0070C0' },
-  { tag: tags.meta, color: '#0070C0' },
+  { tag: tags.processingInstruction, color: v('syntax-marker-light') },
+  { tag: tags.meta, color: v('syntax-marker-light') },
 ]);
 
 const basicSetup = {
@@ -300,7 +300,7 @@ export function Editor() {
     const list: Extension[] = [
       markdownSupport,
       formattingShortcuts,
-      syntaxHighlighting(theme === 'dark' ? darkSyntaxHighlight : lightSyntaxHighlight),
+      theme === 'dark' ? Prec.high(syntaxHighlighting(darkSyntaxHighlight)) : syntaxHighlighting(lightSyntaxHighlight),
       search({ top: false }),
       keymap.of(searchKeymap),
       listExtension,

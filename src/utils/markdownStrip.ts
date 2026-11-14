@@ -21,7 +21,3 @@ export function stripMarkdown(text: string): string {
 export function countPlainTextCharacters(text: string): number {
   return stripMarkdown(text).length;
 }
-
-export function countSelectedCharacters(text: string): number {
-  return stripMarkdown(text).length;
-}

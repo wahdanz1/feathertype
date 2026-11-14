@@ -2,7 +2,7 @@ import { EditorSelection, type ChangeSpec, type EditorState } from '@codemirror/
 import type { EditorView } from '@codemirror/view';
 import { treeUpTo, type SyntaxNode } from './markdownSyntax';
 
-export interface FormatAction {
+interface FormatAction {
   prefix?: string;      // e.g., "**" for bold
   suffix?: string;      // e.g., "**" for bold
   linePrefix?: string;  // e.g., "# " for heading
@@ -16,7 +16,7 @@ const SPANS = {
   '`': { node: 'InlineCode', mark: 'CodeMark' },
 } as const;
 
-export type InlineMarker = keyof typeof SPANS;
+type InlineMarker = keyof typeof SPANS;
 type Span = (typeof SPANS)[InlineMarker];
 type TextRange = { from: number; to: number };
 
@@ -212,7 +212,7 @@ function toggleLinePrefix(view: EditorView, linePrefix: string): void {
   view.dispatch({ changes: changeSet, selection: state.selection.map(changeSet, 1) });
 }
 
-export function applyMarkdownFormat(
+function applyMarkdownFormat(
   view: EditorView | null,
   action: FormatAction
 ): void {
@@ -237,7 +237,7 @@ export function hasFormat(view: EditorView | null, marker: InlineMarker): boolea
   return segments.length > 0 && segments.every((range) => enclosingSpan(state, range, span));
 }
 
-export function hasLineFormat(view: EditorView | null, linePrefix: string): boolean {
+function hasLineFormat(view: EditorView | null, linePrefix: string): boolean {
   if (!view) return false;
 
   const { from } = view.state.selection.main;

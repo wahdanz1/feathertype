@@ -43,10 +43,11 @@ All tokens are defined in `src/globals.css` under `@theme`. Use them via Tailwin
 | Token | Value | Usage |
 |---|---|---|
 | `theme-primary` | `#0e639c` | Primary brand blue — buttons, accents, active states |
-| `theme-accent` | (25% lighter) | Accent color — links, highlights |
+| `theme-accent` | (30% lighter) | Accent color — links, highlights, hero accent words (4.5:1 on dark surfaces) |
 | `theme-primary-hover` | `#1177bb` | Hover state for primary buttons |
 | `theme-primary-border` | `#248ad2` | Border for primary buttons |
 | `theme-primary-outline` | dark `#248ad2`, light `#0e639c` | Active-state borders and focus rings (3:1 on either theme's surfaces) |
+| `on-primary` | `#ffffff` | Text on `theme-primary` fills |
 
 ### Semantic Text (Marketing / Dark-only pages)
 | Token | Value | Replaces |
@@ -54,6 +55,19 @@ All tokens are defined in `src/globals.css` under `@theme`. Use them via Tailwin
 | `theme-text` | `#f3f4f6` | `text-gray-100`, `text-white` (body) |
 | `theme-text-secondary` | `#d1d5db` | `text-gray-300` |
 | `theme-text-muted` | `#9ca3af` | `text-gray-400`, `text-gray-500` |
+| `theme-text-strong` | `#ffffff` | `text-white` (headings, hover text) |
+| `theme-text-body` | `#e5e7eb` | `text-gray-200` (page default, preview code) |
+
+### Washes and Status
+| Token | Value | Usage |
+|---|---|---|
+| `tint` | `#ffffff` | Light wash, always with opacity: `bg-tint/5`, `border-tint/10` (replaces `white/N`) |
+| `shade` | `#000000` | Dark wash, always with opacity: `bg-shade/60`, `shadow-shade/20` (replaces `black/N`) |
+| `success`, `success-text` | green 500 / 400 | Success badges |
+| `info`, `info-text`, `info-subtle` | blue 500 / 400 / 200 | Info and outline badges |
+| `warning`, `warning-text` | amber 500 / 400 | Warning badges, dialog warning icon |
+| `danger`, `danger-text`, `danger-surface` | red 500 / 400 / 900 | Destructive hover (dark), tab close hover |
+| `danger-text-light`, `danger-surface-light`, `danger-border-light` | red 700 / 100 / 200 | Destructive hover (light) |
 
 ### Editor — Dark Mode
 | Token | Value | Usage |
@@ -71,6 +85,10 @@ All tokens are defined in `src/globals.css` under `@theme`. Use them via Tailwin
 | `border` | `#3e3e42` | All dark mode borders |
 | `button-inactive-dark` | `#2d2d2d` | Secondary button bg |
 | `button-hover-dark` | `#3e3e42` | Secondary button hover |
+| `scrollbar-thumb`, `scrollbar-thumb-hover` | `#424242`, `#4e4e4e` | Scrollbar thumb |
+| `preview-link`, `preview-link-hover` | `#60a5fa`, `#93c5fd` | Preview links |
+| `preview-quote` | `#a8a8a8` | Preview blockquote text |
+| `syntax-heading` | `#e57d85` | Editor heading text (layered over oneDark) |
 
 ### Editor — Light Mode
 | Token | Value | Usage |
@@ -80,7 +98,7 @@ All tokens are defined in `src/globals.css` under `@theme`. Use them via Tailwin
 | `editor-surface-raised-light` | `#e8e8e8` | Elevated surfaces, active line gutter |
 | `editor-text-light` | `#1e1e1e` | Editor body text |
 | `editor-gutter-light` | `#f5f5f5` | Gutter background |
-| `editor-gutter-text-light` | `#6e7681` | Line numbers, labels |
+| `editor-gutter-text-light` | `#626873` | Line numbers, labels (4.5:1 on the gutter and active-line gutter) |
 | `editor-selection-light` | `#add6ff` | Text selection |
 | `editor-search-match-light` | `#e8c97a` | Search match highlight |
 | `border-light` | `#d0d0d0` | All light mode borders |
@@ -89,6 +107,10 @@ All tokens are defined in `src/globals.css` under `@theme`. Use them via Tailwin
 | `text-muted-light` | `#626873` | Muted text in light mode (4.5:1 on all light surfaces) |
 | `button-inactive-light` | `#f0f0f0` | Secondary button bg |
 | `button-hover-light` | `#e5e7eb` | Secondary button hover |
+| `scrollbar-thumb-light`, `scrollbar-thumb-hover-light` | `#c0c0c0`, `#a0a0a0` | Scrollbar thumb |
+| `preview-link-light`, `preview-link-hover-light` | `#0066cc`, `#0052a3` | Preview links |
+| `preview-quote-light` | `#5a5a5a` | Preview blockquote text |
+| `syntax-marker-light` | `#0070c0` | Editor Markdown markers |
 
 ### CodeMirror Themes (`Editor.tsx`)
 CodeMirror themes use JavaScript style objects. Reference tokens via the `v()` helper:
@@ -96,7 +118,7 @@ CodeMirror themes use JavaScript style objects. Reference tokens via the `v()` h
 const v = (token: string) => `var(--color-${token})`;
 // Usage: backgroundColor: v('editor-surface')
 ```
-Cursor colors (`#ffffff`/`#000000`) and syntax highlight colors (`#4EC9B0`/`#0070C0`) are intentionally hardcoded.
+Cursor colors (`#ffffff`/`#000000`) are intentionally hardcoded. Dark syntax colours come from the oneDark style that `@uiw/react-codemirror` adds for `theme="dark"`; FeatherType layers only `syntax-heading` over it (with `Prec.high`). Light syntax uses `syntax-marker-light`.
 
 ---
 
@@ -134,7 +156,7 @@ Cursor colors (`#ffffff`/`#000000`) and syntax highlight colors (`#4EC9B0`/`#007
 
 ### Utility
 - **`Spacer`** — `<Spacer width={N} height={N} />` instead of empty divs
-- **`Badge`** — Small labels. Variants: `default`, `success`, `info`, `outline`
+- **`Badge`** — Small labels. Variants: `default`, `success`, `info`, `warning`, `outline`
 - **`IconBox`** — Icon container. Sizes: `sm`/`md`/`lg`. Variants: `primary`/`secondary`/`ghost`
 
 ### Dropdown (`Dropdown.tsx`)

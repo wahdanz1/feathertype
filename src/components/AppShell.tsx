@@ -10,7 +10,7 @@ import { useUnsavedChangesGuard } from '../hooks/useUnsavedChangesGuard';
 import { useEditorStore } from '../store/useEditorStore';
 import { syncDocumentTheme } from '../lib/documentTheme';
 import { EditorThemeContext } from '../lib/editorThemeContext';
-import { isTauri } from '../utils/fileOperations';
+import { isTauri } from '../lib/platform';
 
 export function AppShell() {
   const theme = useEditorStore((s) => s.theme);

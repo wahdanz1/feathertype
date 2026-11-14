@@ -10,7 +10,7 @@ const CURSOR = '‸';
 const OPEN = '«';
 const CLOSE = '»';
 
-export function parseSpec(spec: string): { doc: string; anchor: number; head: number } {
+function parseSpec(spec: string): { doc: string; anchor: number; head: number } {
   const cursor = spec.indexOf(CURSOR);
   if (cursor >= 0) return { doc: spec.replace(CURSOR, ''), anchor: cursor, head: cursor };
   const open = spec.indexOf(OPEN);

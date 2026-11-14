@@ -26,15 +26,15 @@ export function GlassCard({
   ...props 
 }: GlassCardProps) {
   const variantStyles = {
-    default: "bg-editor-bg shadow-2xl shadow-black/20",
-    muted: "bg-white/[0.02] backdrop-blur-3xl",
+    default: "bg-editor-bg shadow-2xl shadow-shade/20",
+    muted: "bg-tint/[0.02] backdrop-blur-3xl",
     gradient: "bg-gradient-to-br from-theme-primary/10 to-transparent backdrop-blur-md shadow-2xl shadow-theme-primary/5",
     none: "bg-transparent",
   };
 
   const interactiveStyles = interactive ? cn(
-    "hover:bg-white/[0.04] cursor-pointer",
-    active && "bg-black/10 hover:bg-black/25"
+    "hover:bg-tint/[0.04] cursor-pointer",
+    active && "bg-shade/10 hover:bg-shade/25"
   ) : "";
 
   const roundedStyles = {
@@ -49,8 +49,8 @@ export function GlassCard({
   };
 
   const borderStyles = {
-    default: variant === 'muted' ? "border-white/10" : "border-border/40",
-    subtle: "border-white/5",
+    default: variant === 'muted' ? "border-tint/10" : "border-border/40",
+    subtle: "border-tint/5",
     none: "border-transparent",
   };
 

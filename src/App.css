@@ -8,8 +8,8 @@
 body {
   margin: 0;
   padding: 0;
-  background-color: #1e1e1e;
-  color: #e5e7eb;
+  background-color: var(--color-editor-bg);
+  color: var(--color-theme-text-body);
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
 }
 
@@ -41,50 +41,6 @@ html.is-editor #root {
   overflow: visible;
 }
 
-/* Markdown syntax highlighting - style all formatting markers with cyan color */
-.cm-formatting,
-.cm-formatting-em,
-.cm-formatting-strong,
-.cm-formatting-strikethrough,
-.cm-formatting-link,
-.cm-formatting-code,
-.cm-em,
-.cm-strong,
-.cm-strikethrough,
-.cm-link,
-.cm-monospace {
-  color: #4EC9B0 !important;
-  /* Cyan color for all markdown syntax markers */
-}
-
-/* Dropdown menu styling */
-select option {
-  border-radius: 4px;
-  padding: 0.5rem;
-}
-
-/* Dark theme dropdown options */
-html:not(.light-theme) select option {
-  background-color: #2d2d2d;
-  color: #d4d4d4;
-}
-
-html:not(.light-theme) select option:hover,
-html:not(.light-theme) select option:checked {
-  background-color: #3e3e42;
-}
-
-/* Light theme dropdown options */
-html.light-theme select option {
-  background-color: #ffffff;
-  color: #1e1e1e;
-}
-
-html.light-theme select option:hover,
-html.light-theme select option:checked {
-  background-color: #f0f0f0;
-}
-
 /* Scrollbar styling - Dark theme */
 ::-webkit-scrollbar {
   width: 14px;
@@ -92,34 +48,34 @@ html.light-theme select option:checked {
 }
 
 ::-webkit-scrollbar-track {
-  background: #1e1e1e;
+  background: var(--color-editor-bg);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #424242;
-  border: 3px solid #1e1e1e;
+  background: var(--color-scrollbar-thumb);
+  border: 3px solid var(--color-editor-bg);
   border-radius: 7px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #4e4e4e;
+  background: var(--color-scrollbar-thumb-hover);
 }
 
 ::-webkit-scrollbar-corner {
-  background: #1e1e1e;
+  background: var(--color-editor-bg);
 }
 
 /* Firefox scrollbar - Dark theme */
 * {
   scrollbar-width: thin;
-  scrollbar-color: #424242 #1e1e1e;
+  scrollbar-color: var(--color-scrollbar-thumb) var(--color-editor-bg);
 }
 
 .markdown-preview {
   max-width: none;
   padding: 1.5rem;
-  color: #d4d4d4;
-  background-color: #1e1e1e;
+  color: var(--color-editor-text);
+  background-color: var(--color-editor-bg);
   font-size: 16px;
   line-height: 1.6;
 }
@@ -129,8 +85,8 @@ html.light-theme select option:checked {
   font-weight: 700;
   margin-bottom: 1rem;
   margin-top: 1.5rem;
-  color: #ffffff;
-  border-bottom: 1px solid #3e3e42;
+  color: var(--color-theme-text-strong);
+  border-bottom: 1px solid var(--color-border);
   padding-bottom: 0.5rem;
 }
 
@@ -139,7 +95,7 @@ html.light-theme select option:checked {
   font-weight: 600;
   margin-bottom: 0.75rem;
   margin-top: 1.25rem;
-  color: #ffffff;
+  color: var(--color-theme-text-strong);
 }
 
 .markdown-preview h3 {
@@ -147,7 +103,7 @@ html.light-theme select option:checked {
   font-weight: 600;
   margin-bottom: 0.5rem;
   margin-top: 1rem;
-  color: #ffffff;
+  color: var(--color-theme-text-strong);
 }
 
 .markdown-preview h4 {
@@ -155,7 +111,7 @@ html.light-theme select option:checked {
   font-weight: 600;
   margin-bottom: 0.5rem;
   margin-top: 0.875rem;
-  color: #ffffff;
+  color: var(--color-theme-text-strong);
 }
 
 .markdown-preview h5 {
@@ -163,12 +119,12 @@ html.light-theme select option:checked {
   font-weight: 600;
   margin-bottom: 0.5rem;
   margin-top: 0.75rem;
-  color: #ffffff;
+  color: var(--color-theme-text-strong);
 }
 
 .markdown-preview code {
-  background-color: #2d2d2d;
-  color: #e5e7eb;
+  background-color: var(--color-tab-active);
+  color: var(--color-theme-text-body);
   padding: 0.2rem 0.4rem;
   border-radius: 0.25rem;
   font-size: 0.875rem;
@@ -176,13 +132,13 @@ html.light-theme select option:checked {
 }
 
 .markdown-preview pre {
-  background-color: #2d2d2d;
-  color: #e5e7eb;
+  background-color: var(--color-tab-active);
+  color: var(--color-theme-text-body);
   padding: 1rem;
   border-radius: 0.375rem;
   overflow-x: auto;
   margin: 1rem 0;
-  border: 1px solid #3e3e42;
+  border: 1px solid var(--color-border);
 }
 
 .markdown-preview pre code {
@@ -210,23 +166,23 @@ html.light-theme select option:checked {
 
 .markdown-preview p {
   margin-bottom: 1rem;
-  color: #d4d4d4;
+  color: var(--color-editor-text);
 }
 
 .markdown-preview a {
-  color: #60a5fa;
+  color: var(--color-preview-link);
   text-decoration: underline;
 }
 
 .markdown-preview a:hover {
-  color: #93c5fd;
+  color: var(--color-preview-link-hover);
 }
 
 .markdown-preview blockquote {
-  border-left: 4px solid #3e3e42;
+  border-left: 4px solid var(--color-border);
   padding-left: 1rem;
   margin: 1rem 0;
-  color: #a8a8a8;
+  color: var(--color-preview-quote);
   font-style: italic;
 }
 
@@ -238,30 +194,30 @@ html.light-theme select option:checked {
 
 .markdown-preview th,
 .markdown-preview td {
-  border: 1px solid #3e3e42;
+  border: 1px solid var(--color-border);
   padding: 0.5rem;
 }
 
 .markdown-preview th {
-  background-color: #2d2d2d;
+  background-color: var(--color-tab-active);
   font-weight: 600;
 }
 
 .markdown-preview hr {
   border: none;
-  border-top: 1px solid #3e3e42;
+  border-top: 1px solid var(--color-border);
   margin: 1.5rem 0;
 }
 
 /* Light theme */
 html.light-theme body {
-  background-color: #ffffff;
-  color: #1e1e1e;
+  background-color: var(--color-editor-bg-light);
+  color: var(--color-text-light);
 }
 
 html.light-theme .markdown-preview {
-  background-color: #ffffff;
-  color: #1e1e1e;
+  background-color: var(--color-editor-bg-light);
+  color: var(--color-text-light);
 }
 
 html.light-theme .markdown-preview h1,
@@ -269,72 +225,72 @@ html.light-theme .markdown-preview h2,
 html.light-theme .markdown-preview h3,
 html.light-theme .markdown-preview h4,
 html.light-theme .markdown-preview h5 {
-  color: #1e1e1e;
+  color: var(--color-text-light);
 }
 
 html.light-theme .markdown-preview h1 {
-  border-bottom-color: #d0d0d0;
+  border-bottom-color: var(--color-border-light);
 }
 
 html.light-theme .markdown-preview code {
-  background-color: #f0f0f0;
-  color: #1e1e1e;
+  background-color: var(--color-button-inactive-light);
+  color: var(--color-text-light);
 }
 
 html.light-theme .markdown-preview pre {
-  background-color: #f5f5f5;
-  color: #1e1e1e;
-  border-color: #d0d0d0;
+  background-color: var(--color-editor-surface-light);
+  color: var(--color-text-light);
+  border-color: var(--color-border-light);
 }
 
 html.light-theme .markdown-preview a {
-  color: #0066cc;
+  color: var(--color-preview-link-light);
 }
 
 html.light-theme .markdown-preview a:hover {
-  color: #0052a3;
+  color: var(--color-preview-link-hover-light);
 }
 
 html.light-theme .markdown-preview blockquote {
-  border-left-color: #d0d0d0;
-  color: #5a5a5a;
+  border-left-color: var(--color-border-light);
+  color: var(--color-preview-quote-light);
 }
 
 html.light-theme .markdown-preview table th,
 html.light-theme .markdown-preview table td {
-  border-color: #d0d0d0;
+  border-color: var(--color-border-light);
 }
 
 html.light-theme .markdown-preview table th {
-  background-color: #f0f0f0;
+  background-color: var(--color-button-inactive-light);
 }
 
 html.light-theme .markdown-preview hr {
-  border-top-color: #d0d0d0;
+  border-top-color: var(--color-border-light);
 }
 
 html.light-theme .markdown-preview p {
-  color: #1e1e1e;
+  color: var(--color-text-light);
 }
 
 /* Scrollbar styling - Light theme */
 html.light-theme ::-webkit-scrollbar-track {
-  background: #ffffff;
+  background: var(--color-editor-bg-light);
 }
 
 html.light-theme ::-webkit-scrollbar-thumb {
-  background: #c0c0c0;
-  border: 3px solid #ffffff;
+  background: var(--color-scrollbar-thumb-light);
+  border: 3px solid var(--color-editor-bg-light);
 }
 
 html.light-theme ::-webkit-scrollbar-thumb:hover {
-  background: #a0a0a0;
+  background: var(--color-scrollbar-thumb-hover-light);
 }
 
 html.light-theme ::-webkit-scrollbar-corner {
-  background: #ffffff;
+  background: var(--color-editor-bg-light);
 }
 
 html.light-theme * {
-  scrollbar-color: #c0c0c0 #ffffff;
+  scrollbar-color: var(--color-scrollbar-thumb-light) var(--color-editor-bg-light);
 }

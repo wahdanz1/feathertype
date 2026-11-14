@@ -58,7 +58,7 @@ function HeroSection({ status, latest }: ReleasesProps) {
       <Flex gap={12} items="start" className="flex-col md:flex-row">
         <Stack gap={6} className="flex-1">
           <h1>
-            Get <span className="text-theme-primary">FeatherType.</span>
+            Get <span className="text-theme-accent">FeatherType.</span>
           </h1>
           <p className="lead max-w-xl">
             Experience the lightest way to write. Available for desktop power or quick browser access.

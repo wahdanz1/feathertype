@@ -50,7 +50,7 @@ export function Button({
   };
 
   const variantStyles = {
-    primary: 'bg-theme-primary text-white border border-theme-primary-border transition-colors hover:bg-theme-primary-hover shadow-sm',
+    primary: 'bg-theme-primary text-on-primary border border-theme-primary-border transition-colors hover:bg-theme-primary-hover shadow-sm',
     secondary: cn(
       'border transition-colors',
       isDark
@@ -60,15 +60,15 @@ export function Button({
     ),
     ghost: cn(
       isDark
-        ? 'bg-transparent hover:bg-white/5 text-theme-text-muted hover:text-white'
-        : 'bg-transparent hover:bg-black/5 text-text-muted-light hover:text-text-light',
+        ? 'bg-transparent hover:bg-tint/5 text-theme-text-muted hover:text-theme-text-strong'
+        : 'bg-transparent hover:bg-shade/5 text-text-muted-light hover:text-text-light',
       isActive && 'text-theme-primary'
     ),
     destructive: cn(
       'border transition-colors',
       isDark
-        ? 'bg-button-inactive-dark border-border text-theme-text-secondary hover:bg-red-900/30 hover:border-red-900/50 hover:text-red-400'
-        : 'bg-button-inactive-light border-border-light text-text-secondary-light hover:bg-red-100 hover:border-red-200 hover:text-red-700'
+        ? 'bg-button-inactive-dark border-border text-theme-text-secondary hover:bg-danger-surface/30 hover:border-danger-surface/50 hover:text-danger-text'
+        : 'bg-button-inactive-light border-border-light text-text-secondary-light hover:bg-danger-surface-light hover:border-danger-border-light hover:text-danger-text-light'
     )
   };
 

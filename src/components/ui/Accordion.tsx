@@ -55,7 +55,7 @@ export function AccordionTrigger({ children, className }: { children: React.Reac
   return (
     <button
       onClick={onToggle}
-      className={cn("w-full text-left p-6 md:p-8 transition-colors hover:bg-white/[0.01] cursor-pointer", className)}
+      className={cn("w-full text-left p-6 md:p-8 transition-colors hover:bg-tint/[0.01] cursor-pointer", className)}
     >
       {children}
     </button>
@@ -73,7 +73,7 @@ export function AccordionContent({ children, className }: { children: React.Reac
       )}
     >
       <div className="overflow-hidden">
-        <div className={cn("px-8 pb-10 border-t border-white/5", className)}>
+        <div className={cn("px-8 pb-10 border-t border-tint/5", className)}>
           {children}
         </div>
       </div>

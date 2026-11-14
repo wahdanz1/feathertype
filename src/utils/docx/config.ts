@@ -50,18 +50,3 @@ export const DEFAULT_CONFIG: DocxConfig = {
     },
   },
 };
-
-/**
- * Common font options for user selection
- */
-export const FONT_OPTIONS = [
-  'Calibri',
-  'Arial',
-  'Times New Roman',
-  'Georgia',
-  'Verdana',
-  'Cambria',
-  'Garamond',
-] as const;
-
-export type FontOption = typeof FONT_OPTIONS[number];

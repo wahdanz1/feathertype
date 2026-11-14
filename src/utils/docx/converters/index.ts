@@ -14,7 +14,7 @@ import { convertBlockquote } from './blockquote';
 /**
  * Convert a markdown AST node to docx content
  */
-export function convertNode(
+function convertNode(
   node: Content,
   ctx: ConverterContext
 ): DocxContent[] {

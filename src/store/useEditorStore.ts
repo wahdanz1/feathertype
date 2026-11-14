@@ -10,10 +10,10 @@ import {
   handleSaveFile,
   hashContent,
   isDocxPath,
-  isTauri,
   readFile,
   toMarkdownPath,
 } from '../utils/fileOperations';
+import { isTauri } from '../lib/platform';
 import { createSafeStorage } from './persistStorage';
 
 interface EditorState {

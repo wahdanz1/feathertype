@@ -20,7 +20,7 @@ export function ActionLink({
   ...props 
 }: ActionLinkProps) {
   const variantClasses = {
-    primary: "text-theme-accent hover:text-white font-semibold",
+    primary: "text-theme-accent hover:text-theme-text-strong font-semibold",
     meta: "text-xs uppercase tracking-widest text-theme-text-muted hover:text-theme-accent font-medium",
   };
 

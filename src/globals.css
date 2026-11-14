@@ -1,10 +1,11 @@
 /* Global color tokens for FeatherType */
 /* These can be easily changed in one place to update the entire theme */
 
-@theme {
+/* static: Editor.tsx reads tokens through var() in JS, which Tailwind's usage scan can't see. */
+@theme static {
   /* === Primary Theme Color === */
   --color-theme-primary: #0e639c;
-  --color-theme-accent: color-mix(in srgb, var(--color-theme-primary), white 25%);
+  --color-theme-accent: color-mix(in srgb, var(--color-theme-primary), white 30%);
   --color-theme-primary-hover: #1177bb;
   --color-theme-primary-border: #248ad2;
   /* Active borders and focus rings: keeps 3:1 against the surface of the current theme */
@@ -24,6 +25,28 @@
   --color-theme-text: #f3f4f6;           /* gray-100 — primary text */
   --color-theme-text-secondary: #d1d5db; /* gray-300 — secondary/lead text */
   --color-theme-text-muted: #9ca3af;     /* gray-400 — muted/subtle text */
+  --color-theme-text-strong: #ffffff;    /* headings and hover text on dark surfaces */
+  --color-theme-text-body: #e5e7eb;      /* gray-200 — page default, preview code */
+  --color-on-primary: #ffffff;           /* text on theme-primary fills */
+
+  /* === Neutral washes: always with an opacity modifier (bg-tint/5, bg-shade/60) === */
+  --color-tint: #ffffff;
+  --color-shade: #000000;
+
+  /* === Status === */
+  --color-success: var(--color-green-500);
+  --color-success-text: var(--color-green-400);
+  --color-info: var(--color-blue-500);
+  --color-info-text: var(--color-blue-400);
+  --color-info-subtle: var(--color-blue-200);
+  --color-warning: var(--color-amber-500);
+  --color-warning-text: var(--color-amber-400);
+  --color-danger: var(--color-red-500);
+  --color-danger-text: var(--color-red-400);
+  --color-danger-surface: var(--color-red-900);
+  --color-danger-text-light: var(--color-red-700);
+  --color-danger-surface-light: var(--color-red-100);
+  --color-danger-border-light: var(--color-red-200);
 
   /* === Editor Colors - Dark === */
   --color-editor-bg: #1e1e1e;
@@ -38,13 +61,19 @@
   --color-tab-active: #2d2d2d;
   --color-tab-inactive: #252526;
   --color-border: #3e3e42;
+  --color-scrollbar-thumb: #424242;
+  --color-scrollbar-thumb-hover: #4e4e4e;
+  --color-preview-link: #60a5fa;
+  --color-preview-link-hover: #93c5fd;
+  --color-preview-quote: #a8a8a8;
+  --color-syntax-heading: #e57d85; /* oneDark coral lifted to 4.5:1 on oneDark's background and active line */
 
   /* === Editor Colors - Light === */
   --color-editor-bg-light: #ffffff;
   --color-editor-surface-light: #f5f5f5;
   --color-editor-surface-raised-light: #e8e8e8;
   --color-editor-gutter-light: #f5f5f5;
-  --color-editor-gutter-text-light: #6e7681;
+  --color-editor-gutter-text-light: #626873;
   --color-editor-text-light: #1e1e1e;
   --color-editor-selection-light: #add6ff;
   --color-editor-search-match-light: #e8c97a;
@@ -52,6 +81,12 @@
   --color-text-light: #1e1e1e;
   --color-text-secondary-light: #374151;
   --color-text-muted-light: #626873;
+  --color-scrollbar-thumb-light: #c0c0c0;
+  --color-scrollbar-thumb-hover-light: #a0a0a0;
+  --color-preview-link-light: #0066cc;
+  --color-preview-link-hover-light: #0052a3;
+  --color-preview-quote-light: #5a5a5a;
+  --color-syntax-marker-light: #0070c0;
 }
 
 html.light-theme {
@@ -66,16 +101,16 @@ html.light-theme {
     scrollbar-gutter: auto;
   }
   h1 {
-    @apply text-4xl font-extrabold tracking-tight text-white sm:text-5xl md:text-6xl;
+    @apply text-4xl font-extrabold tracking-tight text-theme-text-strong sm:text-5xl md:text-6xl;
   }
   .section-hero h1 {
     @apply sm:text-6xl md:text-8xl;
   }
   h2 {
-    @apply text-3xl font-bold tracking-tight text-white sm:text-5xl;
+    @apply text-3xl font-bold tracking-tight text-theme-text-strong sm:text-5xl;
   }
   h3 {
-    @apply text-xl font-bold text-white;
+    @apply text-xl font-bold text-theme-text-strong;
   }
   p {
     @apply leading-relaxed text-theme-text-muted;
@@ -147,10 +182,10 @@ html.light-theme {
     @apply m-auto p-0 w-[calc(100%-2rem)] overflow-hidden rounded-xl text-inherit;
   }
   .dialog::backdrop {
-    @apply bg-black/60 backdrop-blur-sm;
+    @apply bg-shade/60 backdrop-blur-sm;
   }
   .dialog-title {
-    @apply text-lg font-bold text-white;
+    @apply text-lg font-bold text-theme-text-strong;
   }
   .light-theme .dialog-title {
     @apply text-text-light;
@@ -175,19 +210,19 @@ html.light-theme {
     @apply px-2.5 h-full min-w-[100px] max-w-[200px] flex items-center gap-2 cursor-pointer relative transition-all duration-150;
   }
   .tab-active {
-    @apply bg-editor-bg text-white border-x border-t border-border z-10 -mb-[1px] rounded-t-lg shadow-sm font-medium;
+    @apply bg-editor-bg text-theme-text-strong border-x border-t border-border z-10 -mb-[1px] rounded-t-lg shadow-sm font-medium;
   }
   .light-theme .tab-active {
     @apply bg-editor-bg-light text-text-light border-border-light;
   }
   .tab-inactive {
-    @apply bg-transparent text-theme-text-muted hover:bg-white/5 hover:rounded-t-lg border-x border-t border-transparent font-medium;
+    @apply bg-transparent text-theme-text-muted hover:bg-tint/5 hover:rounded-t-lg border-x border-t border-transparent font-medium;
   }
   .light-theme .tab-inactive {
-    @apply text-text-muted-light hover:bg-black/5;
+    @apply text-text-muted-light hover:bg-shade/5;
   }
   .tab-close {
-    @apply flex items-center justify-center w-5 h-5 text-theme-text-muted hover:text-red-500 transition-colors rounded hover:bg-white/10 opacity-0 group-hover:opacity-100;
+    @apply flex items-center justify-center w-5 h-5 text-theme-text-muted hover:text-danger transition-colors rounded hover:bg-tint/10 opacity-0 group-hover:opacity-100;
   }
   .tab-label {
     @apply flex items-center gap-1.5 overflow-hidden flex-1 min-w-0 h-full outline-none;
@@ -201,7 +236,7 @@ html.light-theme {
 
   /* === Mockup Component === */
   .mockup-frame {
-    @apply mt-8 w-full max-w-6xl shadow-2xl shadow-black/50;
+    @apply mt-8 w-full max-w-6xl shadow-2xl shadow-shade/50;
   }
   .mockup-titlebar {
     @apply h-10 border-b border-border/20 bg-editor-bg/50 px-4;
@@ -210,10 +245,10 @@ html.light-theme {
     @apply flex-1 p-8 md:p-12;
   }
   .mockup-code {
-    @apply border-r border-white/5 opacity-90 font-mono text-sm md:text-base;
+    @apply border-r border-tint/5 opacity-90 font-mono text-sm md:text-base;
   }
   .mockup-preview {
-    @apply bg-white/5 backdrop-blur-sm;
+    @apply bg-tint/5 backdrop-blur-sm;
   }
 
   .table-cell {

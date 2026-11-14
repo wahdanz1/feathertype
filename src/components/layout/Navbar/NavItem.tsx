@@ -16,8 +16,8 @@ export function NavItem({ to, children, className, onClick }: NavItemProps) {
   return (
     <Link to={to} onClick={onClick} className={cn("relative group py-1 block", className)}>
       <span className={cn(
-        "text-sm font-medium transition-colors group-hover:text-white",
-        isActive ? "text-white" : "text-theme-text-muted"
+        "text-sm font-medium transition-colors group-hover:text-theme-text-strong",
+        isActive ? "text-theme-text-strong" : "text-theme-text-muted"
       )}>
         {children}
       </span>

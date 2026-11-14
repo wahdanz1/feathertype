@@ -6,7 +6,7 @@ const save = vi.hoisted(() => vi.fn());
 const open = vi.hoisted(() => vi.fn());
 vi.mock('@tauri-apps/api/core', () => ({ invoke }));
 vi.mock('@tauri-apps/plugin-dialog', () => ({ save, open }));
-vi.mock('../utils/docxExport', () => ({ markdownToDocxBuffer: async () => new ArrayBuffer(4) }));
+vi.mock('../utils/docx', () => ({ markdownToDocxBuffer: async () => new ArrayBuffer(4) }));
 vi.mock('mammoth', () => ({ default: { convertToMarkdown: async () => ({ value: '# Report' }) } }));
 
 import { flushPersistedState, STORAGE_FULL_NOTICE, useEditorStore } from './useEditorStore';

@@ -1,5 +1,5 @@
 import { openUrl } from '@tauri-apps/plugin-opener';
-import { isTauri } from '../utils/fileOperations';
+import { isTauri } from './platform';
 
 const OPENABLE_PROTOCOLS = new Set(['http:', 'https:', 'mailto:']);
 

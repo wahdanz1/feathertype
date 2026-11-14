@@ -7,15 +7,7 @@ interface BaseProps extends React.HTMLAttributes<HTMLDivElement> {
 
 export function Page({ children, className, ...props }: BaseProps) {
   return (
-    <div className={cn("flex-1 flex flex-col bg-editor-bg text-theme-text selection:bg-theme-primary selection:text-white", className)} {...props}>
-      {children}
-    </div>
-  );
-}
-
-export function Container({ children, className, ...props }: BaseProps) {
-  return (
-    <div className={cn("container mx-auto px-4", className)} {...props}>
+    <div className={cn("flex-1 flex flex-col bg-editor-bg text-theme-text selection:bg-theme-primary selection:text-on-primary", className)} {...props}>
       {children}
     </div>
   );
@@ -109,7 +101,7 @@ export function Stack({ children, gap = 4, align = 'start', divider = false, cla
       "flex flex-col", 
       gapMap[gap as keyof typeof gapMap], 
       alignMap[align], 
-      divider && "divide-y divide-white/5",
+      divider && "divide-y divide-tint/5",
       className
     )} {...props}>
       {children}
@@ -141,10 +133,10 @@ export function Grid({ children, cols = 1, gap = 8, divide = 'none', className, 
 
   const divideMap = {
     none: '',
-    x: 'divide-x divide-white/10',
-    y: 'divide-y divide-white/10',
-    'md:x': 'divide-y md:divide-y-0 md:divide-x divide-white/10',
-    both: 'divide-y divide-x divide-white/10',
+    x: 'divide-x divide-tint/10',
+    y: 'divide-y divide-tint/10',
+    'md:x': 'divide-y md:divide-y-0 md:divide-x divide-tint/10',
+    both: 'divide-y divide-x divide-tint/10',
   };
 
   return (

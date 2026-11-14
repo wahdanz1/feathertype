@@ -10,8 +10,6 @@
       "identifier": "opener:allow-open-url",
       "allow": [{ "url": "https://*" }, { "url": "http://*" }, { "url": "mailto:*" }]
     },
-    "fs:allow-read-text-file",
-    "fs:allow-write-text-file",
     "dialog:allow-open",
     "dialog:allow-save",
     "dialog:allow-ask"

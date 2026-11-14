@@ -3,7 +3,7 @@ import ReactMarkdown, { type Components, type ExtraProps } from 'react-markdown'
 import remarkGfm from 'remark-gfm';
 import { useEditorStore } from '../store/useEditorStore';
 import { isOpenableUrl, openExternal } from '../lib/externalLinks';
-import { isTauri } from '../utils/fileOperations';
+import { isTauri } from '../lib/platform';
 
 // A full Markdown render of a large document costs more than a keystroke budget,
 // so the preview waits for a typing pause instead of rendering every key.

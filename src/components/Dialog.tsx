@@ -109,7 +109,7 @@ function ModalDialog({
       <Flex justify="between" className="px-6 py-4 border-b panel-header">
         <Flex gap={3}>
           {icon && (
-            <IconBox icon={icon} size="sm" variant="ghost" className="text-yellow-500" />
+            <IconBox icon={icon} size="sm" variant="ghost" className="text-warning" />
           )}
           <h2 id={titleId} className="dialog-title">{title}</h2>
         </Flex>

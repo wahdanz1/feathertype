@@ -24,7 +24,7 @@ export function BrandLogo({ size = 'md', className, hideText = false }: BrandLog
         className={cn("transition-transform group-hover:scale-110", current.img)}
       />
       {!hideText && (
-        <span className={cn("font-bold tracking-tight text-white/70 transition-colors group-hover:text-white", current.text)}>
+        <span className={cn("font-bold tracking-tight text-theme-text-strong/70 transition-colors group-hover:text-theme-text-strong", current.text)}>
           FeatherType
         </span>
       )}

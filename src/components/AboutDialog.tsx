@@ -4,7 +4,7 @@ import { Dialog } from './Dialog';
 import { Button } from './Button';
 import { Stack } from './ui/Layout';
 import { Caption, Subtle } from './ui/Typography';
-import { isTauri } from '../utils/fileOperations';
+import { isTauri } from '../lib/platform';
 import { openExternal } from '../lib/externalLinks';
 import { APP_NAME, APP_VERSION, LINKS } from '../config';
 

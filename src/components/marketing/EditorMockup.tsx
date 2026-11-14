@@ -7,9 +7,9 @@ import { Spacer } from '../ui/Spacer';
 function TrafficLights() {
   return (
     <Flex gap={2}>
-      <div className="h-3 w-3 rounded-full bg-red-400/30" />
-      <div className="h-3 w-3 rounded-full bg-yellow-400/30" />
-      <div className="h-3 w-3 rounded-full bg-green-400/30" />
+      <div className="h-3 w-3 rounded-full bg-danger-text/30" />
+      <div className="h-3 w-3 rounded-full bg-warning-text/30" />
+      <div className="h-3 w-3 rounded-full bg-success-text/30" />
     </Flex>
   );
 }
@@ -51,7 +51,7 @@ export function EditorMockup() {
         </Stack>
 
         <Stack gap={6} className="hidden md:flex mockup-pane mockup-preview prose prose-invert prose-sm md:prose-base">
-          <h1 className="text-2xl font-bold border-b border-white/10 pb-2">FeatherType Editor</h1>
+          <h1 className="text-2xl font-bold border-b border-tint/10 pb-2">FeatherType Editor</h1>
           <Stack gap={4}>
             <p>Focus on writing, the noise is gone.</p>
             <p>Your ideas deserve a lightweight home.</p>

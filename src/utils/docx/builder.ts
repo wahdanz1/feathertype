@@ -16,7 +16,7 @@ import { convertNodes } from './converters';
 /**
  * Convert markdown string to a docx Document
  */
-export async function markdownToDocx(
+async function markdownToDocx(
   markdown: string,
   config: Partial<DocxConfig> = {}
 ): Promise<Document> {

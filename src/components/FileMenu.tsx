@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect, useId } from 'react';
 import { LuMenu } from 'react-icons/lu';
 import { useEditorStore } from '../store/useEditorStore';
-import { exportAsDocx, isTauri } from '../utils/fileOperations';
+import { exportAsDocx } from '../utils/fileOperations';
+import { isTauri } from '../lib/platform';
 import { appCommands, shortcutHint } from '../utils/shortcuts';
 import { useMenu } from '../hooks/usePopup';
 import { Button } from './Button';

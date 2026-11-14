@@ -16,8 +16,8 @@ export function IconBox({
 }: IconBoxProps) {
   const variantStyles = {
     primary: 'bg-theme-primary/10 text-theme-primary',
-    solid: 'bg-theme-primary text-white shadow-lg',
-    secondary: 'bg-white/5 border border-white/10 text-theme-text-muted',
+    solid: 'bg-theme-primary text-on-primary shadow-lg',
+    secondary: 'bg-tint/5 border border-tint/10 text-theme-text-muted',
     ghost: 'bg-transparent text-theme-text-muted',
   };
 

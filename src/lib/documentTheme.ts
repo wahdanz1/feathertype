@@ -5,7 +5,7 @@ export type Theme = 'dark' | 'light';
 export const THEME_STORAGE_KEY = 'feathertype-storage';
 
 export function detectTauri(mode: string, win: { __TAURI_INTERNALS__?: unknown } | undefined): boolean {
-  return mode === 'tauri' || (mode === 'development' && win?.__TAURI_INTERNALS__ !== undefined);
+  return mode === 'tauri' || (mode !== 'production' && win?.__TAURI_INTERNALS__ !== undefined);
 }
 
 export function isEditorRoute(pathname: string, isTauri: boolean): boolean {

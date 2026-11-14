@@ -38,7 +38,7 @@ export function TabBar() {
 
       <button
         onClick={handleAddTab}
-        className="flex items-center justify-center w-8 h-full transition-colors hover:bg-tab-active hover:text-white"
+        className="flex items-center justify-center w-8 h-full transition-colors hover:bg-tab-active hover:text-theme-text-strong"
         title="New Tab (Ctrl+N)"
         aria-label="New tab"
       >

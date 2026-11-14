@@ -21,7 +21,7 @@ export default function Home() {
       <Section variant="hero" size="md">
         <Stack align="center" gap={8}>
           <h1>
-            Focus on <span className="text-theme-primary">writing</span>, <br />
+            Focus on <span className="text-theme-accent">writing</span>, <br />
             leave the noise behind.
           </h1>
 

@@ -3,7 +3,7 @@ import { getCurrentWindow } from '@tauri-apps/api/window';
 import { ask } from '@tauri-apps/plugin-dialog';
 import { flushPersistedState, useEditorStore } from '../store/useEditorStore';
 
-export const hasDirtyTabs = () => useEditorStore.getState().tabs.some((tab) => tab.isDirty);
+const hasDirtyTabs = () => useEditorStore.getState().tabs.some((tab) => tab.isDirty);
 
 async function confirmDesktopClose(): Promise<boolean> {
   try {

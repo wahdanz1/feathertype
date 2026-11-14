@@ -1,7 +1,8 @@
 import { Prec, type Extension } from '@codemirror/state';
 import { EditorView } from '@codemirror/view';
 import { useEditorStore } from '../store/useEditorStore';
-import { openFile, handleSaveFile, handleSaveAsFile, isTauri } from './fileOperations';
+import { openFile, handleSaveFile, handleSaveAsFile } from './fileOperations';
+import { isTauri } from '../lib/platform';
 import { formats } from './markdownFormatting';
 
 const IS_MAC = typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigator.userAgent);
@@ -52,9 +53,9 @@ const formatCommands = {
 };
 
 type FormatCommand = keyof typeof formatCommands;
-export type ShortcutId = AppCommand | FormatCommand;
+type ShortcutId = AppCommand | FormatCommand;
 
-export const SHORTCUTS: Record<ShortcutId, string> = {
+const SHORTCUTS: Record<ShortcutId, string> = {
   new: 'Mod-n',
   open: 'Mod-o',
   save: 'Mod-s',

@@ -54,7 +54,7 @@
   --color-editor-surface: #252526;
   --color-editor-surface-raised: #2a2d2e;
   --color-editor-gutter: #252526;
-  --color-editor-gutter-text: #858585;
+  --color-editor-gutter-text: #8f99aa; /* oneDark stone lifted to 4.5:1 on its gutter and active-line gutter */
   --color-editor-text: #d4d4d4;
   --color-editor-selection: #264f78;
   --color-editor-search-match: #515c6a;
@@ -66,7 +66,8 @@
   --color-preview-link: #60a5fa;
   --color-preview-link-hover: #93c5fd;
   --color-preview-quote: #a8a8a8;
-  --color-syntax-heading: #e57d85; /* oneDark coral lifted to 4.5:1 on oneDark's background and active line */
+  --color-syntax-coral: #e57d85; /* oneDark coral lifted to 4.5:1 on oneDark's background and active line */
+  --color-syntax-stone: #8f99aa; /* oneDark stone (links, comments) lifted the same way */
 
   /* === Editor Colors - Light === */
   --color-editor-bg-light: #ffffff;

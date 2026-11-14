@@ -77,7 +77,7 @@ All tokens are defined in `src/globals.css` under `@theme`. Use them via Tailwin
 | `editor-surface` | `#252526` | Panels, toolbars, tab bar |
 | `editor-surface-raised` | `#2a2d2e` | Dialog headers/footers, elevated surfaces |
 | `editor-text` | `#d4d4d4` | Editor body text |
-| `editor-gutter-text` | `#858585` | Line numbers, labels |
+| `editor-gutter-text` | `#8f99aa` | Line numbers, labels (4.5:1 on the oneDark gutter and active-line gutter) |
 | `editor-selection` | `#264f78` | Text selection |
 | `editor-search-match` | `#515c6a` | Search match highlight |
 | `tab-active` | `#2d2d2d` | Active tab, active line gutter |
@@ -88,7 +88,8 @@ All tokens are defined in `src/globals.css` under `@theme`. Use them via Tailwin
 | `scrollbar-thumb`, `scrollbar-thumb-hover` | `#424242`, `#4e4e4e` | Scrollbar thumb |
 | `preview-link`, `preview-link-hover` | `#60a5fa`, `#93c5fd` | Preview links |
 | `preview-quote` | `#a8a8a8` | Preview blockquote text |
-| `syntax-heading` | `#e57d85` | Editor heading text (layered over oneDark) |
+| `syntax-coral` | `#e57d85` | Editor headings and entities (layered over oneDark) |
+| `syntax-stone` | `#8f99aa` | Editor links, URLs and comments (layered over oneDark) |
 
 ### Editor — Light Mode
 | Token | Value | Usage |
@@ -118,7 +119,7 @@ CodeMirror themes use JavaScript style objects. Reference tokens via the `v()` h
 const v = (token: string) => `var(--color-${token})`;
 // Usage: backgroundColor: v('editor-surface')
 ```
-Cursor colors (`#ffffff`/`#000000`) are intentionally hardcoded. Dark syntax colours come from the oneDark style that `@uiw/react-codemirror` adds for `theme="dark"`; FeatherType layers only `syntax-heading` over it (with `Prec.high`). Light syntax uses `syntax-marker-light`.
+Cursor colors (`#ffffff`/`#000000`) are intentionally hardcoded. Dark syntax colours come from the oneDark style that `@uiw/react-codemirror` adds for `theme="dark"`; FeatherType layers `syntax-coral`, `syntax-stone` and the gutter text colour over it (with `Prec.high`, since oneDark otherwise wins ties). Light syntax uses `syntax-marker-light`.
 
 ---
 

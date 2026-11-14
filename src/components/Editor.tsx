@@ -36,7 +36,6 @@ const darkTheme = EditorView.theme({
   },
   '.cm-gutters': {
     backgroundColor: v('editor-surface'),
-    color: v('editor-gutter-text'),
     border: 'none',
   },
   '.cm-activeLineGutter': {
@@ -198,10 +197,16 @@ const lightTheme = EditorView.theme({
   },
 });
 
-// Layered over the oneDark style that @uiw adds for theme="dark"; its heading coral falls short of 4.5:1.
+// Layered over the oneDark style that @uiw adds for theme="dark"; its coral and stone fall short of 4.5:1.
 const darkSyntaxHighlight = HighlightStyle.define([
-  { tag: tags.heading, color: v('syntax-heading') },
+  { tag: [tags.heading, tags.character], color: v('syntax-coral') },
+  { tag: [tags.link, tags.meta, tags.comment], color: v('syntax-stone') },
 ]);
+
+const darkContrast = [
+  Prec.high(syntaxHighlighting(darkSyntaxHighlight)),
+  Prec.high(EditorView.theme({ '.cm-gutters': { color: v('editor-gutter-text') } })),
+];
 
 const lightSyntaxHighlight = HighlightStyle.define([
   { tag: tags.processingInstruction, color: v('syntax-marker-light') },
@@ -300,7 +305,7 @@ export function Editor() {
     const list: Extension[] = [
       markdownSupport,
       formattingShortcuts,
-      theme === 'dark' ? Prec.high(syntaxHighlighting(darkSyntaxHighlight)) : syntaxHighlighting(lightSyntaxHighlight),
+      theme === 'dark' ? darkContrast : syntaxHighlighting(lightSyntaxHighlight),
       search({ top: false }),
       keymap.of(searchKeymap),
       listExtension,

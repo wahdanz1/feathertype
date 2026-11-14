@@ -1,4 +1,4 @@
-import { useEffect, Suspense, lazy } from 'react';
+import { useLayoutEffect, Suspense, lazy } from 'react';
 import {
   createBrowserRouter,
   RouterProvider,
@@ -13,6 +13,7 @@ import { ScrollToTop } from './components/layout/ScrollToTop';
 import { Navbar } from './components/layout/Navbar';
 import { Footer } from './components/layout/Footer';
 import { cn } from './lib/utils';
+import { detectTauri, isEditorRoute, syncDocumentTheme } from './lib/documentTheme';
 import './App.css';
 
 const Home = lazy(() => import('./pages/Home.tsx'));
@@ -20,7 +21,7 @@ const Download = lazy(() => import('./pages/Download.tsx'));
 const Contact = lazy(() => import('./pages/Contact.tsx'));
 const Privacy = lazy(() => import('./pages/Privacy.tsx'));
 
-const isTauri = import.meta.env.MODE === 'tauri' || (import.meta.env.MODE === 'development' && typeof window !== 'undefined' && window.__TAURI_INTERNALS__ !== undefined);
+const isTauri = detectTauri(import.meta.env.MODE, window);
 
 console.log(`[FeatherType] Environment: ${isTauri ? 'Tauri' : 'Web'} (Mode: ${import.meta.env.MODE})`);
 
@@ -28,24 +29,10 @@ function RootLayout() {
   const theme = useEditorStore((s) => s.theme);
   const location = useLocation();
 
-  const isEditor = location.pathname === '/editor' || isTauri;
+  const isEditor = isEditorRoute(location.pathname, isTauri);
 
-  useEffect(() => {
-    const bodyClasses = [];
-    if (theme === 'light') bodyClasses.push('light-theme');
-    if (isEditor) bodyClasses.push('is-editor-body');
-    document.body.className = bodyClasses.join(' ');
-
-    document.documentElement.classList.toggle('is-editor', isEditor);
-
-    const rootElement = document.getElementById('root');
-    if (rootElement) {
-      if (isEditor) {
-        rootElement.classList.add('is-editor-root');
-      } else {
-        rootElement.classList.remove('is-editor-root');
-      }
-    }
+  useLayoutEffect(() => {
+    syncDocumentTheme(document, theme, isEditor);
   }, [theme, isEditor]);
 
   return (
@@ -92,17 +79,8 @@ function App() {
 function TauriApp() {
   const theme = useEditorStore((s) => s.theme);
 
-  useEffect(() => {
-    const bodyClasses = ['is-editor-body'];
-    if (theme === 'light') bodyClasses.push('light-theme');
-    document.body.className = bodyClasses.join(' ');
-
-    document.documentElement.classList.add('is-editor');
-
-    const rootElement = document.getElementById('root');
-    if (rootElement) {
-      rootElement.classList.add('is-editor-root');
-    }
+  useLayoutEffect(() => {
+    syncDocumentTheme(document, theme, true);
   }, [theme]);
 
   return (

@@ -13,7 +13,7 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
 }
 
-body.is-editor-body {
+html.is-editor body {
   overflow: hidden;
 }
 
@@ -22,7 +22,7 @@ body.is-editor-body {
   width: 100%;
 }
 
-#root.is-editor-root {
+html.is-editor #root {
   height: 100vh;
 }
 
@@ -64,24 +64,24 @@ select option {
 }
 
 /* Dark theme dropdown options */
-body:not(.light-theme) select option {
+html:not(.light-theme) select option {
   background-color: #2d2d2d;
   color: #d4d4d4;
 }
 
-body:not(.light-theme) select option:hover,
-body:not(.light-theme) select option:checked {
+html:not(.light-theme) select option:hover,
+html:not(.light-theme) select option:checked {
   background-color: #3e3e42;
 }
 
 /* Light theme dropdown options */
-body.light-theme select option {
+html.light-theme select option {
   background-color: #ffffff;
   color: #1e1e1e;
 }
 
-body.light-theme select option:hover,
-body.light-theme select option:checked {
+html.light-theme select option:hover,
+html.light-theme select option:checked {
   background-color: #f0f0f0;
 }
 
@@ -254,87 +254,87 @@ body.light-theme select option:checked {
 }
 
 /* Light theme */
-body.light-theme {
+html.light-theme body {
   background-color: #ffffff;
   color: #1e1e1e;
 }
 
-body.light-theme .markdown-preview {
+html.light-theme .markdown-preview {
   background-color: #ffffff;
   color: #1e1e1e;
 }
 
-body.light-theme .markdown-preview h1,
-body.light-theme .markdown-preview h2,
-body.light-theme .markdown-preview h3,
-body.light-theme .markdown-preview h4,
-body.light-theme .markdown-preview h5 {
+html.light-theme .markdown-preview h1,
+html.light-theme .markdown-preview h2,
+html.light-theme .markdown-preview h3,
+html.light-theme .markdown-preview h4,
+html.light-theme .markdown-preview h5 {
   color: #1e1e1e;
 }
 
-body.light-theme .markdown-preview h1 {
+html.light-theme .markdown-preview h1 {
   border-bottom-color: #d0d0d0;
 }
 
-body.light-theme .markdown-preview code {
+html.light-theme .markdown-preview code {
   background-color: #f0f0f0;
   color: #1e1e1e;
 }
 
-body.light-theme .markdown-preview pre {
+html.light-theme .markdown-preview pre {
   background-color: #f5f5f5;
   color: #1e1e1e;
   border-color: #d0d0d0;
 }
 
-body.light-theme .markdown-preview a {
+html.light-theme .markdown-preview a {
   color: #0066cc;
 }
 
-body.light-theme .markdown-preview a:hover {
+html.light-theme .markdown-preview a:hover {
   color: #0052a3;
 }
 
-body.light-theme .markdown-preview blockquote {
+html.light-theme .markdown-preview blockquote {
   border-left-color: #d0d0d0;
   color: #5a5a5a;
 }
 
-body.light-theme .markdown-preview table th,
-body.light-theme .markdown-preview table td {
+html.light-theme .markdown-preview table th,
+html.light-theme .markdown-preview table td {
   border-color: #d0d0d0;
 }
 
-body.light-theme .markdown-preview table th {
+html.light-theme .markdown-preview table th {
   background-color: #f0f0f0;
 }
 
-body.light-theme .markdown-preview hr {
+html.light-theme .markdown-preview hr {
   border-top-color: #d0d0d0;
 }
 
-body.light-theme .markdown-preview p {
+html.light-theme .markdown-preview p {
   color: #1e1e1e;
 }
 
 /* Scrollbar styling - Light theme */
-body.light-theme ::-webkit-scrollbar-track {
+html.light-theme ::-webkit-scrollbar-track {
   background: #ffffff;
 }
 
-body.light-theme ::-webkit-scrollbar-thumb {
+html.light-theme ::-webkit-scrollbar-thumb {
   background: #c0c0c0;
   border: 3px solid #ffffff;
 }
 
-body.light-theme ::-webkit-scrollbar-thumb:hover {
+html.light-theme ::-webkit-scrollbar-thumb:hover {
   background: #a0a0a0;
 }
 
-body.light-theme ::-webkit-scrollbar-corner {
+html.light-theme ::-webkit-scrollbar-corner {
   background: #ffffff;
 }
 
-body.light-theme * {
+html.light-theme * {
   scrollbar-color: #c0c0c0 #ffffff;
 }

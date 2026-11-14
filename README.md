@@ -8,11 +8,11 @@ A feather-light Markdown editor that runs as a native desktop app (Tauri) and an
 
 - Live split-pane Markdown preview
 - Multi-tab editing with unsaved changes tracking
-- DOCX import (Word to Markdown conversion)
+- DOCX import and export (open Word files as Markdown, export Markdown as Word)
 - Dark and light themes
 - Rich formatting toolbar and keyboard shortcuts
-- Zoom control (Ctrl+scroll, Ctrl+/-)
-- Word count and cursor position in status bar
+- Zoom control (Ctrl+scroll, Ctrl+/-, Ctrl+0 to reset)
+- Character count and cursor position in status bar
 - Offline-first — your documents never leave your device
 
 ## Tech Stack
@@ -25,15 +25,16 @@ A feather-light Markdown editor that runs as a native desktop app (Tauri) and an
 
 ### Prerequisites
 
-- [Node.js](https://nodejs.org/) 18+
+- [Node.js](https://nodejs.org/) 20.19+ or 22.12+ (Vite 7; CI uses 22)
 - [pnpm](https://pnpm.io/)
-- [Rust](https://rustup.rs/)
+- [Rust](https://rustup.rs/) (desktop app only)
 
 ### Run locally
 
 ```bash
 pnpm install
-pnpm tauri dev
+pnpm dev        # website and web editor at http://localhost:1420
+pnpm tauri dev  # desktop app
 ```
 
 ### Build

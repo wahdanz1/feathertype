@@ -6,7 +6,39 @@ import { Button } from './Button';
 import { Dropdown } from './Dropdown';
 import { TableGridSelector } from './TableGridSelector';
 import { useEditorStore } from '../store/useEditorStore';
+import { subscribeEditorUpdates } from '../lib/editorUpdates';
 import { formats, hasFormat, hasBlockquote, hasBulletList, hasNumberedList, hasHeading, getHeadingLevel } from '../utils/markdownFormatting';
+
+interface ActiveFormats {
+  view: EditorView | null;
+  bold: boolean;
+  italic: boolean;
+  strikethrough: boolean;
+  code: boolean;
+  blockquote: boolean;
+  bulletList: boolean;
+  numberedList: boolean;
+  heading: boolean;
+  headingLevel: number;
+}
+
+function readFormats(view: EditorView | null): ActiveFormats {
+  return {
+    view,
+    bold: hasFormat(view, '**', '**'),
+    italic: hasFormat(view, '_', '_'),
+    strikethrough: hasFormat(view, '~~', '~~'),
+    code: hasFormat(view, '`', '`'),
+    blockquote: hasBlockquote(view),
+    bulletList: hasBulletList(view),
+    numberedList: hasNumberedList(view),
+    heading: hasHeading(view),
+    headingLevel: getHeadingLevel(view),
+  };
+}
+
+const sameFormats = (a: ActiveFormats, b: ActiveFormats) =>
+  (Object.keys(a) as (keyof ActiveFormats)[]).every((key) => a[key] === b[key]);
 
 export function Toolbar() {
   const toggleTheme = useEditorStore((s) => s.toggleTheme);
@@ -15,60 +47,21 @@ export function Toolbar() {
   const lineWrap = useEditorStore((s) => s.lineWrap);
   const toggleLineWrap = useEditorStore((s) => s.toggleLineWrap);
 
-  const activeTabId = useEditorStore((s) => s.activeTabId);
-
-  const [activeFormats, setActiveFormats] = useState({
-    bold: false,
-    italic: false,
-    strikethrough: false,
-    code: false,
-    blockquote: false,
-    bulletList: false,
-    numberedList: false,
-    heading: false,
-    headingLevel: 0
-  });
-
-  const refreshActiveFormats = () => {
-    setTimeout(() => {
-      if (!editorView) return;
-      setActiveFormats({
-        bold: hasFormat(editorView, '**', '**'),
-        italic: hasFormat(editorView, '_', '_'),
-        strikethrough: hasFormat(editorView, '~~', '~~'),
-        code: hasFormat(editorView, '`', '`'),
-        blockquote: hasBlockquote(editorView),
-        bulletList: hasBulletList(editorView),
-        numberedList: hasNumberedList(editorView),
-        heading: hasHeading(editorView),
-        headingLevel: getHeadingLevel(editorView),
-      });
-    }, 0);
-  };
+  const [activeFormats, setActiveFormats] = useState(() => readFormats(editorView));
+  if (activeFormats.view !== editorView) setActiveFormats(readFormats(editorView));
 
   useEffect(() => {
     if (!editorView) return;
-    refreshActiveFormats();
-    editorView.dom.addEventListener('mouseup', refreshActiveFormats);
-    editorView.dom.addEventListener('keyup', refreshActiveFormats);
-    editorView.dom.addEventListener('click', refreshActiveFormats);
-    editorView.dom.addEventListener('focus', refreshActiveFormats);
-    return () => {
-      editorView.dom.removeEventListener('mouseup', refreshActiveFormats);
-      editorView.dom.removeEventListener('keyup', refreshActiveFormats);
-      editorView.dom.removeEventListener('click', refreshActiveFormats);
-      editorView.dom.removeEventListener('focus', refreshActiveFormats);
-    };
+    return subscribeEditorUpdates((update) => {
+      if (update.view !== editorView) return;
+      const next = readFormats(editorView);
+      setActiveFormats((current) => (sameFormats(current, next) ? current : next));
+    });
   }, [editorView]);
-
-  useEffect(() => {
-    refreshActiveFormats();
-  }, [activeTabId]);
 
   const applyFormat = (formatFn: (view: EditorView) => void) => {
     if (!editorView) return;
     formatFn(editorView);
-    refreshActiveFormats();
   };
 
   const dividerColor = theme === 'dark' ? 'bg-border' : 'bg-border-light';
@@ -133,7 +126,7 @@ export function Toolbar() {
         <LuTextQuote  />
       </Button>
 
-      <TableGridSelector onInsert={(rows, cols) => { if (editorView) formats.table(editorView, rows, cols); refreshActiveFormats(); }} />
+      <TableGridSelector onInsert={(rows, cols) => { if (editorView) formats.table(editorView, rows, cols); }} />
 
       <div className={`w-px h-6 ${dividerColor} mx-1`} />
 

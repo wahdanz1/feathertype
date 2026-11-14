@@ -11,6 +11,7 @@ import { tags } from '@lezer/highlight';
 import { useEditorStore } from '../store/useEditorStore';
 import { tableExtension } from '../utils/tableExtension';
 import { listExtension } from '../utils/listExtension';
+import { editorUpdates } from '../lib/editorUpdates';
 import type { Extension } from '@codemirror/state';
 
 const v = (token: string) => `var(--color-${token})`;
@@ -302,6 +303,7 @@ export function Editor() {
       keymap.of(searchKeymap),
       listExtension,
       tableExtension,
+      editorUpdates,
       theme === 'dark' ? darkTheme : lightTheme,
       indentUnit.of('    '), // 4 spaces for Tab key
       foldGutter({

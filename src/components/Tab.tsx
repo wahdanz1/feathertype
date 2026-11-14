@@ -1,18 +1,20 @@
 import { useState, useRef, useEffect } from 'react';
-import { Tab as TabType } from '../types';
 import { useEditorStore } from '../store/useEditorStore';
 
 interface TabProps {
-  tab: TabType;
+  tabId: string;
   isActive: boolean;
-  onSelect: () => void;
-  onClose: () => void;
 }
 
-export function Tab({ tab, isActive, onSelect, onClose }: TabProps) {
+// Reads its own fields rather than taking the tab object, which is replaced on every keystroke.
+export function Tab({ tabId, isActive }: TabProps) {
+  const title = useEditorStore((s) => s.tabs.find((t) => t.id === tabId)?.title ?? '');
+  const isDirty = useEditorStore((s) => s.tabs.find((t) => t.id === tabId)?.isDirty ?? false);
   const renameTab = useEditorStore((s) => s.renameTab);
+  const setActiveTab = useEditorStore((s) => s.setActiveTab);
+  const closeTab = useEditorStore((s) => s.closeTab);
   const [isEditing, setIsEditing] = useState(false);
-  const [editValue, setEditValue] = useState(tab.title);
+  const [editValue, setEditValue] = useState(title);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -24,14 +26,14 @@ export function Tab({ tab, isActive, onSelect, onClose }: TabProps) {
 
   const handleDoubleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setEditValue(tab.title);
+    setEditValue(title);
     setIsEditing(true);
   };
 
   const commitRename = () => {
     const trimmed = editValue.trim();
-    if (trimmed && trimmed !== tab.title) {
-      renameTab(tab.id, trimmed);
+    if (trimmed && trimmed !== title) {
+      renameTab(tabId, trimmed);
     }
     setIsEditing(false);
   };
@@ -42,9 +44,9 @@ export function Tab({ tab, isActive, onSelect, onClose }: TabProps) {
   };
 
   return (
-    <div onClick={onSelect} className={`tab group ${isActive ? 'tab-active' : 'tab-inactive'}`}>
+    <div onClick={() => setActiveTab(tabId)} className={`tab group ${isActive ? 'tab-active' : 'tab-inactive'}`}>
       <div className="flex items-center gap-1.5 overflow-hidden flex-1 min-w-0">
-        {tab.isDirty && <span className="dirty-dot shrink-0" title="Unsaved changes" />}
+        {isDirty && <span className="dirty-dot shrink-0" title="Unsaved changes" />}
         {isEditing ? (
           <input
             ref={inputRef}
@@ -57,13 +59,13 @@ export function Tab({ tab, isActive, onSelect, onClose }: TabProps) {
           />
         ) : (
           <span className="text-sm truncate select-none" onDoubleClick={handleDoubleClick}>
-            {tab.title}
+            {title}
           </span>
         )}
       </div>
 
       <button
-        onClick={(e) => { e.stopPropagation(); onClose(); }}
+        onClick={(e) => { e.stopPropagation(); closeTab(tabId); }}
         className={`tab-close shrink-0 ${isActive ? 'opacity-100' : ''}`}
         title="Close"
       >

@@ -7,6 +7,7 @@ import { EditorState } from '@codemirror/state';
 import { EditorView } from '@codemirror/view';
 import { Toolbar } from './Toolbar';
 import { editorUpdates } from '../lib/editorUpdates';
+import { markdownSupport } from '../utils/markdownSyntax';
 import { useEditorStore } from '../store/useEditorStore';
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
@@ -19,7 +20,7 @@ const isActive = (title: string) =>
   container.querySelector(`button[title^="${title}"]`)!.className.includes('border-theme-primary');
 
 function mount(doc: string) {
-  view = new EditorView({ state: EditorState.create({ doc, extensions: [editorUpdates] }) });
+  view = new EditorView({ state: EditorState.create({ doc, extensions: [markdownSupport, editorUpdates] }) });
   useEditorStore.setState({ editorView: view });
   container = document.createElement('div');
   document.body.appendChild(container);

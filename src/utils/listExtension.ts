@@ -1,6 +1,7 @@
 import { keymap } from '@codemirror/view';
 import { Prec } from '@codemirror/state';
 import type { EditorView } from '@codemirror/view';
+import { treeUpTo } from './markdownSyntax';
 
 function handleEnterInList(view: EditorView): boolean {
   const { state } = view;
@@ -18,13 +19,15 @@ function handleEnterInList(view: EditorView): boolean {
 
   const indent = bulletMatch ? bulletMatch[1] : (numberedMatch ? numberedMatch[1] : '');
 
-  // Delete the empty list item line — prevents the "dash moving" bug
-  const nextLineStart = line.to < state.doc.length ? line.to + 1 : line.to;
+  // A lone `-` can also be a setext underline or code; only real list markers count.
+  const markerPos = line.from + indent.length;
+  if (treeUpTo(state, line.to).resolveInner(markerPos, 1).name !== 'ListMark') return false;
 
+  // Clear the empty item in place — prevents the "dash moving" bug
   view.dispatch({
     changes: {
       from: line.from,
-      to: nextLineStart,
+      to: line.to,
       insert: indent
     },
     selection: {

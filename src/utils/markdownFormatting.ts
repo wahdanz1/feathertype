@@ -1,4 +1,6 @@
+import { EditorSelection, type ChangeSpec, type EditorState } from '@codemirror/state';
 import type { EditorView } from '@codemirror/view';
+import { treeUpTo, type SyntaxNode } from './markdownSyntax';
 
 export interface FormatAction {
   prefix?: string;      // e.g., "**" for bold
@@ -7,38 +9,207 @@ export interface FormatAction {
   placeholder?: string; // text when nothing selected
 }
 
-function getWordAtCursor(view: EditorView, from: number, to: number): { start: number; end: number; text: string } | null {
-  if (from !== to) return null;
+const SPANS = {
+  '**': { node: 'StrongEmphasis', mark: 'EmphasisMark' },
+  '_': { node: 'Emphasis', mark: 'EmphasisMark' },
+  '~~': { node: 'Strikethrough', mark: 'StrikethroughMark' },
+  '`': { node: 'InlineCode', mark: 'CodeMark' },
+} as const;
 
-  const line = view.state.doc.lineAt(from);
-  const lineText = line.text;
-  const cursorPosInLine = from - line.from;
+export type InlineMarker = keyof typeof SPANS;
+type Span = (typeof SPANS)[InlineMarker];
+type TextRange = { from: number; to: number };
 
-  const charBefore = cursorPosInLine > 0 ? lineText[cursorPosInLine - 1] : ' ';
-  const charAfter = cursorPosInLine < lineText.length ? lineText[cursorPosInLine] : ' ';
+const WORD_CHAR = /[\p{L}\p{M}\p{N}_]/u;
+const BLOCK_PREFIX = /^\s*(?:(?:[-*+]|\d+[.)])\s+|>\s?|#{1,6}\s+)*/;
 
-  if (!/\w/.test(charBefore) && !/\w/.test(charAfter)) {
-    return null;
+const spanFor = (prefix: string): Span | undefined => SPANS[prefix as InlineMarker];
+const isWordChar = (char: string | undefined) => char !== undefined && WORD_CHAR.test(char);
+
+function enclosingSpan(state: EditorState, range: TextRange, span: Span): SyntaxNode | null {
+  const tree = treeUpTo(state, range.to);
+  for (const side of [1, -1] as const) {
+    for (let node: SyntaxNode | null = tree.resolveInner(range.from, side); node; node = node.parent) {
+      if (node.name === span.node && node.from <= range.from && node.to >= range.to) return node;
+    }
+  }
+  return null;
+}
+
+function spansInside(state: EditorState, range: TextRange, span: Span): SyntaxNode[] {
+  const found: SyntaxNode[] = [];
+  treeUpTo(state, range.to).iterate({
+    from: range.from,
+    to: range.to,
+    enter: (ref) => {
+      if (ref.name !== span.node) return;
+      if (ref.from < range.to && ref.to > range.from) found.push(ref.node);
+      return false;
+    },
+  });
+  return found;
+}
+
+function markChanges(node: SyntaxNode, span: Span): ChangeSpec[] {
+  const open = node.firstChild;
+  const close = node.lastChild;
+  if (!open || !close || open === close || open.name !== span.mark || close.name !== span.mark) return [];
+  return [{ from: open.from, to: open.to }, { from: close.from, to: close.to }];
+}
+
+function wordAt(state: EditorState, pos: number): TextRange | null {
+  const line = state.doc.lineAt(pos);
+  let start = pos - line.from;
+  let end = start;
+  while (start > 0 && isWordChar(line.text[start - 1])) start--;
+  while (end < line.length && isWordChar(line.text[end])) end++;
+  return start === end ? null : { from: line.from + start, to: line.from + end };
+}
+
+// One range per selected line, without block markers or surrounding whitespace.
+function selectedSegments(state: EditorState, from: number, to: number): TextRange[] {
+  const segments: TextRange[] = [];
+  const last = state.doc.lineAt(to).number;
+  for (let n = state.doc.lineAt(from).number; n <= last; n++) {
+    const line = state.doc.line(n);
+    const start = Math.max(from, line.from + BLOCK_PREFIX.exec(line.text)![0].length);
+    const end = Math.min(to, line.to);
+    const text = state.sliceDoc(start, end);
+    const trimmedFrom = start + text.length - text.trimStart().length;
+    const trimmedTo = end - (text.length - text.trimEnd().length);
+    if (trimmedFrom < trimmedTo) segments.push({ from: trimmedFrom, to: trimmedTo });
+  }
+  return segments;
+}
+
+function isTextWrapped(state: EditorState, range: TextRange, prefix: string, suffix: string): boolean {
+  const text = state.sliceDoc(range.from, range.to);
+  return text.length > prefix.length + suffix.length && text.startsWith(prefix) && text.endsWith(suffix);
+}
+
+function toggleInline(view: EditorView, prefix: string, suffix: string, placeholder: string): void {
+  const { state } = view;
+  const main = state.selection.main;
+  const span = spanFor(prefix);
+
+  let segments: TextRange[];
+  let word: TextRange | null = null;
+  if (main.empty) {
+    if (span && enclosingSpan(state, main, span)) segments = [main];
+    else {
+      word = wordAt(state, main.head);
+      segments = word ? [word] : [];
+    }
+  } else {
+    segments = selectedSegments(state, main.from, main.to);
   }
 
-  let wordStart = cursorPosInLine;
-  while (wordStart > 0 && /\w/.test(lineText[wordStart - 1])) {
-    wordStart--;
+  if (segments.length === 0) {
+    const insert = prefix + placeholder + suffix;
+    const at = main.empty ? main.head : main.to;
+    view.dispatch({
+      changes: { from: at, insert },
+      selection: EditorSelection.single(at + prefix.length, at + prefix.length + placeholder.length),
+    });
+    return;
   }
 
-  let wordEnd = cursorPosInLine;
-  while (wordEnd < lineText.length && /\w/.test(lineText[wordEnd])) {
-    wordEnd++;
+  const enclosing = segments.map((range) => (span ? enclosingSpan(state, range, span) : null));
+  const allWrapped = span
+    ? enclosing.every(Boolean)
+    : segments.every((range) => isTextWrapped(state, range, prefix, suffix));
+
+  if (allWrapped) {
+    const changes = span
+      ? [...new Map(enclosing.map((node) => [node!.from, node!])).values()].flatMap((node) => markChanges(node, span))
+      : segments.flatMap((range) => [
+          { from: range.from, to: range.from + prefix.length },
+          { from: range.to - suffix.length, to: range.to },
+        ]);
+    view.dispatch({ changes });
+    return;
   }
 
-  const docStart = line.from + wordStart;
-  const docEnd = line.from + wordEnd;
+  const changes: ChangeSpec[] = [];
+  const merged = new Set<number>();
+  segments.forEach((range, i) => {
+    if (enclosing[i]) return;
+    let { from, to } = range;
+    if (span) {
+      for (const node of spansInside(state, range, span)) {
+        if (merged.has(node.from)) continue;
+        merged.add(node.from);
+        changes.push(...markChanges(node, span));
+        from = Math.min(from, node.from);
+        to = Math.max(to, node.to);
+      }
+    }
+    // `_` inside a word is literal text, so emphasis there needs `*`.
+    const intraWord = prefix === '_' && (isWordChar(state.sliceDoc(from - 1, from)) || isWordChar(state.sliceDoc(to, to + 1)));
+    changes.push({ from, insert: intraWord ? '*' : prefix }, { from: to, insert: intraWord ? '*' : suffix });
+  });
 
-  return {
-    start: docStart,
-    end: docEnd,
-    text: lineText.substring(wordStart, wordEnd)
-  };
+  const changeSet = state.changes(changes);
+  let selection: EditorSelection;
+  if (word) {
+    selection = EditorSelection.single(changeSet.mapPos(main.head, main.head === word.to ? -1 : 1));
+  } else {
+    const start = changeSet.mapPos(segments[0].from, 1);
+    const end = changeSet.mapPos(segments[segments.length - 1].to, -1);
+    selection = main.anchor > main.head ? EditorSelection.single(end, start) : EditorSelection.single(start, end);
+  }
+  view.dispatch({ changes: changeSet, selection });
+}
+
+function wrapBlock(view: EditorView, prefix: string, suffix: string, placeholder: string): void {
+  const { from, to } = view.state.selection.main;
+  const text = view.state.sliceDoc(from, to) || placeholder;
+  view.dispatch({
+    changes: { from, to, insert: prefix + text + suffix },
+    selection: EditorSelection.single(from + prefix.length, from + prefix.length + text.length),
+  });
+}
+
+function escapeRegExp(text: string): string {
+  return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function toggleLinePrefix(view: EditorView, linePrefix: string): void {
+  const { state } = view;
+  const { from, to } = state.selection.main;
+  const firstLine = state.doc.lineAt(from).number;
+  let lastLine = state.doc.lineAt(to).number;
+  if (to > from && to === state.doc.line(lastLine).from && lastLine > firstLine) lastLine--;
+
+  const lines = [];
+  for (let n = firstLine; n <= lastLine; n++) lines.push(state.doc.line(n));
+  const targets = lines.length === 1 ? lines : lines.filter((line) => line.text.trim() !== '');
+
+  const numbered = /^\d+\.\s/.test(linePrefix);
+  const ownPrefix = numbered ? /^\d+\.\s/ : new RegExp(`^${escapeRegExp(linePrefix)}`);
+  const parsed = targets.map((line) => {
+    const indent = /^\s*/.exec(line.text)![0];
+    return { start: line.from + indent.length, indent: indent.length, rest: line.text.slice(indent.length) };
+  });
+  const allHavePrefix = parsed.every(({ rest }) => ownPrefix.test(rest));
+
+  const counters = new Map<number, number>();
+  const changes: ChangeSpec[] = [];
+  for (const { start, indent, rest } of parsed) {
+    if (allHavePrefix) {
+      changes.push({ from: start, to: start + ownPrefix.exec(rest)![0].length });
+      continue;
+    }
+    for (const level of counters.keys()) if (level > indent) counters.delete(level);
+    const number = (counters.get(indent) ?? 0) + 1;
+    counters.set(indent, number);
+    if (ownPrefix.test(rest)) continue;
+    const replaced = /^(?:#{1,6}\s|-\s|\d+\.\s)/.exec(rest)?.[0] ?? '';
+    changes.push({ from: start, to: start + replaced.length, insert: numbered ? `${number}. ` : linePrefix });
+  }
+
+  const changeSet = state.changes(changes);
+  view.dispatch({ changes: changeSet, selection: state.selection.map(changeSet, 1) });
 }
 
 export function applyMarkdownFormat(
@@ -47,219 +218,23 @@ export function applyMarkdownFormat(
 ): void {
   if (!view) return;
 
-  let { from, to } = view.state.selection.main;
-  let selectedText = view.state.sliceDoc(from, to);
-
   if (action.prefix && action.suffix) {
-    if (from === to && hasFormat(view, action.prefix, action.suffix)) {
-      const line = view.state.doc.lineAt(from);
-      const lineText = line.text;
-      const cursorPosInLine = from - line.from;
-
-      const prefixPositions: number[] = [];
-      for (let i = 0; i <= lineText.length - action.prefix.length; i++) {
-        if (lineText.substring(i, i + action.prefix.length) === action.prefix) {
-          prefixPositions.push(i);
-        }
-      }
-
-      for (const prefixStart of prefixPositions) {
-        for (let i = prefixStart + action.prefix.length; i <= lineText.length - action.suffix.length; i++) {
-          if (lineText.substring(i, i + action.suffix.length) === action.suffix) {
-            if (cursorPosInLine >= prefixStart && cursorPosInLine <= i + action.suffix.length) {
-              const beforePrefix = lineText.substring(0, prefixStart);
-              const content = lineText.substring(prefixStart + action.prefix.length, i);
-              const afterSuffix = lineText.substring(i + action.suffix.length);
-              const newLineText = beforePrefix + content + afterSuffix;
-
-              let newCursorPos = cursorPosInLine;
-              if (cursorPosInLine > prefixStart) {
-                newCursorPos = Math.min(cursorPosInLine - action.prefix.length, beforePrefix.length + content.length);
-              }
-
-              view.dispatch({
-                changes: { from: line.from, to: line.to, insert: newLineText },
-                selection: {
-                  anchor: line.from + newCursorPos,
-                  head: line.from + newCursorPos
-                }
-              });
-              view.focus();
-              return;
-            }
-            break; // Found matching suffix for this prefix
-          }
-        }
-      }
-    }
-
-    if (from === to) {
-      const wordInfo = getWordAtCursor(view, from, to);
-      if (wordInfo) {
-        from = wordInfo.start;
-        to = wordInfo.end;
-        selectedText = wordInfo.text;
-      }
-    }
-    const isWrapped = selectedText.startsWith(action.prefix) && selectedText.endsWith(action.suffix);
-
-    if (isWrapped) {
-      const unwrapped = selectedText.slice(action.prefix.length, -action.suffix.length);
-      view.dispatch({
-        changes: { from, to, insert: unwrapped },
-        selection: {
-          anchor: from,
-          head: from + unwrapped.length
-        }
-      });
-    } else {
-      const text = selectedText || action.placeholder || '';
-      const formatted = `${action.prefix}${text}${action.suffix}`;
-      view.dispatch({
-        changes: { from, to, insert: formatted },
-        selection: {
-          anchor: from,
-          head: from + formatted.length
-        }
-      });
-    }
-    view.focus();
+    const placeholder = action.placeholder ?? '';
+    if (action.prefix.includes('\n')) wrapBlock(view, action.prefix, action.suffix, placeholder);
+    else toggleInline(view, action.prefix, action.suffix, placeholder);
+  } else if (action.linePrefix) {
+    toggleLinePrefix(view, action.linePrefix);
   }
-
-  if (action.linePrefix) {
-    const startLine = view.state.doc.lineAt(from);
-    const endLine = view.state.doc.lineAt(to);
-
-    const changes = [];
-    let allLinesHavePrefix = true;
-    const isNumberedList = action.linePrefix.match(/^\d+\.\s/);
-
-    for (let pos = startLine.from; pos <= endLine.from;) {
-      const line = view.state.doc.lineAt(pos);
-
-      const match = line.text.match(/^(\s*)(.*)/);
-      const indent = match ? match[1] : '';
-      const textAfterWhitespace = match ? match[2] : line.text;
-
-      const hasPrefix = isNumberedList
-        ? (indent.length > 0 ? /^-\s/.test(textAfterWhitespace) : /^\d+\.\s/.test(textAfterWhitespace))
-        : textAfterWhitespace.startsWith(action.linePrefix);
-
-      if (!hasPrefix) {
-        allLinesHavePrefix = false;
-      }
-      pos = line.to + 1;
-    }
-
-    let lineNumber = 1;
-    for (let pos = startLine.from; pos <= endLine.from;) {
-      const line = view.state.doc.lineAt(pos);
-      const lineText = line.text;
-
-      const match = lineText.match(/^(\s*)(.*)/);
-      const indent = match ? match[1] : '';
-      const textAfterWhitespace = match ? match[2] : lineText;
-
-      if (allLinesHavePrefix) {
-        let withoutPrefix: string;
-        if (isNumberedList) {
-          withoutPrefix = indent.length > 0
-            ? textAfterWhitespace.replace(/^-\s/, '')
-            : textAfterWhitespace.replace(/^\d+\.\s/, '');
-        } else {
-          withoutPrefix = textAfterWhitespace.replace(new RegExp(`^${action.linePrefix.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`), '');
-        }
-
-        let normalizedIndent = indent;
-        if (indent.length > 0) {
-          const indentLevel = Math.max(1, Math.ceil(indent.length / 4));
-          normalizedIndent = ' '.repeat(indentLevel * 4);
-        }
-
-        changes.push({
-          from: line.from,
-          to: line.to,
-          insert: `${normalizedIndent}${withoutPrefix}`
-        });
-      } else {
-        const hasPrefix = isNumberedList
-          ? (indent.length > 0 ? /^-\s/.test(textAfterWhitespace) : /^\d+\.\s/.test(textAfterWhitespace))
-          : textAfterWhitespace.startsWith(action.linePrefix);
-
-        if (!hasPrefix) {
-          const cleanText = textAfterWhitespace.replace(/^#{1,6}\s|^-\s|^\d+\.\s/, '');
-
-          let normalizedIndent = indent;
-          if (indent.length > 0) {
-            const indentLevel = Math.max(1, Math.ceil(indent.length / 4));
-            normalizedIndent = ' '.repeat(indentLevel * 4);
-          }
-
-          let prefix: string;
-          if (isNumberedList && indent.length > 0) {
-            prefix = '- ';
-          } else if (isNumberedList) {
-            prefix = `${lineNumber}. `;
-            lineNumber++;
-          } else {
-            prefix = action.linePrefix;
-          }
-
-          changes.push({
-            from: line.from,
-            to: line.to,
-            insert: `${normalizedIndent}${prefix}${cleanText}`
-          });
-        } else if (isNumberedList && indent.length === 0) {
-          lineNumber++;
-        }
-      }
-
-      pos = line.to + 1;
-    }
-
-    if (changes.length > 0) {
-      view.dispatch({ changes });
-    }
-    view.focus();
-  }
+  view.focus();
 }
 
-export function hasFormat(view: EditorView | null, prefix: string, suffix: string): boolean {
+export function hasFormat(view: EditorView | null, marker: InlineMarker): boolean {
   if (!view) return false;
-
-  const { from, to } = view.state.selection.main;
-
-  if (from !== to) {
-    const selectedText = view.state.sliceDoc(from, to);
-    if (selectedText.startsWith(prefix) && selectedText.endsWith(suffix) && selectedText.length > prefix.length + suffix.length) {
-      return true;
-    }
-  }
-
-  const line = view.state.doc.lineAt(from);
-  const lineText = line.text;
-  const cursorPosInLine = from - line.from;
-
-  const prefixPositions: number[] = [];
-  for (let i = 0; i <= lineText.length - prefix.length; i++) {
-    if (lineText.substring(i, i + prefix.length) === prefix) {
-      prefixPositions.push(i);
-    }
-  }
-
-  for (const prefixStart of prefixPositions) {
-    for (let i = prefixStart + prefix.length; i <= lineText.length - suffix.length; i++) {
-      if (lineText.substring(i, i + suffix.length) === suffix) {
-        if (cursorPosInLine >= prefixStart && cursorPosInLine <= i + suffix.length) {
-          return true;
-        }
-        break;
-      }
-    }
-  }
-
-  return false;
+  const { state } = view;
+  const main = state.selection.main;
+  const span = SPANS[marker];
+  const segments = main.empty ? [main] : selectedSegments(state, main.from, main.to);
+  return segments.length > 0 && segments.every((range) => enclosingSpan(state, range, span));
 }
 
 export function hasLineFormat(view: EditorView | null, linePrefix: string): boolean {

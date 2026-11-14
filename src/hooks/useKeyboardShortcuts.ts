@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useEditorStore } from '../store/useEditorStore';
-import { openFileDialog, openAndReadFile, getFileName, handleSaveFile, handleSaveAsFile } from '../utils/fileOperations';
+import { openFile, handleSaveFile, handleSaveAsFile } from '../utils/fileOperations';
 import { formats } from '../utils/markdownFormatting';
 
 export function useKeyboardShortcuts() {
@@ -29,12 +29,8 @@ export function useKeyboardShortcuts() {
       if (isMod && e.key === 'o') {
         e.preventDefault();
         try {
-          const path = await openFileDialog();
-          if (path) {
-            const content = await openAndReadFile(path);
-            const title = getFileName(path);
-            addTab({ filePath: path, content, title, isDirty: false });
-          }
+          const opened = await openFile();
+          if (opened) addTab({ ...opened, isDirty: false });
         } catch (error) {
           console.error('Failed to open file:', error);
           alert('Failed to open file: ' + error);

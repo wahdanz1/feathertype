@@ -6,10 +6,14 @@ import { markdownToDocxBuffer } from './docxExport';
 
 export const isTauri = () => !!window.__TAURI_INTERNALS__;
 
+export const BROWSER_SAVE = 'browser-save';
+
+type MarkTabClean = (tabId: string, savedContent: string) => void;
+type UpdateTabPath = (tabId: string, path: string, title: string) => void;
+
 const DOCX_MIME = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
 
-const isDocxPath = (path: string | File): boolean =>
-  (typeof path === 'string' ? path : path.name).toLowerCase().endsWith('.docx');
+const isDocxPath = (path: string): boolean => path.toLowerCase().endsWith('.docx');
 
 function downloadBlob(data: BlobPart, fileName: string, mime: string): void {
   const blob = new Blob([data], { type: mime });
@@ -59,10 +63,10 @@ export async function openFileDialog(): Promise<string | File | null> {
   return null;
 }
 
-export async function saveFileDialog(defaultPath?: string | File): Promise<string | File | null> {
-  if (!isTauri()) return 'browser-save'; 
+export async function saveFileDialog(defaultPath?: string | null): Promise<string | null> {
+  if (!isTauri()) return BROWSER_SAVE;
 
-  const initialPath = typeof defaultPath === 'string' ? defaultPath : undefined;
+  const initialPath = defaultPath && defaultPath !== BROWSER_SAVE ? defaultPath : undefined;
   const selected = await save({
     defaultPath: initialPath,
     filters: [
@@ -104,12 +108,12 @@ export async function readFileBinary(path: string | File): Promise<ArrayBuffer> 
   return new Uint8Array(bytes).buffer;
 }
 
-export async function writeFile(path: string | File, content: string, downloadName?: string): Promise<void> {
+export async function writeFile(path: string, content: string, downloadName?: string): Promise<void> {
   if (!isTauri()) {
     const blob = new Blob([content], { type: 'text/markdown' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    const baseName = downloadName || (path instanceof File ? path.name : 'document');
+    const baseName = downloadName || 'document';
     const fileName = baseName.endsWith('.md') ? baseName : `${baseName}.md`;
     a.href = url;
     a.download = fileName;
@@ -123,17 +127,20 @@ export async function writeFile(path: string | File, content: string, downloadNa
 // Writes editor content to a target path, converting markdown to a real DOCX
 // package when the path is a .docx — otherwise the markdown source would be
 // written verbatim and Word would reject the file as unreadable.
-async function writeContent(path: string | File, content: string): Promise<void> {
+async function writeContent(path: string, content: string): Promise<void> {
   if (isDocxPath(path)) {
-    const buffer = await markdownToDocxBuffer(content);
-    if (isTauri() && typeof path === 'string') {
-      await writeFileBinary(path, buffer);
-    } else {
-      downloadBlob(buffer, getFileName(path), DOCX_MIME);
-    }
+    await writeFileBinary(path, await markdownToDocxBuffer(content));
     return;
   }
   await writeFile(path, content);
+}
+
+async function downloadContent(name: string, content: string): Promise<void> {
+  if (isDocxPath(name)) {
+    downloadBlob(await markdownToDocxBuffer(content), name, DOCX_MIME);
+    return;
+  }
+  await writeFile(BROWSER_SAVE, content, name);
 }
 
 export function getFileName(path: string | File): string {
@@ -161,63 +168,74 @@ export async function openAndReadFile(path: string | File): Promise<string> {
   }
 }
 
+export async function openFile(): Promise<Pick<Tab, 'filePath' | 'title' | 'content'> | null> {
+  const path = await openFileDialog();
+  if (path === null) return null;
+  const content = await openAndReadFile(path);
+  // A File can't be persisted, so a web tab keeps only its name and saves as a download of it.
+  return { filePath: typeof path === 'string' ? path : BROWSER_SAVE, title: getFileName(path), content };
+}
+
+// Resolves true only once the content was written; failures are reported here and never thrown.
 export async function handleSaveFile(
   tab: Tab,
-  markTabClean: (tabId: string) => void,
-  updateTabPath: (tabId: string, path: string | File, title: string) => void
-): Promise<void> {
+  markTabClean: MarkTabClean,
+  updateTabPath: UpdateTabPath
+): Promise<boolean> {
+  const { id, content } = tab;
   try {
-    if (tab.filePath && tab.filePath !== 'browser-save') {
-      await writeContent(tab.filePath, tab.content);
-      markTabClean(tab.id);
+    if (tab.filePath && tab.filePath !== BROWSER_SAVE) {
+      await writeContent(tab.filePath, content);
     } else if (!isTauri()) {
       const name = tab.title === 'Untitled'
         ? promptFileName(tab.title)
         : tab.title;
-      if (!name) return;
-      await writeFile('browser-save', tab.content, name);
-      updateTabPath(tab.id, 'browser-save', name);
-      markTabClean(tab.id);
+      if (!name) return false;
+      await downloadContent(name, content);
+      updateTabPath(id, BROWSER_SAVE, name);
     } else {
-      const path = await saveFileDialog(tab.filePath || undefined);
-      if (path) {
-        await writeContent(path, tab.content);
-        updateTabPath(tab.id, path, getFileName(path));
-        markTabClean(tab.id);
-      }
+      const path = await saveFileDialog(tab.filePath);
+      if (!path) return false;
+      await writeContent(path, content);
+      updateTabPath(id, path, getFileName(path));
     }
+    markTabClean(id, content);
+    return true;
   } catch (error) {
-    console.error('Failed to save file:', error);
-    alert('Failed to save file: ' + error);
-    throw error;
+    reportSaveError(error);
+    return false;
   }
 }
 
 export async function handleSaveAsFile(
   tab: Tab,
-  markTabClean: (tabId: string) => void,
-  updateTabPath: (tabId: string, path: string | File, title: string) => void
-): Promise<void> {
+  markTabClean: MarkTabClean,
+  updateTabPath: UpdateTabPath
+): Promise<boolean> {
+  const { id, content } = tab;
   try {
     if (!isTauri()) {
       const name = promptFileName(tab.title);
-      if (!name) return;
-      await writeFile('browser-save', tab.content, name);
-      updateTabPath(tab.id, 'browser-save', name);
-      markTabClean(tab.id);
+      if (!name) return false;
+      await downloadContent(name, content);
+      updateTabPath(id, BROWSER_SAVE, name);
     } else {
-      const path = await saveFileDialog(tab.filePath || undefined);
-      if (path) {
-        await writeContent(path, tab.content);
-        updateTabPath(tab.id, path, getFileName(path));
-        markTabClean(tab.id);
-      }
+      const path = await saveFileDialog(tab.filePath);
+      if (!path) return false;
+      await writeContent(path, content);
+      updateTabPath(id, path, getFileName(path));
     }
+    markTabClean(id, content);
+    return true;
   } catch (error) {
-    console.error('Failed to save file:', error);
-    alert('Failed to save file: ' + error);
-    throw error;
+    reportSaveError(error);
+    return false;
   }
+}
+
+function reportSaveError(error: unknown): void {
+  console.error('Failed to save file:', error);
+  alert('Failed to save file: ' + error);
 }
 
 function promptFileName(defaultName: string): string | null {
@@ -232,11 +250,17 @@ export async function writeFileBinary(path: string, data: ArrayBuffer): Promise<
   await invoke('write_file_binary', { path, data: bytes });
 }
 
-export async function exportAsDocx(content: string, currentFilePath?: string | File | null): Promise<void> {
+function docxNameFor(tab: Pick<Tab, 'filePath' | 'title'>): string {
+  if (!tab.filePath) return 'document.docx';
+  const source = tab.filePath === BROWSER_SAVE ? tab.title : getFileName(tab.filePath);
+  const base = source.replace(/\.(md|markdown|txt)$/i, '');
+  return isDocxPath(base) ? base : `${base}.docx`;
+}
+
+export async function exportAsDocx(tab: Pick<Tab, 'content' | 'filePath' | 'title'>): Promise<void> {
+  const { content } = tab;
   try {
-    const defaultName = currentFilePath
-      ? (typeof currentFilePath === 'string' ? getFileName(currentFilePath) : (currentFilePath as File).name).replace(/\.(md|markdown|txt)$/i, '.docx')
-      : 'document.docx';
+    const defaultName = docxNameFor(tab);
 
     if (!isTauri()) {
       const arrayBuffer = await markdownToDocxBuffer(content);

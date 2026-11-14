@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { LuMenu } from 'react-icons/lu';
 import { useEditorStore } from '../store/useEditorStore';
-import { openFileDialog, openAndReadFile, getFileName, handleSaveFile, handleSaveAsFile, exportAsDocx, isTauri } from '../utils/fileOperations';
+import { openFile, handleSaveFile, handleSaveAsFile, exportAsDocx, isTauri } from '../utils/fileOperations';
 import { Button } from './Button';
 import { APP_NAME } from '../config';
 
@@ -32,12 +32,8 @@ export function FileMenu() {
 
   const handleOpen = async () => {
     try {
-      const path = await openFileDialog();
-      if (path !== null) {
-        const content = await openAndReadFile(path as string | File);
-        const title = getFileName(path);
-        addTab({ filePath: path, content, title, isDirty: false });
-      }
+      const opened = await openFile();
+      if (opened) addTab({ ...opened, isDirty: false });
     } catch (error) {
       console.error('Failed to open file:', error);
       alert('Failed to open file: ' + error);
@@ -62,7 +58,7 @@ export function FileMenu() {
   const handleExportDocx = async () => {
     const activeTab = getActiveTab();
     if (!activeTab) return;
-    await exportAsDocx(activeTab.content, activeTab.filePath as string | File | null);
+    await exportAsDocx(activeTab);
     close();
   };
 

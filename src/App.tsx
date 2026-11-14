@@ -8,6 +8,7 @@ import {
   Outlet
 } from 'react-router-dom';
 import { useEditorStore } from './store/useEditorStore';
+import { useUnsavedChangesGuard } from './hooks/useUnsavedChangesGuard';
 import { AppShell } from './components/AppShell';
 import { ScrollToTop } from './components/layout/ScrollToTop';
 import { Navbar } from './components/layout/Navbar';
@@ -72,6 +73,7 @@ const router = createBrowserRouter([
 ]);
 
 function App() {
+  useUnsavedChangesGuard(isTauri);
   if (isTauri) return <TauriApp />;
   return <RouterProvider router={router} />;
 }

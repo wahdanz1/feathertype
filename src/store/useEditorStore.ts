@@ -3,7 +3,7 @@ import { persist } from 'zustand/middleware';
 import { Tab } from '../types';
 import { v4 as uuidv4 } from 'uuid';
 import type { EditorView } from '@codemirror/view';
-import { handleSaveFile } from '../utils/fileOperations';
+import { BROWSER_SAVE, handleSaveFile } from '../utils/fileOperations';
 
 interface EditorState {
   tabs: Tab[];
@@ -29,9 +29,9 @@ interface EditorStore extends EditorState {
   saveAndCloseTab: () => Promise<void>;
   setActiveTab: (tabId: string) => void;
   updateTabContent: (tabId: string, content: string) => void;
-  updateTabPath: (tabId: string, path: string | File, title: string) => void;
+  updateTabPath: (tabId: string, path: string, title: string) => void;
   renameTab: (tabId: string, title: string) => void;
-  markTabClean: (tabId: string) => void;
+  markTabClean: (tabId: string, savedContent: string) => void;
 
   // UI state
   togglePreview: () => void;
@@ -165,7 +165,9 @@ export const useEditorStore = create<EditorStore>()(
         const tab = state.tabs.find((t) => t.id === tabId);
         if (!tab) return;
 
-        await handleSaveFile(tab, get().markTabClean, get().updateTabPath);
+        const saved = await handleSaveFile(tab, get().markTabClean, get().updateTabPath);
+        const current = get().tabs.find((t) => t.id === tabId);
+        if (!saved || !current || current.isDirty) return;
 
         set((state) => {
           const newTabs = state.tabs.filter((t) => t.id !== tabId);
@@ -200,7 +202,7 @@ export const useEditorStore = create<EditorStore>()(
         }));
       },
 
-      updateTabPath: (tabId: string, path: string | File, title: string) => {
+      updateTabPath: (tabId: string, path: string, title: string) => {
         set((state) => ({
           tabs: state.tabs.map((tab) =>
             tab.id === tabId
@@ -218,10 +220,10 @@ export const useEditorStore = create<EditorStore>()(
         }));
       },
 
-      markTabClean: (tabId: string) => {
+      markTabClean: (tabId: string, savedContent: string) => {
         set((state) => ({
           tabs: state.tabs.map((tab) =>
-            tab.id === tabId
+            tab.id === tabId && tab.content === savedContent
               ? { ...tab, isDirty: false }
               : tab
           ),
@@ -287,6 +289,19 @@ export const useEditorStore = create<EditorStore>()(
     }),
     {
       name: 'feathertype-storage',
+      version: 1,
+      migrate: (persisted, version) => {
+        const state = persisted as Partial<EditorState>;
+        // v0 could hold a web File, which JSON turns into {}.
+        if (version < 1 && Array.isArray(state.tabs)) {
+          state.tabs = state.tabs.map((tab) =>
+            tab.filePath === null || typeof tab.filePath === 'string'
+              ? tab
+              : { ...tab, filePath: BROWSER_SAVE }
+          );
+        }
+        return state as EditorStore;
+      },
       // Only persist specific keys to avoid bloat or singleton view refs
       partialize: (state) => ({
         tabs: state.tabs,

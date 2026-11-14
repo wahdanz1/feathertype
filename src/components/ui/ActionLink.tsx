@@ -46,14 +46,14 @@ export function ActionLink({
       );
     }
     return (
-      <Link to={to} className={commonClasses} {...(props as any)}>
+      <Link to={to} className={commonClasses} {...props}>
         {content}
       </Link>
     );
   }
 
   return (
-    <Component className={commonClasses} {...(props as any)}>
+    <Component className={commonClasses} {...props}>
       {content}
     </Component>
   );

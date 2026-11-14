@@ -29,7 +29,7 @@ export function Button({
   ...props
 }: ButtonProps) {
   const theme = useEditorStore((s) => s.theme);
-  const isEditor = window.location.pathname === '/editor' || !!(window as any).__TAURI_INTERNALS__;
+  const isEditor = window.location.pathname === '/editor' || !!window.__TAURI_INTERNALS__;
   const isDark = theme === 'dark';
 
   const baseStyles = cn(

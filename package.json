@@ -15,7 +15,10 @@
     "build:tauri": "tsc && vite build --mode tauri",
     "preview": "vite preview",
     "tauri": "tauri",
-    "release": "node scripts/release.mjs"
+    "release": "node scripts/release.mjs",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "test": "vitest run"
   },
   "dependencies": {
     "@codemirror/commands": "^6.10.2",
@@ -49,6 +52,7 @@
     "zustand": "^5.0.11"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@tailwindcss/vite": "^4.2.1",
     "@tauri-apps/cli": "^2",
     "@types/mdast": "^4.0.4",
@@ -58,9 +62,15 @@
     "@types/uuid": "^11.0.0",
     "@vitejs/plugin-react": "^4.6.0",
     "autoprefixer": "^10.4.27",
+    "eslint": "^10.15.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "globals": "^17.14.0",
+    "jsdom": "^31.0.1",
     "postcss": "^8.5.8",
     "tailwindcss": "^4.2.1",
     "typescript": "~5.8.3",
-    "vite": "^7.0.4"
+    "typescript-eslint": "^8.72.2",
+    "vite": "^7.0.4",
+    "vitest": "^5.1.0"
   }
 }

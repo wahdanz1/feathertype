@@ -3,7 +3,7 @@ import { persist } from 'zustand/middleware';
 import { Tab } from '../types';
 import { v4 as uuidv4 } from 'uuid';
 import type { EditorView } from '@codemirror/view';
-import { BROWSER_SAVE, handleSaveFile } from '../utils/fileOperations';
+import { BROWSER_SAVE, getFileName, handleSaveFile, isDocxPath, toMarkdownPath } from '../utils/fileOperations';
 
 interface EditorState {
   tabs: Tab[];
@@ -206,7 +206,7 @@ export const useEditorStore = create<EditorStore>()(
         set((state) => ({
           tabs: state.tabs.map((tab) =>
             tab.id === tabId
-              ? { ...tab, filePath: path, title }
+              ? { ...tab, filePath: path, title, suggestedPath: undefined }
               : tab
           ),
         }));
@@ -289,7 +289,7 @@ export const useEditorStore = create<EditorStore>()(
     }),
     {
       name: 'feathertype-storage',
-      version: 1,
+      version: 2,
       migrate: (persisted, version) => {
         const state = persisted as Partial<EditorState>;
         // v0 could hold a web File, which JSON turns into {}.
@@ -299,6 +299,15 @@ export const useEditorStore = create<EditorStore>()(
               ? tab
               : { ...tab, filePath: BROWSER_SAVE }
           );
+        }
+        // v1 tabs imported from Word still target the .docx, so Ctrl+S would overwrite it.
+        if (version < 2 && Array.isArray(state.tabs)) {
+          state.tabs = state.tabs.map((tab) => {
+            const target = tab.filePath === BROWSER_SAVE ? tab.title : tab.filePath;
+            if (!target || !isDocxPath(target)) return tab;
+            const suggestedPath = toMarkdownPath(target);
+            return { ...tab, filePath: null, title: getFileName(suggestedPath), suggestedPath };
+          });
         }
         return state as EditorStore;
       },

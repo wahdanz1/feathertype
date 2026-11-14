@@ -13,7 +13,9 @@ type UpdateTabPath = (tabId: string, path: string, title: string) => void;
 
 const DOCX_MIME = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
 
-const isDocxPath = (path: string): boolean => path.toLowerCase().endsWith('.docx');
+export const isDocxPath = (path: string): boolean => path.toLowerCase().endsWith('.docx');
+
+export const toMarkdownPath = (path: string): string => path.replace(/\.docx$/i, '.md');
 
 function downloadBlob(data: BlobPart, fileName: string, mime: string): void {
   const blob = new Blob([data], { type: mime });
@@ -77,6 +79,10 @@ export async function saveFileDialog(defaultPath?: string | null): Promise<strin
       {
         name: 'Text',
         extensions: ['txt'],
+      },
+      {
+        name: 'Word Document',
+        extensions: ['docx'],
       },
     ],
   });
@@ -168,12 +174,18 @@ export async function openAndReadFile(path: string | File): Promise<string> {
   }
 }
 
-export async function openFile(): Promise<Pick<Tab, 'filePath' | 'title' | 'content'> | null> {
+export async function openFile(): Promise<Pick<Tab, 'filePath' | 'title' | 'content' | 'suggestedPath'> | null> {
   const path = await openFileDialog();
   if (path === null) return null;
   const content = await openAndReadFile(path);
+  const title = getFileName(path);
+  if (isDocxPath(title)) {
+    // Saving rebuilds Word files from Markdown, dropping images, styles and comments, so an import never targets its source.
+    const suggestedPath = toMarkdownPath(typeof path === 'string' ? path : title);
+    return { filePath: null, title: getFileName(suggestedPath), content, suggestedPath };
+  }
   // A File can't be persisted, so a web tab keeps only its name and saves as a download of it.
-  return { filePath: typeof path === 'string' ? path : BROWSER_SAVE, title: getFileName(path), content };
+  return { filePath: typeof path === 'string' ? path : BROWSER_SAVE, title, content };
 }
 
 // Resolves true only once the content was written; failures are reported here and never thrown.
@@ -187,14 +199,14 @@ export async function handleSaveFile(
     if (tab.filePath && tab.filePath !== BROWSER_SAVE) {
       await writeContent(tab.filePath, content);
     } else if (!isTauri()) {
-      const name = tab.title === 'Untitled'
+      const name = tab.title === 'Untitled' || tab.suggestedPath
         ? promptFileName(tab.title)
         : tab.title;
       if (!name) return false;
       await downloadContent(name, content);
       updateTabPath(id, BROWSER_SAVE, name);
     } else {
-      const path = await saveFileDialog(tab.filePath);
+      const path = await saveFileDialog(tab.filePath ?? tab.suggestedPath);
       if (!path) return false;
       await writeContent(path, content);
       updateTabPath(id, path, getFileName(path));
@@ -220,7 +232,7 @@ export async function handleSaveAsFile(
       await downloadContent(name, content);
       updateTabPath(id, BROWSER_SAVE, name);
     } else {
-      const path = await saveFileDialog(tab.filePath);
+      const path = await saveFileDialog(tab.filePath ?? tab.suggestedPath);
       if (!path) return false;
       await writeContent(path, content);
       updateTabPath(id, path, getFileName(path));
@@ -250,14 +262,14 @@ export async function writeFileBinary(path: string, data: ArrayBuffer): Promise<
   await invoke('write_file_binary', { path, data: bytes });
 }
 
-function docxNameFor(tab: Pick<Tab, 'filePath' | 'title'>): string {
-  if (!tab.filePath) return 'document.docx';
-  const source = tab.filePath === BROWSER_SAVE ? tab.title : getFileName(tab.filePath);
+function docxNameFor(tab: Pick<Tab, 'filePath' | 'title' | 'suggestedPath'>): string {
+  if (!tab.filePath && !tab.suggestedPath) return 'document.docx';
+  const source = tab.filePath && tab.filePath !== BROWSER_SAVE ? getFileName(tab.filePath) : tab.title;
   const base = source.replace(/\.(md|markdown|txt)$/i, '');
   return isDocxPath(base) ? base : `${base}.docx`;
 }
 
-export async function exportAsDocx(tab: Pick<Tab, 'content' | 'filePath' | 'title'>): Promise<void> {
+export async function exportAsDocx(tab: Pick<Tab, 'content' | 'filePath' | 'title' | 'suggestedPath'>): Promise<void> {
   const { content } = tab;
   try {
     const defaultName = docxNameFor(tab);

@@ -3,12 +3,14 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const invoke = vi.hoisted(() => vi.fn());
 const save = vi.hoisted(() => vi.fn());
+const open = vi.hoisted(() => vi.fn());
 vi.mock('@tauri-apps/api/core', () => ({ invoke }));
-vi.mock('@tauri-apps/plugin-dialog', () => ({ save, open: vi.fn() }));
+vi.mock('@tauri-apps/plugin-dialog', () => ({ save, open }));
 vi.mock('../utils/docxExport', () => ({ markdownToDocxBuffer: async () => new ArrayBuffer(4) }));
+vi.mock('mammoth', () => ({ default: { convertToMarkdown: async () => ({ value: '# Report' }) } }));
 
 import { useEditorStore } from './useEditorStore';
-import { exportAsDocx, handleSaveFile, openFile } from '../utils/fileOperations';
+import { exportAsDocx, handleSaveAsFile, handleSaveFile, openFile } from '../utils/fileOperations';
 import type { Tab } from '../types';
 
 const STORAGE_KEY = 'feathertype-storage';
@@ -16,6 +18,7 @@ const s = () => useEditorStore.getState();
 const tab = () => s().tabs.find((t) => t.id === 'a');
 
 let downloads: string[];
+let downloadTypes: string[];
 let alertSpy: ReturnType<typeof vi.spyOn>;
 let promptSpy: ReturnType<typeof vi.spyOn>;
 
@@ -42,8 +45,10 @@ beforeEach(() => {
   setDesktop(false);
   invoke.mockReset();
   save.mockReset();
+  open.mockReset();
   downloads = [];
-  URL.createObjectURL = vi.fn(() => 'blob:test');
+  downloadTypes = [];
+  URL.createObjectURL = vi.fn((blob: Blob) => { downloadTypes.push(blob.type); return 'blob:test'; });
   URL.revokeObjectURL = vi.fn();
   vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(function (this: HTMLAnchorElement) {
     downloads.push(this.download);
@@ -158,5 +163,73 @@ describe('web-opened files across reloads', () => {
     expect(promptSpy).not.toHaveBeenCalled();
     expect(alertSpy).not.toHaveBeenCalled();
     expect(tab()?.isDirty).toBe(false);
+  });
+});
+
+describe('imported Word files', () => {
+  const writes = (cmd: string) => invoke.mock.calls.filter(([c]) => c === cmd).map(([, args]) => args.path);
+
+  async function importDesktopDocx() {
+    setDesktop(true);
+    open.mockResolvedValue('C:/docs/report.docx');
+    invoke.mockImplementation(async (cmd: string) => (cmd === 'read_file_binary' ? [0] : undefined));
+    const opened = await openFile();
+    useEditorStore.setState({ tabs: [{ id: 'a', isDirty: false, ...opened! }], activeTabId: 'a' });
+  }
+
+  it('saves a desktop import through the dialog with a .md beside the original', async () => {
+    await importDesktopDocx();
+    save.mockResolvedValue(null);
+    await saveActive();
+    expect(writes('write_file_binary')).toEqual([]);
+    expect(tab()).toMatchObject({ filePath: null, title: 'report.md' });
+    expect(save).toHaveBeenCalledWith(expect.objectContaining({ defaultPath: 'C:/docs/report.md' }));
+
+    save.mockResolvedValue('C:/docs/report.md');
+    await expect(saveActive()).resolves.toBe(true);
+    expect(writes('write_file')).toEqual(['C:/docs/report.md']);
+    expect(writes('write_file_binary')).toEqual([]);
+    expect(tab()).toMatchObject({ filePath: 'C:/docs/report.md', title: 'report.md' });
+    expect(tab()?.suggestedPath).toBeUndefined();
+  });
+
+  it('still writes a real DOCX when Save As picks a .docx path', async () => {
+    await importDesktopDocx();
+    save.mockResolvedValue('C:/docs/report.docx');
+
+    await expect(handleSaveAsFile(tab()!, s().markTabClean, s().updateTabPath)).resolves.toBe(true);
+    expect(writes('write_file_binary')).toEqual(['C:/docs/report.docx']);
+    expect(writes('write_file')).toEqual([]);
+  });
+
+  it('prompts a web import for a name prefilled with .md and downloads Markdown', async () => {
+    const file = new File(['PK'], 'report.docx');
+    vi.spyOn(HTMLInputElement.prototype, 'click').mockImplementation(function (this: HTMLInputElement) {
+      Object.defineProperty(this, 'files', { value: [file] });
+      this.onchange?.({ target: this } as unknown as Event);
+    });
+    const opened = await openFile();
+    useEditorStore.setState({ tabs: [{ id: 'a', isDirty: false, ...opened! }], activeTabId: 'a' });
+    promptSpy.mockImplementation((_message?: string, value?: string) => value ?? null);
+
+    await expect(saveActive()).resolves.toBe(true);
+    expect(promptSpy).toHaveBeenCalledWith('File name:', 'report.md');
+    expect(downloads).toEqual(['report.md']);
+    expect(downloadTypes).toEqual(['text/markdown']);
+  });
+
+  it('migrates a persisted tab that still targets a .docx', async () => {
+    setDesktop(true);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      state: { tabs: [{ id: 'a', title: 'report.docx', filePath: 'C:/docs/report.docx', content: 'draft', isDirty: true }], activeTabId: 'a' },
+      version: 1,
+    }));
+    await useEditorStore.persist.rehydrate();
+    expect(tab()).toMatchObject({ filePath: null, title: 'report.md', suggestedPath: 'C:/docs/report.md' });
+
+    save.mockResolvedValue(null);
+    await saveActive();
+    expect(save).toHaveBeenCalledWith(expect.objectContaining({ defaultPath: 'C:/docs/report.md' }));
+    expect(invoke).not.toHaveBeenCalled();
   });
 });
